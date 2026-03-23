@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portal de Contenidos — Ingeniería Informática</title>
+<style>
+:root{
+  --bg:#0b1020; --panel:#111a31; --card:#16213f; --line:rgba(148,163,184,.25);
+  --text:#e5e7eb; --muted:#93a4bf; --blue:#60a5fa; --cyan:#22d3ee;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; font-family:Inter,Segoe UI,Arial,sans-serif; color:var(--text);
+  background:radial-gradient(circle at 20% 0%, #1a2f5f 0%, var(--bg) 45%, #060a16 100%);
+}
+.layout{
+  display:grid; grid-template-columns:300px 1fr; min-height:100vh;
+}
+.sidebar{
+  border-right:1px solid var(--line); background:rgba(2,6,23,.55); padding:18px;
+}
+.brand{
+  border:1px solid var(--line); border-radius:12px; padding:12px; margin-bottom:14px;
+  background:linear-gradient(135deg, rgba(96,165,250,.16), rgba(34,211,238,.08));
+}
+.brand h1{font-size:1rem; margin:0 0 6px}
+.brand p{font-size:.82rem; margin:0; color:var(--muted)}
+.menu-title{margin:0 0 8px; font-size:.85rem; color:var(--muted); letter-spacing:.4px}
+.menu{display:flex; flex-direction:column; gap:8px}
+.menu button{
+  width:100%; text-align:left; border:1px solid var(--line); border-radius:10px;
+  background:var(--panel); color:var(--text); padding:10px 12px; cursor:pointer; font-weight:600;
+}
+.menu button:hover{border-color:var(--blue)}
+.menu button.active{
+  border-color:var(--cyan); background:rgba(34,211,238,.12);
+}
+.content{
+  padding:14px;
+}
+.viewer-wrap{
+  height:calc(100vh - 28px); border:1px solid var(--line); border-radius:12px; overflow:hidden;
+  background:#0a1227;
+}
+.topbar{
+  height:44px; border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between;
+  padding:0 12px; background:rgba(15,23,42,.7);
+}
+.topbar .title{font-size:.9rem; color:#cfe4ff}
+.topbar a{
+  color:var(--cyan); text-decoration:none; font-size:.82rem; border:1px solid var(--line);
+  padding:5px 8px; border-radius:8px;
+}
+iframe{
+  width:100%; height:calc(100% - 44px); border:none; background:#fff;
+}
+@media (max-width:980px){
+  .layout{grid-template-columns:1fr}
+  .sidebar{border-right:none; border-bottom:1px solid var(--line)}
+  .viewer-wrap{height:72vh}
+}
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand">
+      <h1>Portal de Contenidos</h1>
+      <p>Ruta sugerida por avance de carrera para visualizar cada módulo.</p>
+    </div>
+    <p class="menu-title">MENU</p>
+    <div class="menu" id="menu"></div>
+  </aside>
+
+  <main class="content">
+    <div class="viewer-wrap">
+      <div class="topbar">
+        <span class="title" id="currentTitle">Cargando...</span>
+        <a id="openNewTab" href="infraestructura-so.html" target="_blank" rel="noopener">Abrir en nueva pestaña</a>
+      </div>
+      <iframe id="viewer" src="infraestructura-so.html" title="Visor de contenido"></iframe>
+    </div>
+  </main>
+</div>
+
+<script>
+const pages = [
+  { file: "infraestructura-so.html", label: "Infraestructura y SO" },
+  { file: "redes-fundamentos.html", label: "Redes (Fundamentos)" },
+  { file: "redes.html", label: "Redes (Avanzado)" },
+  { file: "electronica-basica-iot.html", label: "Electrónica Básica e IoT" },
+  { file: "base-datos-fundamentos.html", label: "Base de Datos (Fundamentos)" },
+  { file: "ingenieria-software.html", label: "Ingeniería de Software" },
+  { file: "arquitectura-ddd-dip.html", label: "Arquitectura DDD y DIP" },
+  { file: "auditoria.html", label: "Auditoría de Sistemas" },
+  { file: "innovacion.html", label: "Innovación Tecnológica (BI, ML, DL, IA)" },
+  { file: "prueba-final-avanzada.html", label: "Prueba Final" }
+];
+
+const menu = document.getElementById("menu");
+const viewer = document.getElementById("viewer");
+const title = document.getElementById("currentTitle");
+const openNewTab = document.getElementById("openNewTab");
+
+function loadPage(file, label, btn) {
+  viewer.src = file;
+  title.textContent = label + " (" + file + ")";
+  openNewTab.href = file;
+  document.querySelectorAll(".menu button").forEach(b => b.classList.remove("active"));
+  if (btn) btn.classList.add("active");
+}
+
+pages.forEach((p, idx) => {
+  const btn = document.createElement("button");
+  btn.textContent = p.label;
+  btn.addEventListener("click", () => loadPage(p.file, p.label, btn));
+  menu.appendChild(btn);
+  if (idx === 0) loadPage(p.file, p.label, btn);
+});
+</script>
+</body>
+</html>

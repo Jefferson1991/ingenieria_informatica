@@ -1,0 +1,1743 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DDD + DIP | Arquitectura de Software Moderna</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============ RESET & BASE ============ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg-primary:#0a0e1a;--bg-secondary:#111827;--bg-card:#1a1f35;--bg-card-hover:#222845;
+  --cyan:#00e5ff;--cyan-dim:#00b8d4;--purple:#a855f7;--purple-dim:#7c3aed;
+  --blue:#3b82f6;--blue-dim:#2563eb;--pink:#ec4899;--green:#10b981;--orange:#f59e0b;--red:#ef4444;
+  --text-primary:#e2e8f0;--text-secondary:#94a3b8;--text-muted:#64748b;
+  --border:#1e293b;--border-glow:rgba(0,229,255,.15);
+  --radius:12px;--radius-sm:8px;--radius-lg:16px;
+  --glow-cyan:0 0 20px rgba(0,229,255,.3);--glow-purple:0 0 20px rgba(168,85,247,.3);
+  --transition:all .3s cubic-bezier(.4,0,.2,1);
+  --font-sans:'Inter',system-ui,sans-serif;--font-mono:'JetBrains Mono',monospace;
+}
+html{scroll-behavior:smooth;font-size:16px}
+body{font-family:var(--font-sans);background:var(--bg-primary);color:var(--text-primary);min-height:100vh;overflow-x:hidden;line-height:1.6}
+a{color:var(--cyan);text-decoration:none}
+h1,h2,h3,h4{font-weight:700;line-height:1.2}
+code,pre{font-family:var(--font-mono)}
+
+/* ============ CANVAS BG ============ */
+#bgCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
+
+/* ============ HEADER ============ */
+.header{position:sticky;top:0;z-index:100;background:rgba(10,14,26,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:.8rem 0}
+.header-inner{max-width:1400px;margin:0 auto;padding:0 2rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:.75rem}
+.logo-icon{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--cyan),var(--purple));display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1.1rem;color:var(--bg-primary)}
+.logo-text{font-size:1.1rem;font-weight:700;background:linear-gradient(90deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+
+/* ============ TABS NAV ============ */
+.tabs-nav{display:flex;gap:.25rem;flex-wrap:wrap}
+.tab-btn{padding:.5rem 1rem;border:1px solid var(--border);border-radius:var(--radius-sm);background:transparent;color:var(--text-secondary);cursor:pointer;font-family:var(--font-sans);font-size:.82rem;font-weight:500;transition:var(--transition);white-space:nowrap}
+.tab-btn:hover{color:var(--cyan);border-color:rgba(0,229,255,.3);background:rgba(0,229,255,.05)}
+.tab-btn.active{color:#fff;background:linear-gradient(135deg,rgba(0,229,255,.15),rgba(168,85,247,.15));border-color:var(--cyan);box-shadow:var(--glow-cyan)}
+
+/* ============ MAIN ============ */
+.main{position:relative;z-index:1;max-width:1400px;margin:0 auto;padding:2rem}
+.tab-content{display:none;animation:fadeUp .5s ease}
+.tab-content.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+/* ============ SECTION TITLE ============ */
+.section-title{font-size:2rem;font-weight:800;margin-bottom:.5rem;background:linear-gradient(90deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.section-subtitle{color:var(--text-secondary);font-size:1.05rem;margin-bottom:2rem;max-width:700px}
+
+/* ============ CARDS ============ */
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1.5rem;transition:var(--transition)}
+.card:hover{border-color:rgba(0,229,255,.25);box-shadow:0 4px 30px rgba(0,229,255,.07)}
+.card-header{display:flex;align-items:center;gap:.75rem;margin-bottom:1rem}
+.card-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:800;flex-shrink:0}
+.card-title{font-size:1.15rem;font-weight:700}
+.card-desc{color:var(--text-secondary);font-size:.92rem;line-height:1.7;margin-bottom:1rem}
+
+/* ============ CODE BLOCKS ============ */
+.code-block{background:#0d1117;border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem 1.25rem;overflow-x:auto;font-family:var(--font-mono);font-size:.82rem;line-height:1.7;margin:.75rem 0;color:#c9d1d9;position:relative}
+.code-block .kw{color:#ff7b72}.code-block .tp{color:#79c0ff}.code-block .str{color:#a5d6ff}.code-block .cm{color:#8b949e;font-style:italic}.code-block .fn{color:#d2a8ff}.code-block .nr{color:#79c0ff}.code-block .op{color:#ff7b72}.code-block .at{color:#ffa657}.code-block .vr{color:#ffa657}
+.code-label{position:absolute;top:.5rem;right:.75rem;font-size:.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em}
+
+/* ============ TOGGLE (before/after) ============ */
+.toggle-group{display:flex;gap:.5rem;margin-bottom:.75rem}
+.toggle-btn{padding:.35rem .85rem;border:1px solid var(--border);border-radius:var(--radius-sm);background:transparent;color:var(--text-secondary);cursor:pointer;font-family:var(--font-sans);font-size:.8rem;transition:var(--transition)}
+.toggle-btn.active{background:var(--cyan);color:var(--bg-primary);border-color:var(--cyan);font-weight:600}
+.toggle-panel{display:none}.toggle-panel.active{display:block}
+
+/* ============ QUIZ ============ */
+.quiz-box{background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.2);border-radius:var(--radius);padding:1.25rem;margin-top:1rem}
+.quiz-question{font-weight:600;margin-bottom:.75rem;font-size:.95rem}
+.quiz-options{display:flex;flex-direction:column;gap:.4rem}
+.quiz-opt{padding:.5rem .85rem;border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;font-size:.85rem;transition:var(--transition);background:var(--bg-card)}
+.quiz-opt:hover{border-color:var(--cyan)}
+.quiz-opt.correct{background:rgba(16,185,129,.15);border-color:var(--green);color:var(--green)}
+.quiz-opt.wrong{background:rgba(239,68,68,.1);border-color:var(--red);color:var(--red)}
+.quiz-opt.disabled{pointer-events:none;opacity:.7}
+.quiz-feedback{margin-top:.5rem;font-size:.85rem;padding:.5rem .75rem;border-radius:var(--radius-sm);display:none}
+.quiz-feedback.show{display:block}
+.quiz-feedback.ok{background:rgba(16,185,129,.1);color:var(--green)}
+.quiz-feedback.nok{background:rgba(239,68,68,.08);color:var(--red)}
+
+/* ============ INTERACTIVE DIAGRAMS ============ */
+.diagram-container{background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-lg);padding:2rem;margin:1rem 0;position:relative;overflow:hidden}
+.diagram-container canvas{display:block;margin:0 auto}
+
+/* ============ INTERACTIVE BOXES ============ */
+.ibox-row{display:flex;gap:1rem;flex-wrap:wrap;margin:1rem 0;justify-content:center}
+.ibox{border:2px solid var(--border);border-radius:var(--radius);padding:1rem 1.25rem;text-align:center;min-width:140px;transition:var(--transition);cursor:pointer;position:relative;background:var(--bg-card)}
+.ibox:hover{transform:translateY(-3px);box-shadow:var(--glow-cyan)}
+.ibox-label{font-weight:600;font-size:.85rem;margin-bottom:.25rem}
+.ibox-sub{color:var(--text-muted);font-size:.75rem}
+.ibox.highlight{border-color:var(--cyan);box-shadow:var(--glow-cyan)}
+
+/* ============ ARROW ============ */
+.arrow-down{text-align:center;font-size:1.5rem;color:var(--cyan);margin:.5rem 0;animation:arrowPulse 2s infinite}
+@keyframes arrowPulse{0%,100%{opacity:.4;transform:translateY(0)}50%{opacity:1;transform:translateY(4px)}}
+
+/* ============ CONCENTRIC CIRCLES ============ */
+.circle-arch{position:relative;width:100%;max-width:500px;margin:2rem auto;aspect-ratio:1}
+.circle-layer{position:absolute;border-radius:50%;border:2px solid;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:var(--transition)}
+.circle-layer:hover{transform:scale(1.02)}
+.circle-layer .cl-label{position:absolute;font-size:.75rem;font-weight:600;text-align:center;pointer-events:none}
+
+/* ============ HEXAGON ============ */
+.hex-container{display:flex;justify-content:center;align-items:center;gap:2rem;flex-wrap:wrap;margin:2rem 0;min-height:350px}
+
+/* ============ FOLDER TREE ============ */
+.folder-tree{font-family:var(--font-mono);font-size:.82rem;line-height:2;color:var(--text-secondary)}
+.folder-tree .folder{cursor:pointer;transition:var(--transition);padding:.1rem .4rem;border-radius:4px;display:inline-block}
+.folder-tree .folder:hover{background:rgba(0,229,255,.1);color:var(--cyan)}
+.folder-tree .folder.active{color:var(--cyan);background:rgba(0,229,255,.1)}
+.tree-detail{background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem;margin-top:.75rem;font-size:.85rem;display:none}
+.tree-detail.active{display:block}
+
+/* ============ FLOW STEPS ============ */
+.flow-steps{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin:1.5rem 0;justify-content:center}
+.flow-step{padding:.6rem 1rem;border:2px solid var(--border);border-radius:var(--radius-sm);font-size:.8rem;font-weight:600;transition:var(--transition);cursor:pointer;background:var(--bg-card);text-align:center;min-width:120px}
+.flow-step.active{border-color:var(--cyan);box-shadow:var(--glow-cyan);color:var(--cyan)}
+.flow-step.done{border-color:var(--green);color:var(--green);opacity:.7}
+.flow-arrow{color:var(--text-muted);font-size:1.2rem}
+
+/* ============ GRID LAYOUTS ============ */
+.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1.5rem}
+.grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem}
+
+/* ============ DRAG & DROP ============ */
+.drag-zone{min-height:80px;border:2px dashed var(--border);border-radius:var(--radius);padding:.75rem;margin:.5rem 0;transition:var(--transition);display:flex;gap:.5rem;flex-wrap:wrap;align-items:flex-start;align-content:flex-start}
+.drag-zone.over{border-color:var(--cyan);background:rgba(0,229,255,.05)}
+.drag-item{padding:.35rem .7rem;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:.8rem;cursor:grab;background:var(--bg-card);transition:var(--transition);user-select:none}
+.drag-item:active{cursor:grabbing}
+.drag-zone-label{font-size:.8rem;font-weight:600;margin-bottom:.25rem}
+
+/* ============ COMPARISON TABLE ============ */
+.cmp-table{width:100%;border-collapse:collapse;font-size:.82rem;margin:1rem 0}
+.cmp-table th{background:rgba(0,229,255,.1);padding:.6rem .75rem;text-align:left;border:1px solid var(--border);color:var(--cyan);font-weight:600}
+.cmp-table td{padding:.55rem .75rem;border:1px solid var(--border);color:var(--text-secondary)}
+.cmp-table tr:hover td{background:rgba(0,229,255,.03)}
+
+/* ============ GLOSSARY ============ */
+.glossary-input{display:flex;gap:.5rem;margin-bottom:1rem}
+.glossary-input input{flex:1;padding:.5rem .75rem;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-secondary);color:var(--text-primary);font-family:var(--font-sans);font-size:.85rem}
+.glossary-input input:focus{outline:none;border-color:var(--cyan)}
+.glossary-input button{padding:.5rem 1rem;border:none;border-radius:var(--radius-sm);background:var(--cyan);color:var(--bg-primary);font-weight:600;cursor:pointer;font-size:.85rem;transition:var(--transition)}
+.glossary-input button:hover{background:var(--cyan-dim)}
+.glossary-list{display:flex;flex-direction:column;gap:.4rem}
+.glossary-item{display:flex;justify-content:space-between;align-items:center;padding:.5rem .75rem;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:.85rem}
+.glossary-item .term{font-weight:600;color:var(--cyan)}
+.glossary-item .def{color:var(--text-secondary);flex:1;margin-left:1rem}
+.glossary-item .del-btn{background:none;border:none;color:var(--red);cursor:pointer;font-size:1rem;padding:0 .25rem}
+
+/* ============ BADGE ============ */
+.badge{display:inline-block;padding:.15rem .55rem;border-radius:20px;font-size:.7rem;font-weight:600;letter-spacing:.03em}
+.badge-cyan{background:rgba(0,229,255,.15);color:var(--cyan)}.badge-purple{background:rgba(168,85,247,.15);color:var(--purple)}.badge-green{background:rgba(16,185,129,.15);color:var(--green)}.badge-orange{background:rgba(245,158,11,.15);color:var(--orange)}.badge-pink{background:rgba(236,72,153,.15);color:var(--pink)}.badge-blue{background:rgba(59,130,246,.15);color:var(--blue)}
+
+/* ============ ANALOGY BOX ============ */
+.analogy{background:linear-gradient(135deg,rgba(0,229,255,.05),rgba(168,85,247,.05));border:1px solid rgba(0,229,255,.15);border-radius:var(--radius);padding:1rem 1.25rem;margin:1rem 0;font-size:.9rem}
+.analogy-title{font-weight:700;color:var(--cyan);margin-bottom:.35rem;font-size:.85rem;text-transform:uppercase;letter-spacing:.04em}
+
+/* ============ PROGRESS BAR (final quiz) ============ */
+.progress-bar{width:100%;height:6px;background:var(--bg-secondary);border-radius:3px;margin:1rem 0;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--purple));border-radius:3px;transition:width .5s ease;width:0}
+
+/* ============ SCORE ============ */
+.score-display{text-align:center;padding:1.5rem;font-size:1.4rem;font-weight:800;background:linear-gradient(90deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+
+/* ============ BTN ============ */
+.btn{padding:.55rem 1.2rem;border:none;border-radius:var(--radius-sm);font-family:var(--font-sans);font-weight:600;cursor:pointer;font-size:.85rem;transition:var(--transition)}
+.btn-cyan{background:var(--cyan);color:var(--bg-primary)}.btn-cyan:hover{background:var(--cyan-dim)}
+.btn-purple{background:var(--purple);color:#fff}.btn-purple:hover{background:var(--purple-dim)}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text-secondary)}.btn-outline:hover{border-color:var(--cyan);color:var(--cyan)}
+.btn-sm{padding:.35rem .75rem;font-size:.78rem}
+
+/* ============ CONTEXT MAP ============ */
+.ctx-map{display:flex;gap:1.5rem;flex-wrap:wrap;justify-content:center;margin:1.5rem 0}
+.ctx-box{width:200px;padding:1rem;border:2px solid;border-radius:var(--radius);text-align:center;cursor:pointer;transition:var(--transition);position:relative}
+.ctx-box:hover{transform:translateY(-3px)}
+.ctx-detail{position:absolute;bottom:-10px;left:50%;transform:translateX(-50%) translateY(100%);background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.75rem;font-size:.78rem;width:240px;z-index:10;display:none;text-align:left;color:var(--text-secondary);box-shadow:0 10px 30px rgba(0,0,0,.4)}
+.ctx-box.open .ctx-detail{display:block}
+
+/* ============ EVENT TIMELINE ============ */
+.event-tl{display:flex;align-items:center;gap:0;margin:1.5rem 0;flex-wrap:wrap;justify-content:center}
+.evt-node{width:44px;height:44px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;transition:var(--transition);cursor:pointer;background:var(--bg-card);flex-shrink:0}
+.evt-node.active{border-color:var(--cyan);box-shadow:var(--glow-cyan);color:var(--cyan)}
+.evt-line{width:40px;height:2px;background:var(--border);transition:var(--transition);flex-shrink:0}
+.evt-line.active{background:var(--cyan)}
+
+/* ============ SPEC BUILDER ============ */
+.spec-builder{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin:1rem 0}
+.spec-chip{padding:.4rem .75rem;border:1px solid var(--cyan);border-radius:20px;font-size:.8rem;color:var(--cyan);cursor:pointer;transition:var(--transition)}
+.spec-chip:hover{background:rgba(0,229,255,.1)}
+.spec-chip.active{background:var(--cyan);color:var(--bg-primary)}
+.spec-op{padding:.3rem .6rem;border-radius:var(--radius-sm);background:var(--purple);color:#fff;font-size:.75rem;font-weight:700;cursor:pointer}
+.spec-result{margin-top:.75rem;padding:.75rem;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:.85rem}
+
+/* ============ RESPONSIVE ============ */
+@media(max-width:768px){
+  .main{padding:1rem}
+  .section-title{font-size:1.5rem}
+  .grid-2{grid-template-columns:1fr}
+  .tabs-nav{gap:.15rem}
+  .tab-btn{padding:.4rem .65rem;font-size:.75rem}
+  .header-inner{padding:0 1rem}
+  .flow-steps{flex-direction:column}
+  .flow-arrow{transform:rotate(90deg)}
+  .hex-container{flex-direction:column;align-items:center}
+}
+</style>
+</head>
+<body>
+<canvas id="bgCanvas"></canvas>
+
+<!-- ============ HEADER ============ -->
+<header class="header">
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-icon">DD</div>
+      <div class="logo-text">DDD + DIP &mdash; Arquitectura Moderna</div>
+    </div>
+    <nav class="tabs-nav" id="tabsNav">
+      <button class="tab-btn active" data-tab="tab1">SOLID</button>
+      <button class="tab-btn" data-tab="tab2">DDD Conceptos</button>
+      <button class="tab-btn" data-tab="tab3">Patrones T&aacute;cticos</button>
+      <button class="tab-btn" data-tab="tab4">Arquitectura</button>
+      <button class="tab-btn" data-tab="tab5">DDD+DIP Pr&aacute;ctica</button>
+    </nav>
+  </div>
+</header>
+
+<!-- ============ MAIN ============ -->
+<main class="main">
+
+<!-- ======================================================== -->
+<!-- TAB 1: PRINCIPIOS SOLID -->
+<!-- ======================================================== -->
+<div class="tab-content active" id="tab1">
+<h2 class="section-title">Principios SOLID</h2>
+<p class="section-subtitle">Los cinco principios fundamentales del dise&ntilde;o orientado a objetos que permiten crear software mantenible, escalable y flexible.</p>
+
+<!-- === S === -->
+<div class="card" id="solid-s">
+  <div class="card-header">
+    <div class="card-icon" style="background:linear-gradient(135deg,var(--cyan),var(--blue));color:var(--bg-primary)">S</div>
+    <div>
+      <div class="card-title">Single Responsibility Principle</div>
+      <div class="badge badge-cyan">Responsabilidad &Uacute;nica</div>
+    </div>
+  </div>
+  <p class="card-desc">Una clase debe tener una, y solo una, raz&oacute;n para cambiar. Cada clase encapsula una &uacute;nica responsabilidad o concepto del dominio.</p>
+
+  <div class="analogy">
+    <div class="analogy-title">Analog&iacute;a del mundo real</div>
+    En un restaurante, el chef cocina, el mesero atiende mesas y el cajero cobra. Si una sola persona hiciera todo, cualquier cambio en el men&uacute;, el servicio o los pagos afectar&iacute;a a la misma persona.
+  </div>
+
+  <div class="toggle-group">
+    <button class="toggle-btn active" onclick="toggleCode(this,'srp')">Antes (Mal)</button>
+    <button class="toggle-btn" onclick="toggleCode(this,'srp')">Despu&eacute;s (Bien)</button>
+  </div>
+  <div class="toggle-panel active" data-group="srp">
+    <div class="code-block"><span class="code-label">C# &mdash; Violaci&oacute;n SRP</span>
+<span class="kw">public class</span> <span class="tp">ReporteEmpleado</span>
+{
+    <span class="kw">public void</span> <span class="fn">CalcularSalario</span>() { <span class="cm">// L&oacute;gica de negocio</span> }
+    <span class="kw">public void</span> <span class="fn">GuardarEnBD</span>()     { <span class="cm">// Persistencia</span> }
+    <span class="kw">public void</span> <span class="fn">GenerarPDF</span>()     { <span class="cm">// Presentaci&oacute;n</span> }
+    <span class="kw">public void</span> <span class="fn">EnviarEmail</span>()    { <span class="cm">// Notificaci&oacute;n</span> }
+}
+<span class="cm">// 4 razones para cambiar = violaci&oacute;n SRP</span></div>
+  </div>
+  <div class="toggle-panel" data-group="srp">
+    <div class="code-block"><span class="code-label">C# &mdash; SRP Aplicado</span>
+<span class="kw">public class</span> <span class="tp">CalculadoraSalario</span>  { <span class="kw">public decimal</span> <span class="fn">Calcular</span>(<span class="tp">Empleado</span> e) { ... } }
+<span class="kw">public class</span> <span class="tp">EmpleadoRepositorio</span> { <span class="kw">public void</span> <span class="fn">Guardar</span>(<span class="tp">Empleado</span> e)  { ... } }
+<span class="kw">public class</span> <span class="tp">ReportePDF</span>          { <span class="kw">public byte[]</span> <span class="fn">Generar</span>(<span class="tp">Empleado</span> e){ ... } }
+<span class="kw">public class</span> <span class="tp">NotificadorEmail</span>    { <span class="kw">public void</span> <span class="fn">Enviar</span>(<span class="str">string</span> to)  { ... } }
+<span class="cm">// Cada clase tiene UNA raz&oacute;n para cambiar</span></div>
+  </div>
+
+  <!-- SRP Interactive Visualization -->
+  <div class="diagram-container" style="text-align:center">
+    <p style="font-size:.85rem;color:var(--text-muted);margin-bottom:1rem">Haz clic para refactorizar:</p>
+    <div id="srp-demo">
+      <div class="ibox" style="min-width:260px;border-color:var(--red)" id="srpBigBox" onclick="srpRefactor()">
+        <div class="ibox-label" style="color:var(--red)">ReporteEmpleado</div>
+        <div class="ibox-sub">Calcular + Guardar + PDF + Email</div>
+      </div>
+    </div>
+    <div id="srp-refactored" style="display:none">
+      <div class="arrow-down">&darr;</div>
+      <div class="ibox-row">
+        <div class="ibox" style="border-color:var(--cyan)"><div class="ibox-label" style="color:var(--cyan)">CalculadoraSalario</div><div class="ibox-sub">Calcular</div></div>
+        <div class="ibox" style="border-color:var(--green)"><div class="ibox-label" style="color:var(--green)">EmpleadoRepo</div><div class="ibox-sub">Guardar</div></div>
+        <div class="ibox" style="border-color:var(--purple)"><div class="ibox-label" style="color:var(--purple)">ReportePDF</div><div class="ibox-sub">Generar</div></div>
+        <div class="ibox" style="border-color:var(--orange)"><div class="ibox-label" style="color:var(--orange)">Notificador</div><div class="ibox-sub">Enviar</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="quiz-box">
+    <div class="quiz-question">Si una clase maneja autenticaci&oacute;n, logging y env&iacute;o de correos, &iquest;cu&aacute;ntas razones para cambiar tiene?</div>
+    <div class="quiz-options" data-correct="2">
+      <div class="quiz-opt" onclick="checkQuiz(this,false)">1 &mdash; es una sola clase</div>
+      <div class="quiz-opt" onclick="checkQuiz(this,true)">3 &mdash; cada responsabilidad es una raz&oacute;n</div>
+      <div class="quiz-opt" onclick="checkQuiz(this,false)">Depende del lenguaje</div>
+    </div>
+    <div class="quiz-feedback"></div>
+  </div>
+</div>
+
+<!-- === O === -->
+<div class="card" id="solid-o">
+  <div class="card-header">
+    <div class="card-icon" style="background:linear-gradient(135deg,var(--green),var(--cyan));color:var(--bg-primary)">O</div>
+    <div>
+      <div class="card-title">Open/Closed Principle</div>
+      <div class="badge badge-green">Abierto/Cerrado</div>
+    </div>
+  </div>
+  <p class="card-desc">Las entidades de software deben estar abiertas para extensi&oacute;n, pero cerradas para modificaci&oacute;n. A&ntilde;adir comportamiento nuevo sin alterar c&oacute;digo existente.</p>
+
+  <div class="analogy">
+    <div class="analogy-title">Analog&iacute;a del mundo real</div>
+    Un smartphone est&aacute; cerrado (no modificas su hardware), pero abierto a extensi&oacute;n mediante apps. Agregas funcionalidad sin abrir el tel&eacute;fono.
+  </div>
+
+  <div class="toggle-group">
+    <button class="toggle-btn active" onclick="toggleCode(this,'ocp')">Antes (Mal)</button>
+    <button class="toggle-btn" onclick="toggleCode(this,'ocp')">Despu&eacute;s (Bien)</button>
+  </div>
+  <div class="toggle-panel active" data-group="ocp">
+    <div class="code-block"><span class="code-label">C# &mdash; Violaci&oacute;n OCP</span>
+<span class="kw">public class</span> <span class="tp">CalculadoraDescuento</span>
+{
+    <span class="kw">public decimal</span> <span class="fn">Calcular</span>(<span class="str">string</span> tipo, <span class="kw">decimal</span> monto)
+    {
+        <span class="kw">if</span> (tipo == <span class="str">"Regular"</span>)   <span class="kw">return</span> monto * <span class="nr">0.1m</span>;
+        <span class="kw">if</span> (tipo == <span class="str">"Premium"</span>)   <span class="kw">return</span> monto * <span class="nr">0.2m</span>;
+        <span class="kw">if</span> (tipo == <span class="str">"VIP"</span>)       <span class="kw">return</span> monto * <span class="nr">0.3m</span>;
+        <span class="cm">// Cada nuevo tipo = modificar este m&eacute;todo</span>
+        <span class="kw">return</span> <span class="nr">0</span>;
+    }
+}</div>
+  </div>
+  <div class="toggle-panel" data-group="ocp">
+    <div class="code-block"><span class="code-label">C# &mdash; OCP Aplicado</span>
+<span class="kw">public interface</span> <span class="tp">IDescuento</span>
+{
+    <span class="kw">decimal</span> <span class="fn">Calcular</span>(<span class="kw">decimal</span> monto);
+}
+<span class="kw">public class</span> <span class="tp">DescuentoRegular</span> : <span class="tp">IDescuento</span>
+{
+    <span class="kw">public decimal</span> <span class="fn">Calcular</span>(<span class="kw">decimal</span> m) => m * <span class="nr">0.1m</span>;
+}
+<span class="kw">public class</span> <span class="tp">DescuentoVIP</span> : <span class="tp">IDescuento</span>
+{
+    <span class="kw">public decimal</span> <span class="fn">Calcular</span>(<span class="kw">decimal</span> m) => m * <span class="nr">0.3m</span>;
+}
+<span class="cm">// Nuevo tipo? Solo agregar nueva clase. Sin tocar las existentes.</span></div>
+  </div>
+
+  <div class="diagram-container" style="text-align:center">
+    <p style="font-size:.85rem;color:var(--text-muted);margin-bottom:.75rem">Haz clic en &quot;Agregar Tipo&quot; para extender sin modificar:</p>
+    <div class="ibox-row" id="ocp-types">
+      <div class="ibox" style="border-color:var(--green)"><div class="ibox-label" style="color:var(--green)">Regular</div><div class="ibox-sub">10%</div></div>
+      <div class="ibox" style="border-color:var(--purple)"><div class="ibox-label" style="color:var(--purple)">Premium</div><div class="ibox-sub">20%</div></div>
+    </div>
+    <button class="btn btn-cyan btn-sm" onclick="ocpAddType()" id="ocpBtn">+ Agregar Tipo (Extensi&oacute;n)</button>
+  </div>
+
+  <div class="quiz-box">
+    <div class="quiz-question">&iquest;Cu&aacute;l es la forma correcta de extender comportamiento seg&uacute;n OCP?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" onclick="checkQuiz(this,false)">Modificar el m&eacute;todo existente agregando un nuevo if/switch</div>
+      <div class="quiz-opt" onclick="checkQuiz(this,true)">Crear una nueva clase que implemente la interfaz</div>
+      <div class="quiz-opt" onclick="checkQuiz(this,false)">Heredar de la clase concreta y hacer override</div>
+    </div>
+    <div class="quiz-feedback"></div>
+  </div>
+</div>
+
+<!-- === L === -->
+<div class="card" id="solid-l">
+  <div class="card-header">
+    <div class="card-icon" style="background:linear-gradient(135deg,var(--purple),var(--pink));color:#fff">L</div>
+    <div>
+      <div class="card-title">Liskov Substitution Principle</div>
+      <div class="badge badge-purple">Sustituci&oacute;n de Liskov</div>
+    </div>
+  </div>
+  <p class="card-desc">Los objetos de una clase derivada deben poder sustituir a los de su clase base sin alterar el correcto funcionamiento del programa.</p>
+
+  <div class="analogy">
+    <div class="analogy-title">Analog&iacute;a del mundo real</div>
+    Si esperas un &quot;veh&iacute;culo&quot; para transportarte, cualquier subtipo (auto, camioneta, bus) deber&iacute;a funcionar. Un &quot;veh&iacute;culo de juguete&quot; rompe el contrato porque no te puede transportar.
+  </div>
+
+  <div class="toggle-group">
+    <button class="toggle-btn active" onclick="toggleCode(this,'lsp')">Antes (Violaci&oacute;n)</button>
+    <button class="toggle-btn" onclick="toggleCode(this,'lsp')">Despu&eacute;s (Correcto)</button>
+  </div>
+  <div class="toggle-panel active" data-group="lsp">
+    <div class="code-block"><span class="code-label">El problema Rect&aacute;ngulo/Cuadrado</span>
+<span class="kw">public class</span> <span class="tp">Rectangulo</span>
+{
+    <span class="kw">public virtual int</span> Ancho { <span class="kw">get</span>; <span class="kw">set</span>; }
+    <span class="kw">public virtual int</span> Alto  { <span class="kw">get</span>; <span class="kw">set</span>; }
+    <span class="kw">public int</span> <span class="fn">Area</span>() => Ancho * Alto;
+}
+<span class="kw">public class</span> <span class="tp">Cuadrado</span> : <span class="tp">Rectangulo</span>
+{
+    <span class="kw">public override int</span> Ancho { <span class="kw">set</span> { <span class="kw">base</span>.Ancho = <span class="kw">value</span>; <span class="kw">base</span>.Alto = <span class="kw">value</span>; } }
+    <span class="kw">public override int</span> Alto  { <span class="kw">set</span> { <span class="kw">base</span>.Alto = <span class="kw">value</span>; <span class="kw">base</span>.Ancho = <span class="kw">value</span>; } }
+}
+<span class="cm">// Cuadrado rompe el comportamiento esperado de Rectangulo</span>
+<span class="tp">Rectangulo</span> r = <span class="kw">new</span> <span class="tp">Cuadrado</span>();
+r.Ancho = <span class="nr">5</span>; r.Alto = <span class="nr">3</span>;
+<span class="cm">// Esperamos Area = 15, pero obtenemos 9!</span></div>
+  </div>
+  <div class="toggle-panel" data-group="lsp">
+    <div class="code-block"><span class="code-label">Soluci&oacute;n: abstracci&oacute;n com&uacute;n</span>
+<span class="kw">public interface</span> <span class="tp">IForma</span>
+{
+    <span class="kw">int</span> <span class="fn">Area</span>();
+}
+<span class="kw">public class</span> <span class="tp">Rectangulo</span> : <span class="tp">IForma</span>
+{
+    <span class="kw">public int</span> Ancho { <span class="kw">get</span>; }
+    <span class="kw">public int</span> Alto { <span class="kw">get</span>; }
+    <span class="kw">public</span> <span class="fn">Rectangulo</span>(<span class="kw">int</span> a, <span class="kw">int</span> h) { Ancho=a; Alto=h; }
+    <span class="kw">public int</span> <span class="fn">Area</span>() => Ancho * Alto;
+}
+<span class="kw">public class</span> <span class="tp">Cuadrado</span> : <span class="tp">IForma</span>
+{
+    <span class="kw">public int</span> Lado { <span class="kw">get</span>; }
+    <span class="kw">public</span> <span class="fn">Cuadrado</span>(<span class="kw">int</span> l) { Lado=l; }
+    <span class="kw">public int</span> <span class="fn">Area</span>() => Lado * Lado;
+}
+<span class="cm">// Ambos cumplen el contrato de IForma correctamente</span></div>
+  </div>
+
+  <div class="diagram-container" style="text-align:center">
+    <p style="font-size:.85rem;color:var(--text-muted);margin-bottom:1rem">Demo interactivo: &iquest;Puede Cuadrado sustituir a Rect&aacute;ngulo?</p>
+    <div class="ibox-row">
+      <div class="ibox" style="border-color:var(--purple)">
+        <div class="ibox-label" style="color:var(--purple)">Rect&aacute;ngulo</div>
+        <div class="ibox-sub">Ancho: <span id="lsp-w">5</span>, Alto: <span id="lsp-h">3</span></div>
+        <div style="margin-top:.4rem;font-size:.85rem">Area: <strong id="lsp-area-r">15</strong></div>
+      </div>
+      <div class="ibox" style="border-color:var(--pink)">
+        <div class="ibox-label" style="color:var(--pink)">Cuadrado (hereda Rect&aacute;ngulo)</div>
+        <div class="ibox-sub">Set Ancho=5, Set Alto=3</div>
+        <div style="margin-top:.4rem;font-size:.85rem">Area: <strong id="lsp-area-sq" style="color:var(--red)">9</strong> <span style="color:var(--red);font-size:.75rem">&ne; 15!</span></div>
+      </div>
+    </div>
+    <p style="font-size:.8rem;color:var(--red);margin-top:.75rem">El Cuadrado fuerza Alto=3, haciendo Ancho=3 tambi&eacute;n. No puede sustituir al Rect&aacute;ngulo.</p>
+  </div>
+
+  <div class="quiz-box">
+    <div class="quiz-question">&iquest;Por qu&eacute; Cuadrado no puede heredar de Rect&aacute;ngulo correctamente?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" onclick="checkQuiz(this,true)">Porque al cambiar una dimensi&oacute;n, fuerza la otra, violando el contrato del padre</div>
+      <div class="quiz-opt" onclick="checkQuiz(this,false)">Porque un cuadrado no es una forma geom&eacute;trica</div>
+      <div class="quiz-opt" onclick="checkQuiz(this,false)">Porque los cuadrados no tienen &aacute;rea</div>
+    </div>
+    <div class="quiz-feedback"></div>
+  </div>
+</div>
+
+<!-- === I === -->
+<div class="card" id="solid-i">
+  <div class="card-header">
+    <div class="card-icon" style="background:linear-gradient(135deg,var(--orange),var(--pink));color:var(--bg-primary)">I</div>
+    <div>
+      <div class="card-title">Interface Segregation Principle</div>
+      <div class="badge badge-orange">Segregaci&oacute;n de Interfaces</div>
+    </div>
+  </div>
+  <p class="card-desc">Los clientes no deben verse forzados a depender de interfaces que no utilizan. Mejor muchas interfaces espec&iacute;ficas que una interfaz general.</p>
+
+  <div class="analogy">
+    <div class="analogy-title">Analog&iacute;a del mundo real</div>
+    Un control remoto universal tiene 50 botones, pero para la TV solo usas 10. Mejor tener controles espec&iacute;ficos: uno para TV, otro para aire acondicionado, etc.
+  </div>
+
+  <div class="toggle-group">
+    <button class="toggle-btn active" onclick="toggleCode(this,'isp')">Antes (Interfaz gorda)</button>
+    <button class="toggle-btn" onclick="toggleCode(this,'isp')">Despu&eacute;s (Segregado)</button>
+  </div>
+  <div class="toggle-panel active" data-group="isp">
+    <div class="code-block"><span class="code-label">Interfaz gorda</span>
+<span class="kw">public interface</span> <span class="tp">ITrabajador</span>
+{
+    <span class="kw">void</span> <span class="fn">Trabajar</span>();
+    <span class="kw">void</span> <span class="fn">Comer</span>();
+    <span class="kw">void</span> <span class="fn">Dormir</span>();
+    <span class="kw">void</span> <span class="fn">HacerReporte</span>();
+    <span class="kw">void</span> <span class="fn">AsistirReunion</span>();
+}
+<span class="cm">// Un Robot no come ni duerme...</span>
+<span class="kw">public class</span> <span class="tp">Robot</span> : <span class="tp">ITrabajador</span>
+{
+    <span class="kw">public void</span> <span class="fn">Trabajar</span>() { ... }
+    <span class="kw">public void</span> <span class="fn">Comer</span>() { <span class="kw">throw new</span> <span class="tp">NotImplementedException</span>(); } <span class="cm">// Forzado!</span>
+    <span class="kw">public void</span> <span class="fn">Dormir</span>() { <span class="kw">throw new</span> <span class="tp">NotImplementedException</span>(); }
+    ...
+}</div>
+  </div>
+  <div class="toggle-panel" data-group="isp">
+    <div class="code-block"><span class="code-label">Interfaces segregadas</span>
+<span class="kw">public interface</span> <span class="tp">ITrabajable</span>    { <span class="kw">void</span> <span class="fn">Trabajar</span>(); }
+<span class="kw">public interface</span> <span class="tp">IAlimentable</span>   { <span class="kw">void</span> <span class="fn">Comer</span>(); }
+<span class="kw">public interface</span> <span class="tp">IDescansable</span>   { <span class="kw">void</span> <span class="fn">Dormir</span>(); }
+<span class="kw">public interface</span> <span class="tp">IReporteable</span>   { <span class="kw">void</span> <span class="fn">HacerReporte</span>(); }
+
+<span class="kw">public class</span> <span class="tp">Empleado</span> : <span class="tp">ITrabajable</span>, <span class="tp">IAlimentable</span>, <span class="tp">IDescansable</span>, <span class="tp">IReporteable</span> { ... }
+<span class="kw">public class</span> <span class="tp">Robot</span>    : <span class="tp">ITrabajable</span>, <span class="tp">IReporteable</span> { ... }
+<span class="cm">// Robot solo implementa lo que necesita</span></div>
+  </div>
+
+  <div class="diagram-container" style="text-align:center">
+    <p style="font-size:.85rem;color:var(--text-muted);margin-bottom:1rem">Haz clic para segregar la interfaz:</p>
+    <div id="isp-fat" onclick="ispSegment()">
+      <div class="ibox" style="border-color:var(--red);min-width:280px;cursor:pointer">
+        <div class="ibox-label" style="color:var(--red)">ITrabajador (5 m&eacute;todos)</div>
+        <div class="ibox-sub">Trabajar &bull; Comer &bull; Dormir &bull; Reporte &bull; Reuni&oacute;n</div>
+      </div>
+    </div>
+    <div id="isp-split" style="display:none">
+      <div class="arrow-down">&darr;</div>
+      <div class="ibox-row">
+        <div class="ibox" style="border-color:var(--cyan)"><div class="ibox-label" style="color:var(--cyan)">ITrabajable</div><div class="ibox-sub">Trabajar</div></div>
+        <div class="ibox" style="border-color:var(--green)"><div class="ibox-label" style="color:var(--green)">IAlimentable</div><div class="ibox-sub">Comer</div></div>
+        <div class="ibox" style="border-color:var(--purple)"><div class="ibox-label" style="color:var(--purple)">IDescansable</div><div class="ibox-sub">Dormir</div></div>
+        <div class="ibox" style="border-color:var(--orange)"><div class="ibox-label" style="color:var(--orange)">IReporteable</div><div class="ibox-sub">Reporte</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="quiz-box">
+    <div class="quiz-question">&iquest;Cu&aacute;l es la se&ntilde;al principal de una violaci&oacute;n a ISP?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" onclick="checkQuiz(this,false)">Tener muchas interfaces peque&ntilde;as</div>
+      <div class="quiz-opt" onclick="checkQuiz(this,true)">Clases que implementan m&eacute;todos con NotImplementedException o vac&iacute;os</div>
+      <div class="quiz-opt" onclick="checkQuiz(this,false)">Usar herencia en lugar de composici&oacute;n</div>
+    </div>
+    <div class="quiz-feedback"></div>
+  </div>
+</div>
+
+<!-- === D (STAR) === -->
+<div class="card" id="solid-d" style="border:1px solid rgba(0,229,255,.3);box-shadow:0 0 40px rgba(0,229,255,.08)">
+  <div class="card-header">
+    <div class="card-icon" style="background:linear-gradient(135deg,var(--cyan),var(--purple));color:#fff;box-shadow:var(--glow-cyan)">D</div>
+    <div>
+      <div class="card-title">Dependency Inversion Principle <span class="badge badge-pink" style="margin-left:.5rem">ESTRELLA</span></div>
+      <div class="badge badge-cyan">Inversi&oacute;n de Dependencias</div>
+    </div>
+  </div>
+  <p class="card-desc"><strong>Los m&oacute;dulos de alto nivel no deben depender de m&oacute;dulos de bajo nivel. Ambos deben depender de abstracciones.</strong> Las abstracciones no deben depender de detalles; los detalles deben depender de abstracciones.</p>
+
+  <div class="analogy">
+    <div class="analogy-title">Analog&iacute;a: El enchufe el&eacute;ctrico</div>
+    Un electrodom&eacute;stico (alto nivel) no se conecta directamente al cableado el&eacute;ctrico (bajo nivel). Ambos dependen de una <strong>abstracci&oacute;n: el enchufe/tomacorriente</strong>. Puedes cambiar la licuadora por una tostadora sin modificar la instalaci&oacute;n el&eacute;ctrica. El enchufe es la <em>interfaz</em>.
+  </div>
+
+  <div class="toggle-group">
+    <button class="toggle-btn active" onclick="toggleCode(this,'dip')">Sin DIP (Acoplado)</button>
+    <button class="toggle-btn" onclick="toggleCode(this,'dip')">Con DIP (Desacoplado)</button>
+  </div>
+  <div class="toggle-panel active" data-group="dip">
+    <div class="code-block"><span class="code-label">C# &mdash; Violaci&oacute;n DIP</span>
+<span class="kw">public class</span> <span class="tp">PedidoService</span>
+{
+    <span class="kw">private readonly</span> <span class="tp">SqlServerRepository</span> _repo; <span class="cm">// Dependencia directa!</span>
+    <span class="kw">private readonly</span> <span class="tp">SmtpEmailSender</span> _email;    <span class="cm">// Dependencia directa!</span>
+
+    <span class="kw">public</span> <span class="fn">PedidoService</span>()
+    {
+        _repo = <span class="kw">new</span> <span class="tp">SqlServerRepository</span>();  <span class="cm">// Acoplado a SQL Server</span>
+        _email = <span class="kw">new</span> <span class="tp">SmtpEmailSender</span>();     <span class="cm">// Acoplado a SMTP</span>
+    }
+}
+<span class="cm">// No puedes testear sin base de datos real ni servidor SMTP</span></div>
+  </div>
+  <div class="toggle-panel" data-group="dip">
+    <div class="code-block"><span class="code-label">C# &mdash; DIP Aplicado</span>
+<span class="kw">public interface</span> <span class="tp">IPedidoRepository</span> { <span class="tp">Pedido</span> <span class="fn">ObtenerPorId</span>(<span class="kw">int</span> id); }
+<span class="kw">public interface</span> <span class="tp">INotificador</span>     { <span class="kw">void</span> <span class="fn">Notificar</span>(<span class="str">string</span> msg); }
+
+<span class="kw">public class</span> <span class="tp">PedidoService</span>
+{
+    <span class="kw">private readonly</span> <span class="tp">IPedidoRepository</span> _repo; <span class="cm">// Abstracci&oacute;n!</span>
+    <span class="kw">private readonly</span> <span class="tp">INotificador</span> _notif;      <span class="cm">// Abstracci&oacute;n!</span>
+
+    <span class="kw">public</span> <span class="fn">PedidoService</span>(<span class="tp">IPedidoRepository</span> repo, <span class="tp">INotificador</span> notif)
+    {
+        _repo = repo;   <span class="cm">// Inyectado por DI Container</span>
+        _notif = notif;
+    }
+}
+<span class="cm">// Ahora puedes inyectar MockRepository para tests!</span></div>
+  </div>
+
+  <!-- DIP Interactive Diagram -->
+  <div class="diagram-container">
+    <p style="font-size:.85rem;color:var(--text-muted);margin-bottom:1rem;text-align:center">Direcci&oacute;n de dependencias &mdash; Haz clic para alternar:</p>
+    <div id="dip-diagram" style="text-align:center">
+      <div class="ibox-row" style="margin-bottom:0">
+        <div class="ibox" style="border-color:var(--cyan);min-width:200px"><div class="ibox-label" style="color:var(--cyan)">M&oacute;dulo Alto Nivel</div><div class="ibox-sub">PedidoService</div></div>
+      </div>
+      <div class="arrow-down" id="dip-arrow1">&darr;</div>
+      <div class="ibox-row" style="margin-bottom:0">
+        <div class="ibox" id="dip-abs-box" style="border-color:var(--purple);min-width:200px"><div class="ibox-label" style="color:var(--purple)">Abstracci&oacute;n</div><div class="ibox-sub">IPedidoRepository</div></div>
+      </div>
+      <div class="arrow-down" id="dip-arrow2">&uarr;</div>
+      <div class="ibox-row">
+        <div class="ibox" style="border-color:var(--green);min-width:200px"><div class="ibox-label" style="color:var(--green)">M&oacute;dulo Bajo Nivel</div><div class="ibox-sub">SqlServerRepository</div></div>
+      </div>
+    </div>
+    <p style="text-align:center;margin-top:.75rem;font-size:.8rem;color:var(--cyan)">Alto nivel depende de abstracci&oacute;n &darr; &mdash; Bajo nivel depende de abstracci&oacute;n &uarr;</p>
+  </div>
+
+  <h4 style="margin:1.5rem 0 .75rem;color:var(--cyan)">Ventajas de DIP</h4>
+  <div class="grid-3">
+    <div class="card" style="padding:1rem;text-align:center">
+      <div style="font-size:1.5rem;margin-bottom:.4rem;color:var(--green)">&#9745;</div>
+      <div style="font-weight:600;font-size:.85rem;margin-bottom:.25rem">Testabilidad</div>
+      <div style="font-size:.78rem;color:var(--text-secondary)">Puedes usar mocks e inyectarlos f&aacute;cilmente</div>
+    </div>
+    <div class="card" style="padding:1rem;text-align:center">
+      <div style="font-size:1.5rem;margin-bottom:.4rem;color:var(--purple)">&#9881;</div>
+      <div style="font-weight:600;font-size:.85rem;margin-bottom:.25rem">Flexibilidad</div>
+      <div style="font-size:.78rem;color:var(--text-secondary)">Cambiar implementaci&oacute;n sin tocar l&oacute;gica</div>
+    </div>
+    <div class="card" style="padding:1rem;text-align:center">
+      <div style="font-size:1.5rem;margin-bottom:.4rem;color:var(--cyan)">&#128279;</div>
+      <div style="font-weight:600;font-size:.85rem;margin-bottom:.25rem">Desacoplamiento</div>
+      <div style="font-size:.78rem;color:var(--text-secondary)">M&oacute;dulos independientes entre s&iacute;</div>
+    </div>
+  </div>
+
+  <div class="quiz-box">
+    <div class="quiz-question">&iquest;D&oacute;nde debe vivir la interfaz IPedidoRepository?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" onclick="checkQuiz(this,false)">En la capa de infraestructura junto a SqlServerRepository</div>
+      <div class="quiz-opt" onclick="checkQuiz(this,true)">En la capa de dominio (alto nivel), as&iacute; el dominio define el contrato</div>
+      <div class="quiz-opt" onclick="checkQuiz(this,false)">En un proyecto aparte de &quot;interfaces compartidas&quot;</div>
+    </div>
+    <div class="quiz-feedback"></div>
+  </div>
+
+  <div class="quiz-box" style="margin-top:1rem">
+    <div class="quiz-question">&iquest;Cu&aacute;l es la diferencia entre DIP e Inyecci&oacute;n de Dependencias (DI)?</div>
+    <div class="quiz-options">
+      <div class="quiz-opt" onclick="checkQuiz(this,false)">Son exactamente lo mismo</div>
+      <div class="quiz-opt" onclick="checkQuiz(this,true)">DIP es el principio (depender de abstracciones); DI es la t&eacute;cnica para lograrlo</div>
+      <div class="quiz-opt" onclick="checkQuiz(this,false)">DI es m&aacute;s importante que DIP</div>
+    </div>
+    <div class="quiz-feedback"></div>
+  </div>
+</div>
+</div><!-- /tab1 -->
+
+
+<!-- ======================================================== -->
+<!-- TAB 2: DDD CONCEPTOS -->
+<!-- ======================================================== -->
+<div class="tab-content" id="tab2">
+<h2 class="section-title">Domain-Driven Design &mdash; Conceptos</h2>
+<p class="section-subtitle">Dise&ntilde;o guiado por el dominio: una filosof&iacute;a para abordar la complejidad del software alineando el c&oacute;digo con el conocimiento del negocio. Acuñado por Eric Evans en 2003.</p>
+
+<div class="grid-2">
+<div class="card">
+  <div class="card-header">
+    <div class="card-icon" style="background:linear-gradient(135deg,var(--cyan),var(--blue));color:var(--bg-primary)">?</div>
+    <div class="card-title">&iquest;Qu&eacute; es DDD?</div>
+  </div>
+  <p class="card-desc">DDD es un enfoque para el desarrollo de software que pone el <strong>dominio del negocio</strong> en el centro de todas las decisiones de dise&ntilde;o. No es un framework ni una tecnolog&iacute;a, sino un conjunto de principios y patrones para modelar software complejo.</p>
+  <ul style="color:var(--text-secondary);font-size:.88rem;padding-left:1.25rem;line-height:2">
+    <li>Colaboraci&oacute;n estrecha entre desarrolladores y expertos del dominio</li>
+    <li>Modelo de dominio como artefacto central del proyecto</li>
+    <li>C&oacute;digo que refleja el lenguaje del negocio</li>
+    <li>Gesti&oacute;n expl&iacute;cita de la complejidad</li>
+  </ul>
+</div>
+<div class="card">
+  <div class="card-header">
+    <div class="card-icon" style="background:linear-gradient(135deg,var(--purple),var(--pink));color:#fff">VS</div>
+    <div class="card-title">Dise&ntilde;o Estrat&eacute;gico vs T&aacute;ctico</div>
+  </div>
+  <div class="grid-2" style="gap:1rem">
+    <div style="background:rgba(0,229,255,.05);border:1px solid rgba(0,229,255,.2);border-radius:var(--radius-sm);padding:.75rem">
+      <div style="font-weight:700;color:var(--cyan);margin-bottom:.4rem;font-size:.9rem">Estrat&eacute;gico</div>
+      <ul style="color:var(--text-secondary);font-size:.82rem;padding-left:1rem;line-height:1.8">
+        <li>Bounded Contexts</li>
+        <li>Ubiquitous Language</li>
+        <li>Context Maps</li>
+        <li>Subdominios</li>
+      </ul>
+    </div>
+    <div style="background:rgba(168,85,247,.05);border:1px solid rgba(168,85,247,.2);border-radius:var(--radius-sm);padding:.75rem">
+      <div style="font-weight:700;color:var(--purple);margin-bottom:.4rem;font-size:.9rem">T&aacute;ctico</div>
+      <ul style="color:var(--text-secondary);font-size:.82rem;padding-left:1rem;line-height:1.8">
+        <li>Entities / Value Objects</li>
+        <li>Aggregates</li>
+        <li>Repositories</li>
+        <li>Domain Events</li>
+      </ul>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- UBIQUITOUS LANGUAGE -->
+<div class="card">
+  <div class="card-header">
+    <div class="card-icon" style="background:linear-gradient(135deg,var(--green),var(--cyan));color:var(--bg-primary)">UL</div>
+    <div class="card-title">Lenguaje Ubicuo (Ubiquitous Language)</div>
+  </div>
+  <p class="card-desc">Un lenguaje com&uacute;n, riguroso, compartido por desarrolladores y expertos del dominio. Cada t&eacute;rmino tiene un significado preciso que se refleja directamente en el c&oacute;digo.</p>
+
+  <h4 style="font-size:.9rem;margin-bottom:.5rem;color:var(--cyan)">Constructor de Glosario Interactivo</h4>
+  <div class="glossary-input">
+    <input type="text" id="glossaryTerm" placeholder="T&eacute;rmino (ej: Pedido)">
+    <input type="text" id="glossaryDef" placeholder="Definici&oacute;n" style="flex:2">
+    <button onclick="addGlossary()">Agregar</button>
+  </div>
+  <div class="glossary-list" id="glossaryList">
+    <div class="glossary-item"><span class="term">Pedido</span><span class="def">Solicitud de un cliente para adquirir uno o m&aacute;s productos</span><button class="del-btn" onclick="this.parentElement.remove()">&times;</button></div>
+    <div class="glossary-item"><span class="term">Factura</span><span class="def">Documento fiscal que respalda una transacci&oacute;n comercial</span><button class="del-btn" onclick="this.parentElement.remove()">&times;</button></div>
+    <div class="glossary-item"><span class="term">Despacho</span><span class="def">Proceso de preparar y enviar productos al cliente</span><button class="del-btn" onclick="this.parentElement.remove()">&times;</button></div>
+  </div>
+</div>
+
+<!-- BOUNDED CONTEXTS -->
+<div class="card">
+  <div class="card-header">
+    <div class="card-icon" style="background:linear-gradient(135deg,var(--purple),var(--blue));color:#fff">BC</div>
+    <div class="card-title">Bounded Contexts (Contextos Delimitados)</div>
+  </div>
+  <p class="card-desc">L&iacute;mites expl&iacute;citos dentro de los cuales un modelo de dominio es v&aacute;lido. Cada contexto tiene su propio lenguaje ubicuo y sus propias reglas. El mismo concepto puede significar cosas diferentes en distintos contextos.</p>
+
+  <div class="ctx-map">
+    <div class="ctx-box" style="border-color:var(--cyan);background:rgba(0,229,255,.05)" onclick="toggleCtx(this)">
+      <div style="font-weight:700;color:var(--cyan);font-size:.9rem">Ventas</div>
+      <div style="font-size:.75rem;color:var(--text-secondary);margin-top:.25rem">&quot;Producto&quot; = lo que el cliente compra</div>
+      <div class="ctx-detail">
+        <strong>Modelo de Producto en Ventas:</strong><br>
+        &bull; Nombre, Precio, Descuento<br>
+        &bull; Disponibilidad, Categor&iacute;a<br>
+        &bull; No le importa: peso, dimensiones f&iacute;sicas del paquete
+      </div>
+    </div>
+    <div class="ctx-box" style="border-color:var(--green);background:rgba(16,185,129,.05)" onclick="toggleCtx(this)">
+      <div style="font-weight:700;color:var(--green);font-size:.9rem">Almac&eacute;n</div>
+      <div style="font-size:.75rem;color:var(--text-secondary);margin-top:.25rem">&quot;Producto&quot; = lo que se almacena</div>
+      <div class="ctx-detail">
+        <strong>Modelo de Producto en Almac&eacute;n:</strong><br>
+        &bull; SKU, Ubicaci&oacute;n, Peso, Dimensiones<br>
+        &bull; Stock m&iacute;nimo, Fecha vencimiento<br>
+        &bull; No le importa: precio de venta, descuento
+      </div>
+    </div>
+    <div class="ctx-box" style="border-color:var(--purple);background:rgba(168,85,247,.05)" onclick="toggleCtx(this)">
+      <div style="font-weight:700;color:var(--purple);font-size:.9rem">Facturaci&oacute;n</div>
+      <div style="font-size:.75rem;color:var(--text-secondary);margin-top:.25rem">&quot;Producto&quot; = l&iacute;nea de factura</div>
+      <div class="ctx-detail">
+        <strong>Modelo de Producto en Facturaci&oacute;n:</strong><br>
+        &bull; C&oacute;digo, Descripci&oacute;n fiscal, IVA<br>
+        &bull; Unidad de medida, C&oacute;digo arancelario<br>
+        &bull; No le importa: stock, ubicaci&oacute;n
+      </div>
+    </div>
+    <div class="ctx-box" style="border-color:var(--orange);background:rgba(245,158,11,.05)" onclick="toggleCtx(this)">
+      <div style="font-weight:700;color:var(--orange);font-size:.9rem">Producci&oacute;n</div>
+      <div style="font-size:.75rem;color:var(--text-secondary);margin-top:.25rem">&quot;Producto&quot; = lo que se fabrica</div>
+      <div class="ctx-detail">
+        <strong>Modelo de Producto en Producci&oacute;n:</strong><br>
+        &bull; Receta, Materiales, Tiempo de ciclo<br>
+        &bull; M&aacute;quina asignada, Orden de producci&oacute;n<br>
+        &bull; No le importa: precio, categor&iacute;a comercial
+      </div>
+    </div>
+  </div>
+
+  <h4 style="font-size:.9rem;margin:1.5rem 0 .75rem;color:var(--cyan)">Patrones de Context Map</h4>
+  <div class="grid-3">
+    <div class="card" style="padding:.75rem"><div style="font-weight:600;font-size:.85rem;color:var(--cyan);margin-bottom:.3rem">Shared Kernel</div><div style="font-size:.78rem;color:var(--text-secondary)">Dos contextos comparten un subconjunto del modelo. Cambios requieren coordinaci&oacute;n.</div></div>
+    <div class="card" style="padding:.75rem"><div style="font-weight:600;font-size:.85rem;color:var(--green);margin-bottom:.3rem">Customer-Supplier</div><div style="font-size:.78rem;color:var(--text-secondary)">Un contexto (supplier) provee datos al otro (customer). El customer puede negociar requerimientos.</div></div>
+    <div class="card" style="padding:.75rem"><div style="font-weight:600;font-size:.85rem;color:var(--purple);margin-bottom:.3rem">Conformist</div><div style="font-size:.78rem;color:var(--text-secondary)">El contexto downstream adopta el modelo del upstream sin modificaciones. No hay negociaci&oacute;n.</div></div>
+    <div class="card" style="padding:.75rem"><div style="font-weight:600;font-size:.85rem;color:var(--orange);margin-bottom:.3rem">Anticorruption Layer</div><div style="font-size:.78rem;color:var(--text-secondary)">Capa de traducci&oacute;n que protege el modelo propio de modelos externos (sistemas legacy, APIs).</div></div>
+    <div class="card" style="padding:.75rem"><div style="font-weight:600;font-size:.85rem;color:var(--pink);margin-bottom:.3rem">Open Host Service</div><div style="font-size:.78rem;color:var(--text-secondary)">Expone un protocolo bien definido (API p&uacute;blica) para que m&uacute;ltiples consumidores se integren.</div></div>
+    <div class="card" style="padding:.75rem"><div style="font-weight:600;font-size:.85rem;color:var(--blue);margin-bottom:.3rem">Published Language</div><div style="font-size:.78rem;color:var(--text-secondary)">Formato de intercambio documentado (JSON Schema, Protobuf, XML) entre contextos.</div></div>
+  </div>
+</div>
+
+<!-- SUBDOMAINS -->
+<div class="card">
+  <div class="card-header">
+    <div class="card-icon" style="background:linear-gradient(135deg,var(--orange),var(--green));color:var(--bg-primary)">SD</div>
+    <div class="card-title">Subdominios: Core, Supporting, Generic</div>
+  </div>
+  <p class="card-desc">No todas las partes de un sistema tienen la misma importancia estrat&eacute;gica. Clasificar subdominios ayuda a decidir d&oacute;nde invertir esfuerzo.</p>
+
+  <div class="grid-3" style="margin-bottom:1rem">
+    <div class="drag-zone" id="dz-core" ondrop="dropSD(event)" ondragover="allowDrop(event)">
+      <div class="drag-zone-label" style="color:var(--cyan);width:100%">Core Domain (lo que nos diferencia)</div>
+    </div>
+    <div class="drag-zone" id="dz-support" ondrop="dropSD(event)" ondragover="allowDrop(event)">
+      <div class="drag-zone-label" style="color:var(--purple);width:100%">Supporting (necesario pero no diferenciador)</div>
+    </div>
+    <div class="drag-zone" id="dz-generic" ondrop="dropSD(event)" ondragover="allowDrop(event)">
+      <div class="drag-zone-label" style="color:var(--text-muted);width:100%">Generic (comprar o usar librer&iacute;a)</div>
+    </div>
+  </div>
+  <div class="drag-zone" id="dz-items" ondrop="dropSD(event)" ondragover="allowDrop(event)" style="border-color:var(--orange)">
+    <div class="drag-zone-label" style="color:var(--orange);width:100%">Arrastra cada elemento a su categor&iacute;a:</div>
+    <div class="drag-item" draggable="true" ondragstart="dragSD(event)" data-correct="core">Algoritmo de producci&oacute;n</div>
+    <div class="drag-item" draggable="true" ondragstart="dragSD(event)" data-correct="core">Motor de precios</div>
+    <div class="drag-item" draggable="true" ondragstart="dragSD(event)" data-correct="support">Gesti&oacute;n de empleados</div>
+    <div class="drag-item" draggable="true" ondragstart="dragSD(event)" data-correct="support">Reportes internos</div>
+    <div class="drag-item" draggable="true" ondragstart="dragSD(event)" data-correct="generic">Autenticaci&oacute;n (Identity)</div>
+    <div class="drag-item" draggable="true" ondragstart="dragSD(event)" data-correct="generic">Env&iacute;o de emails</div>
+    <div class="drag-item" draggable="true" ondragstart="dragSD(event)" data-correct="generic">Logging</div>
+    <div class="drag-item" draggable="true" ondragstart="dragSD(event)" data-correct="core">Recetas de empaque</div>
+  </div>
+</div>
+</div><!-- /tab2 -->
+
+
+<!-- ======================================================== -->
+<!-- TAB 3: PATRONES TACTICOS (Building Blocks) -->
+<!-- ======================================================== -->
+<div class="tab-content" id="tab3">
+<h2 class="section-title">Patrones T&aacute;cticos DDD</h2>
+<p class="section-subtitle">Los bloques de construcci&oacute;n del dise&ntilde;o guiado por el dominio: las piezas con las que modelas la l&oacute;gica de negocio dentro de cada Bounded Context.</p>
+
+<div class="grid-2">
+<!-- Entity -->
+<div class="card">
+  <div class="card-header">
+    <div class="card-icon" style="background:linear-gradient(135deg,var(--cyan),var(--blue));color:var(--bg-primary)">E</div>
+    <div><div class="card-title">Entity (Entidad)</div><div class="badge badge-cyan">Identidad + Mutable</div></div>
+  </div>
+  <p class="card-desc">Objeto con identidad &uacute;nica que persiste a lo largo del tiempo. Aunque sus atributos cambien, sigue siendo la misma entidad.</p>
+  <div class="code-block"><span class="code-label">C#</span>
+<span class="kw">public class</span> <span class="tp">Pedido</span>
+{
+    <span class="kw">public</span> <span class="tp">Guid</span> Id { <span class="kw">get</span>; }  <span class="cm">// Identidad inmutable</span>
+    <span class="kw">public</span> <span class="tp">EstadoPedido</span> Estado { <span class="kw">get</span>; <span class="kw">private set</span>; }
+    <span class="kw">public</span> <span class="tp">DateTime</span> FechaCreacion { <span class="kw">get</span>; }
+
+    <span class="kw">public void</span> <span class="fn">Confirmar</span>()
+    {
+        <span class="kw">if</span> (Estado != <span class="tp">EstadoPedido</span>.Borrador)
+            <span class="kw">throw new</span> <span class="tp">InvalidOperationException</span>();
+        Estado = <span class="tp">EstadoPedido</span>.Confirmado;
+    }
+}</div>
+  <div class="diagram-container" style="padding:1rem;text-align:center">
+    <p style="font-size:.82rem;color:var(--text-muted);margin-bottom:.5rem">Cambia el estado &mdash; la identidad persiste:</p>
+    <div class="ibox" style="border-color:var(--cyan);display:inline-block;min-width:180px">
+      <div class="ibox-label">Pedido #<span style="color:var(--cyan)">A7F3</span></div>
+      <div class="ibox-sub">Estado: <span id="entityState" style="color:var(--orange)">Borrador</span></div>
+    </div>
+    <div style="margin-top:.5rem"><button class="btn btn-cyan btn-sm" onclick="entityAdvance()">Avanzar Estado</button></div>
+  </div>
+</div>
+
+<!-- Value Object -->
+<div class="card">
+  <div class="card-header">
+    <div class="card-icon" style="background:linear-gradient(135deg,var(--purple),var(--pink));color:#fff">VO</div>
+    <div><div class="card-title">Value Object (Objeto de Valor)</div><div class="badge badge-purple">Sin identidad + Inmutable</div></div>
+  </div>
+  <p class="card-desc">Objeto definido por sus atributos, no por una identidad. Dos VOs con los mismos valores son iguales. Son inmutables: para cambiar, se crea uno nuevo.</p>
+  <div class="code-block"><span class="code-label">C#</span>
+<span class="kw">public record</span> <span class="tp">Dinero</span>
+{
+    <span class="kw">public decimal</span> Cantidad { <span class="kw">get</span>; <span class="kw">init</span>; }
+    <span class="kw">public string</span> Moneda { <span class="kw">get</span>; <span class="kw">init</span>; }
+
+    <span class="kw">public</span> <span class="tp">Dinero</span> <span class="fn">Sumar</span>(<span class="tp">Dinero</span> otro)
+    {
+        <span class="kw">if</span> (Moneda != otro.Moneda)
+            <span class="kw">throw new</span> <span class="tp">InvalidOperationException</span>();
+        <span class="kw">return new</span> <span class="tp">Dinero</span> { Cantidad = Cantidad + otro.Cantidad, Moneda = Moneda };
+    }
+}</div>
+  <div class="diagram-container" style="padding:1rem;text-align:center">
+    <p style="font-size:.82rem;color:var(--text-muted);margin-bottom:.5rem">Igualdad por valor:</p>
+    <div class="ibox-row">
+      <div class="ibox" style="border-color:var(--purple)"><div class="ibox-label" style="color:var(--purple)">Dinero A</div><div class="ibox-sub">$100 USD</div></div>
+      <div style="display:flex;align-items:center;font-size:1.5rem;color:var(--green);font-weight:800">=</div>
+      <div class="ibox" style="border-color:var(--purple)"><div class="ibox-label" style="color:var(--purple)">Dinero B</div><div class="ibox-sub">$100 USD</div></div>
+    </div>
+    <p style="font-size:.8rem;color:var(--green);margin-top:.5rem">Mismos valores = misma entidad conceptual (sin Id)</p>
+  </div>
+</div>
+</div>
+
+<!-- Aggregate -->
+<div class="card">
+  <div class="card-header">
+    <div class="card-icon" style="background:linear-gradient(135deg,var(--orange),var(--red));color:#fff">AG</div>
+    <div><div class="card-title">Aggregate (Agregado)</div><div class="badge badge-orange">L&iacute;mite de Consistencia</div></div>
+  </div>
+  <p class="card-desc">Grupo de entidades y objetos de valor tratados como una unidad para prop&oacute;sitos de cambios de datos. Tiene un <strong>Aggregate Root</strong> que es el &uacute;nico punto de entrada.</p>
+
+  <div class="diagram-container" style="text-align:center">
+    <p style="font-size:.85rem;color:var(--text-muted);margin-bottom:1rem">Haz clic en los elementos para ver reglas de acceso:</p>
+    <div style="border:2px dashed var(--orange);border-radius:var(--radius-lg);padding:1.5rem;display:inline-block;position:relative;min-width:300px">
+      <div style="position:absolute;top:-10px;left:20px;background:var(--bg-secondary);padding:0 .5rem;font-size:.75rem;color:var(--orange);font-weight:600">AGGREGATE BOUNDARY</div>
+      <div class="ibox" style="border-color:var(--cyan);margin-bottom:.75rem" onclick="aggAccess(this,'root')">
+        <div class="ibox-label" style="color:var(--cyan)">Pedido (Root)</div>
+        <div class="ibox-sub">Punto de entrada &uacute;nico</div>
+      </div>
+      <div class="ibox-row" style="margin:0;gap:.5rem">
+        <div class="ibox" style="border-color:var(--purple)" onclick="aggAccess(this,'child')">
+          <div class="ibox-label" style="color:var(--purple);font-size:.8rem">LineaPedido</div>
+          <div class="ibox-sub">Entity</div>
+        </div>
+        <div class="ibox" style="border-color:var(--green)" onclick="aggAccess(this,'child')">
+          <div class="ibox-label" style="color:var(--green);font-size:.8rem">Direcci&oacute;n</div>
+          <div class="ibox-sub">Value Object</div>
+        </div>
+      </div>
+    </div>
+    <div id="agg-msg" style="margin-top:.75rem;font-size:.85rem;min-height:1.5rem;transition:var(--transition)"></div>
+  </div>
+
+  <div class="code-block"><span class="code-label">Reglas del Agregado</span>
+<span class="cm">// 1. Solo acceder mediante el Root</span>
+pedido.<span class="fn">AgregarLinea</span>(producto, cantidad); <span class="cm">// Correcto</span>
+lineaPedido.Cantidad = <span class="nr">5</span>;                <span class="cm">// INCORRECTO - acceso directo</span>
+
+<span class="cm">// 2. Consistencia transaccional dentro del agregado</span>
+<span class="cm">// 3. Referencias externas solo por ID, nunca por objeto</span>
+<span class="cm">// 4. Un agregado = una transacci&oacute;n</span></div>
+</div>
+
+<!-- Repository -->
+<div class="card">
+  <div class="card-header">
+    <div class="card-icon" style="background:linear-gradient(135deg,var(--green),var(--cyan));color:var(--bg-primary)">R</div>
+    <div><div class="card-title">Repository (Repositorio)</div><div class="badge badge-green">Abstracci&oacute;n de Persistencia</div></div>
+  </div>
+  <p class="card-desc">Interfaz tipo colecci&oacute;n para acceder a agregados. La interfaz vive en el dominio, la implementaci&oacute;n en infraestructura &mdash; esto es <strong>DIP en acci&oacute;n</strong>.</p>
+
+  <div class="code-block"><span class="code-label">Dominio (Interfaz)</span>
+<span class="cm">// Vive en: Domain/Repositories/</span>
+<span class="kw">public interface</span> <span class="tp">IPedidoRepository</span>
+{
+    <span class="tp">Pedido</span> <span class="fn">ObtenerPorId</span>(<span class="tp">Guid</span> id);
+    <span class="kw">void</span> <span class="fn">Guardar</span>(<span class="tp">Pedido</span> pedido);
+    <span class="tp">IReadOnlyList</span>&lt;<span class="tp">Pedido</span>&gt; <span class="fn">ObtenerPendientes</span>();
+}</div>
+  <div class="code-block"><span class="code-label">Infraestructura (Implementaci&oacute;n)</span>
+<span class="cm">// Vive en: Infrastructure/Persistence/</span>
+<span class="kw">public class</span> <span class="tp">PedidoRepositoryEF</span> : <span class="tp">IPedidoRepository</span>
+{
+    <span class="kw">private readonly</span> <span class="tp">AppDbContext</span> _ctx;
+    <span class="kw">public</span> <span class="tp">Pedido</span> <span class="fn">ObtenerPorId</span>(<span class="tp">Guid</span> id)
+        => _ctx.Pedidos.<span class="fn">Find</span>(id);
+    <span class="cm">// ...</span>
+}</div>
+</div>
+
+<!-- Domain Service -->
+<div class="card">
+  <div class="card-header">
+    <div class="card-icon" style="background:linear-gradient(135deg,var(--blue),var(--purple));color:#fff">DS</div>
+    <div><div class="card-title">Domain Service (Servicio de Dominio)</div><div class="badge badge-blue">L&oacute;gica multi-entidad</div></div>
+  </div>
+  <p class="card-desc">Operaci&oacute;n del dominio que no pertenece naturalmente a una sola entidad. Trabaja con m&uacute;ltiples agregados o requiere l&oacute;gica que trasciende una entidad.</p>
+  <div class="code-block"><span class="code-label">C#</span>
+<span class="kw">public class</span> <span class="tp">TransferenciaService</span>
+{
+    <span class="kw">public void</span> <span class="fn">Transferir</span>(<span class="tp">Cuenta</span> origen, <span class="tp">Cuenta</span> destino, <span class="tp">Dinero</span> monto)
+    {
+        origen.<span class="fn">Debitar</span>(monto);
+        destino.<span class="fn">Acreditar</span>(monto);
+        <span class="cm">// L&oacute;gica que involucra DOS agregados</span>
+    }
+}</div>
+</div>
+
+<!-- Domain Event -->
+<div class="card">
+  <div class="card-header">
+    <div class="card-icon" style="background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff">DE</div>
+    <div><div class="card-title">Domain Event (Evento de Dominio)</div><div class="badge badge-pink">Algo que ocurri&oacute;</div></div>
+  </div>
+  <p class="card-desc">Representa algo que sucedi&oacute; en el dominio y que es relevante para otras partes del sistema. Siempre en pasado: PedidoCreado, PagoRealizado, StockAgotado.</p>
+
+  <div class="diagram-container" style="text-align:center">
+    <p style="font-size:.82rem;color:var(--text-muted);margin-bottom:1rem">Haz clic en cada nodo para simular el flujo de eventos:</p>
+    <div class="event-tl" id="eventTimeline">
+      <div class="evt-node" onclick="evtAdvance(0)" title="Acci&oacute;n">1</div>
+      <div class="evt-line"></div>
+      <div class="evt-node" onclick="evtAdvance(1)" title="Evento">2</div>
+      <div class="evt-line"></div>
+      <div class="evt-node" onclick="evtAdvance(2)" title="Handler A">3</div>
+      <div class="evt-line"></div>
+      <div class="evt-node" onclick="evtAdvance(3)" title="Handler B">4</div>
+      <div class="evt-line"></div>
+      <div class="evt-node" onclick="evtAdvance(4)" title="Resultado">5</div>
+    </div>
+    <div id="evt-desc" style="margin-top:.75rem;font-size:.85rem;color:var(--text-secondary);min-height:2rem">Haz clic en el nodo 1 para comenzar</div>
+  </div>
+  <div class="code-block"><span class="code-label">C#</span>
+<span class="kw">public record</span> <span class="tp">PedidoConfirmado</span>(<span class="tp">Guid</span> PedidoId, <span class="tp">DateTime</span> Fecha) : <span class="tp">IDomainEvent</span>;
+
+<span class="cm">// Handler que reacciona al evento:</span>
+<span class="kw">public class</span> <span class="tp">EnviarEmailHandler</span> : <span class="tp">IHandler</span>&lt;<span class="tp">PedidoConfirmado</span>&gt;
+{
+    <span class="kw">public void</span> <span class="fn">Handle</span>(<span class="tp">PedidoConfirmado</span> evt)
+    {
+        <span class="cm">// Enviar email de confirmaci&oacute;n</span>
+    }
+}</div>
+</div>
+
+<!-- Factory -->
+<div class="card">
+  <div class="card-header">
+    <div class="card-icon" style="background:linear-gradient(135deg,var(--green),var(--orange));color:var(--bg-primary)">F</div>
+    <div><div class="card-title">Factory (F&aacute;brica)</div><div class="badge badge-green">Creaci&oacute;n compleja</div></div>
+  </div>
+  <p class="card-desc">Encapsula la l&oacute;gica de creaci&oacute;n de objetos complejos (agregados con muchas dependencias). Garantiza que el objeto se cree en un estado v&aacute;lido.</p>
+  <div class="code-block"><span class="code-label">C#</span>
+<span class="kw">public class</span> <span class="tp">PedidoFactory</span>
+{
+    <span class="kw">public</span> <span class="tp">Pedido</span> <span class="fn">CrearPedido</span>(<span class="tp">Cliente</span> cliente, <span class="tp">List</span>&lt;<span class="tp">Producto</span>&gt; items)
+    {
+        <span class="kw">var</span> pedido = <span class="kw">new</span> <span class="tp">Pedido</span>(<span class="tp">Guid</span>.<span class="fn">NewGuid</span>(), cliente.Id);
+        <span class="kw">foreach</span> (<span class="kw">var</span> item <span class="kw">in</span> items)
+            pedido.<span class="fn">AgregarLinea</span>(item);
+        pedido.<span class="fn">ValidarReglas</span>();
+        <span class="kw">return</span> pedido;
+    }
+}</div>
+</div>
+
+<!-- Specification -->
+<div class="card">
+  <div class="card-header">
+    <div class="card-icon" style="background:linear-gradient(135deg,var(--cyan),var(--pink));color:var(--bg-primary)">SP</div>
+    <div><div class="card-title">Specification (Especificaci&oacute;n)</div><div class="badge badge-cyan">Regla de negocio encapsulada</div></div>
+  </div>
+  <p class="card-desc">Patr&oacute;n que encapsula una regla de negocio en un objeto reutilizable. Se pueden combinar con AND, OR, NOT.</p>
+
+  <div class="diagram-container" style="text-align:center">
+    <p style="font-size:.82rem;color:var(--text-muted);margin-bottom:.75rem">Combina especificaciones (haz clic para activar/desactivar):</p>
+    <div class="spec-builder" style="justify-content:center">
+      <span class="spec-chip" id="sp1" onclick="specToggle('sp1')">EsClientePremium</span>
+      <span class="spec-op" onclick="specOp('AND')">AND</span>
+      <span class="spec-chip" id="sp2" onclick="specToggle('sp2')">TieneCr&eacute;ditoDisponible</span>
+      <span class="spec-op" onclick="specOp('OR')">OR</span>
+      <span class="spec-chip" id="sp3" onclick="specToggle('sp3')">NOT PedidoPendiente</span>
+    </div>
+    <div class="spec-result" id="specResult">Selecciona especificaciones para ver el resultado combinado</div>
+  </div>
+  <div class="code-block"><span class="code-label">C#</span>
+<span class="kw">public class</span> <span class="tp">EsClientePremium</span> : <span class="tp">Specification</span>&lt;<span class="tp">Cliente</span>&gt;
+{
+    <span class="kw">public override bool</span> <span class="fn">IsSatisfiedBy</span>(<span class="tp">Cliente</span> c) => c.Tipo == <span class="tp">TipoCliente</span>.Premium;
+}
+<span class="cm">// Uso combinado:</span>
+<span class="kw">var</span> spec = <span class="kw">new</span> <span class="tp">EsClientePremium</span>().<span class="fn">And</span>(<span class="kw">new</span> <span class="tp">TieneCreditoDisponible</span>());
+<span class="kw">var</span> aptos = clientes.<span class="fn">Where</span>(c => spec.<span class="fn">IsSatisfiedBy</span>(c));</div>
+</div>
+
+</div><!-- /tab3 -->
+
+
+<!-- ======================================================== -->
+<!-- TAB 4: ARQUITECTURA -->
+<!-- ======================================================== -->
+<div class="tab-content" id="tab4">
+<h2 class="section-title">Arquitectura por Capas + Clean Architecture</h2>
+<p class="section-subtitle">Evoluci&oacute;n de los estilos arquitect&oacute;nicos: desde capas tradicionales hasta Clean Architecture, pasando por Onion y Hexagonal.</p>
+
+<!-- Traditional Layers -->
+<div class="card">
+  <div class="card-header">
+    <div class="card-icon" style="background:linear-gradient(135deg,var(--text-muted),var(--text-secondary));color:var(--bg-primary)">TL</div>
+    <div><div class="card-title">Arquitectura Tradicional por Capas</div><div class="badge badge-orange">Cl&aacute;sica</div></div>
+  </div>
+  <p class="card-desc">Todas las dependencias apuntan hacia abajo. La capa de negocio depende directamente de la capa de datos. <strong>Problema:</strong> el dominio est&aacute; acoplado a la infraestructura.</p>
+  <div class="diagram-container" style="text-align:center">
+    <div class="ibox" style="border-color:var(--blue);min-width:250px;margin:0 auto"><div class="ibox-label" style="color:var(--blue)">Presentaci&oacute;n</div><div class="ibox-sub">Controllers, Vistas</div></div>
+    <div class="arrow-down" style="color:var(--red)">&darr; depende de</div>
+    <div class="ibox" style="border-color:var(--purple);min-width:250px;margin:0 auto"><div class="ibox-label" style="color:var(--purple)">L&oacute;gica de Negocio</div><div class="ibox-sub">Servicios, Reglas</div></div>
+    <div class="arrow-down" style="color:var(--red)">&darr; depende de</div>
+    <div class="ibox" style="border-color:var(--green);min-width:250px;margin:0 auto"><div class="ibox-label" style="color:var(--green)">Acceso a Datos</div><div class="ibox-sub">Repositorios, ORM, SQL</div></div>
+    <p style="margin-top:1rem;font-size:.82rem;color:var(--red)">Problema: si cambias la base de datos, afectas la l&oacute;gica de negocio.</p>
+  </div>
+</div>
+
+<!-- Onion -->
+<div class="card">
+  <div class="card-header">
+    <div class="card-icon" style="background:linear-gradient(135deg,var(--cyan),var(--green));color:var(--bg-primary)">ON</div>
+    <div><div class="card-title">Onion Architecture (Jeffrey Palermo)</div><div class="badge badge-cyan">Dependencias hacia adentro</div></div>
+  </div>
+  <p class="card-desc">Capas conc&eacute;ntricas donde las dependencias apuntan <strong>siempre hacia el centro</strong>. El dominio no depende de nada externo.</p>
+
+  <div class="diagram-container" style="text-align:center">
+    <div style="position:relative;width:380px;height:380px;margin:0 auto">
+      <div class="circle-layer" style="width:380px;height:380px;top:0;left:0;border-color:rgba(100,116,139,.4);background:rgba(100,116,139,.05);cursor:pointer" onclick="onionClick(this,'outer')" id="onion-outer">
+        <span class="cl-label" style="top:12px;left:50%;transform:translateX(-50%);color:var(--text-muted)">Infraestructura / UI / Tests</span>
+      </div>
+      <div class="circle-layer" style="width:280px;height:280px;top:50px;left:50px;border-color:rgba(59,130,246,.4);background:rgba(59,130,246,.05);cursor:pointer" onclick="onionClick(this,'app')" id="onion-app">
+        <span class="cl-label" style="top:12px;left:50%;transform:translateX(-50%);color:var(--blue)">Application Services</span>
+      </div>
+      <div class="circle-layer" style="width:180px;height:180px;top:100px;left:100px;border-color:rgba(168,85,247,.4);background:rgba(168,85,247,.05);cursor:pointer" onclick="onionClick(this,'domsvc')" id="onion-domsvc">
+        <span class="cl-label" style="top:12px;left:50%;transform:translateX(-50%);color:var(--purple)">Domain Services</span>
+      </div>
+      <div class="circle-layer" style="width:90px;height:90px;top:145px;left:145px;border-color:var(--cyan);background:rgba(0,229,255,.1);cursor:pointer" onclick="onionClick(this,'core')" id="onion-core">
+        <span class="cl-label" style="top:50%;left:50%;transform:translate(-50%,-50%);color:var(--cyan)">Core</span>
+      </div>
+    </div>
+    <div id="onion-desc" style="margin-top:1rem;font-size:.85rem;color:var(--text-secondary);min-height:2rem">Haz clic en cada capa para ver qu&eacute; contiene</div>
+  </div>
+</div>
+
+<!-- Hexagonal -->
+<div class="card">
+  <div class="card-header">
+    <div class="card-icon" style="background:linear-gradient(135deg,var(--purple),var(--pink));color:#fff">HX</div>
+    <div><div class="card-title">Hexagonal Architecture (Ports &amp; Adapters)</div><div class="badge badge-purple">Alistair Cockburn</div></div>
+  </div>
+  <p class="card-desc">El dominio y la aplicaci&oacute;n est&aacute;n en el centro. Se comunican con el exterior a trav&eacute;s de <strong>puertos</strong> (interfaces) y <strong>adaptadores</strong> (implementaciones).</p>
+
+  <div class="diagram-container">
+    <div class="hex-container">
+      <div style="text-align:right;min-width:160px">
+        <div style="font-weight:600;font-size:.85rem;color:var(--green);margin-bottom:.75rem">Driving (Primarios)</div>
+        <div class="ibox" style="border-color:var(--green);margin-bottom:.5rem;text-align:center" onclick="hexPort('rest')"><div class="ibox-label" style="color:var(--green);font-size:.8rem">REST API</div></div>
+        <div class="ibox" style="border-color:var(--green);margin-bottom:.5rem;text-align:center" onclick="hexPort('cli')"><div class="ibox-label" style="color:var(--green);font-size:.8rem">CLI</div></div>
+        <div class="ibox" style="border-color:var(--green);text-align:center" onclick="hexPort('ui')"><div class="ibox-label" style="color:var(--green);font-size:.8rem">UI Web</div></div>
+      </div>
+
+      <div style="text-align:center">
+        <div style="border:3px solid var(--cyan);border-radius:var(--radius-lg);padding:2rem 1.5rem;background:rgba(0,229,255,.05);min-width:180px">
+          <div style="font-weight:700;color:var(--cyan);font-size:.9rem;margin-bottom:.5rem">DOMINIO +<br>APLICACI&Oacute;N</div>
+          <div style="font-size:.75rem;color:var(--text-muted);border-top:1px solid var(--border);padding-top:.5rem;margin-top:.5rem">Puertos (interfaces)<br>en los bordes</div>
+        </div>
+      </div>
+
+      <div style="text-align:left;min-width:160px">
+        <div style="font-weight:600;font-size:.85rem;color:var(--orange);margin-bottom:.75rem">Driven (Secundarios)</div>
+        <div class="ibox" style="border-color:var(--orange);margin-bottom:.5rem;text-align:center" onclick="hexPort('db')"><div class="ibox-label" style="color:var(--orange);font-size:.8rem">Base de Datos</div></div>
+        <div class="ibox" style="border-color:var(--orange);margin-bottom:.5rem;text-align:center" onclick="hexPort('email')"><div class="ibox-label" style="color:var(--orange);font-size:.8rem">Email Service</div></div>
+        <div class="ibox" style="border-color:var(--orange);text-align:center" onclick="hexPort('extapi')"><div class="ibox-label" style="color:var(--orange);font-size:.8rem">API Externa</div></div>
+      </div>
+    </div>
+    <div id="hex-desc" style="text-align:center;margin-top:1rem;font-size:.85rem;color:var(--text-secondary);min-height:1.5rem">Haz clic en un adaptador para ver c&oacute;mo se conecta</div>
+  </div>
+</div>
+
+<!-- Clean Architecture -->
+<div class="card">
+  <div class="card-header">
+    <div class="card-icon" style="background:linear-gradient(135deg,var(--cyan),var(--purple));color:#fff;box-shadow:var(--glow-cyan)">CA</div>
+    <div><div class="card-title">Clean Architecture (Robert C. Martin)</div><div class="badge badge-cyan">Uncle Bob</div></div>
+  </div>
+  <p class="card-desc">C&iacute;rculos conc&eacute;ntricos con la <strong>Dependency Rule</strong>: las dependencias del c&oacute;digo fuente solo apuntan hacia adentro. Las capas internas no saben nada de las externas. DIP hace esto posible.</p>
+
+  <div class="diagram-container" style="text-align:center">
+    <div style="position:relative;width:400px;height:400px;margin:0 auto">
+      <div class="circle-layer" style="width:400px;height:400px;top:0;left:0;border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.04)" onclick="cleanClick('fw')">
+        <span class="cl-label" style="top:10px;left:50%;transform:translateX(-50%);color:var(--red);font-size:.72rem">Frameworks &amp; Drivers</span>
+      </div>
+      <div class="circle-layer" style="width:300px;height:300px;top:50px;left:50px;border-color:rgba(16,185,129,.3);background:rgba(16,185,129,.04)" onclick="cleanClick('ia')">
+        <span class="cl-label" style="top:10px;left:50%;transform:translateX(-50%);color:var(--green);font-size:.72rem">Interface Adapters</span>
+      </div>
+      <div class="circle-layer" style="width:200px;height:200px;top:100px;left:100px;border-color:rgba(59,130,246,.3);background:rgba(59,130,246,.04)" onclick="cleanClick('uc')">
+        <span class="cl-label" style="top:10px;left:50%;transform:translateX(-50%);color:var(--blue);font-size:.72rem">Use Cases</span>
+      </div>
+      <div class="circle-layer" style="width:100px;height:100px;top:150px;left:150px;border-color:var(--cyan);background:rgba(0,229,255,.12)" onclick="cleanClick('ent')">
+        <span class="cl-label" style="top:50%;left:50%;transform:translate(-50%,-50%);color:var(--cyan);font-size:.72rem">Entities</span>
+      </div>
+    </div>
+    <div id="clean-desc" style="margin-top:1rem;font-size:.85rem;color:var(--text-secondary);min-height:2rem">Haz clic en cada anillo para explorar</div>
+    <p style="font-size:.8rem;color:var(--cyan);margin-top:.5rem">Dependency Rule: dependencias solo apuntan &rarr; hacia el centro</p>
+  </div>
+</div>
+
+<!-- Comparison Table -->
+<div class="card">
+  <div class="card-header">
+    <div class="card-icon" style="background:linear-gradient(135deg,var(--orange),var(--purple));color:#fff">VS</div>
+    <div class="card-title">Comparaci&oacute;n de Arquitecturas</div>
+  </div>
+  <div style="overflow-x:auto">
+  <table class="cmp-table">
+    <thead>
+      <tr><th>Caracter&iacute;stica</th><th>Capas Trad.</th><th>Onion</th><th>Hexagonal</th><th>Clean</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Direcci&oacute;n de dependencias</td><td>Hacia abajo &darr;</td><td>Hacia el centro &rarr;</td><td>Hacia el centro &rarr;</td><td>Hacia el centro &rarr;</td></tr>
+      <tr><td>Dominio depende de infra?</td><td style="color:var(--red)">S&iacute;</td><td style="color:var(--green)">No</td><td style="color:var(--green)">No</td><td style="color:var(--green)">No</td></tr>
+      <tr><td>Usa DIP?</td><td style="color:var(--red)">No</td><td style="color:var(--green)">S&iacute;</td><td style="color:var(--green)">S&iacute;</td><td style="color:var(--green)">S&iacute;</td></tr>
+      <tr><td>Testabilidad</td><td>Baja</td><td>Alta</td><td>Alta</td><td>Alta</td></tr>
+      <tr><td>Metáfora visual</td><td>Torta</td><td>Cebolla</td><td>Hex&aacute;gono</td><td>C&iacute;rculos</td></tr>
+      <tr><td>Concepto clave</td><td>Capas</td><td>Capas conc&eacute;ntricas</td><td>Puertos/Adaptadores</td><td>Dependency Rule</td></tr>
+      <tr><td>Similitud principal</td><td>&mdash;</td><td colspan="3" style="text-align:center;color:var(--cyan)">Todas invierten dependencias para proteger el dominio</td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+</div><!-- /tab4 -->
+
+
+<!-- ======================================================== -->
+<!-- TAB 5: DDD + DIP EN PRACTICA -->
+<!-- ======================================================== -->
+<div class="tab-content" id="tab5">
+<h2 class="section-title">DDD + DIP en Pr&aacute;ctica</h2>
+<p class="section-subtitle">Implementaci&oacute;n real combinando Domain-Driven Design con el Principio de Inversi&oacute;n de Dependencias en un proyecto.</p>
+
+<!-- Project Structure -->
+<div class="card">
+  <div class="card-header">
+    <div class="card-icon" style="background:linear-gradient(135deg,var(--cyan),var(--purple));color:#fff">FS</div>
+    <div class="card-title">Estructura de Proyecto</div>
+  </div>
+  <p class="card-desc">Haz clic en cada carpeta para ver qu&eacute; contiene y un ejemplo de c&oacute;digo:</p>
+
+  <div class="grid-2">
+    <div class="folder-tree" id="folderTree">
+      <div><span class="folder" data-folder="domain" onclick="showFolder(this)">src/</span></div>
+      <div>&nbsp;&nbsp;<span class="folder" data-folder="domain" onclick="showFolder(this)">Domain/</span> <span class="badge badge-cyan">Core</span></div>
+      <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="folder" data-folder="entities" onclick="showFolder(this)">Entities/</span></div>
+      <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="folder" data-folder="vo" onclick="showFolder(this)">ValueObjects/</span></div>
+      <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="folder" data-folder="aggregates" onclick="showFolder(this)">Aggregates/</span></div>
+      <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="folder" data-folder="repos-iface" onclick="showFolder(this)">Repositories/</span> <span class="badge badge-purple">Solo Interfaces!</span></div>
+      <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="folder" data-folder="domsvc" onclick="showFolder(this)">Services/</span></div>
+      <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="folder" data-folder="events" onclick="showFolder(this)">Events/</span></div>
+      <div>&nbsp;&nbsp;<span class="folder" data-folder="app" onclick="showFolder(this)">Application/</span> <span class="badge badge-green">Use Cases</span></div>
+      <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="folder" data-folder="commands" onclick="showFolder(this)">Commands/</span></div>
+      <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="folder" data-folder="queries" onclick="showFolder(this)">Queries/</span></div>
+      <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="folder" data-folder="dtos" onclick="showFolder(this)">DTOs/</span></div>
+      <div>&nbsp;&nbsp;<span class="folder" data-folder="infra" onclick="showFolder(this)">Infrastructure/</span> <span class="badge badge-orange">DIP aqu&iacute;!</span></div>
+      <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="folder" data-folder="persistence" onclick="showFolder(this)">Persistence/</span></div>
+      <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="folder" data-folder="emailimpl" onclick="showFolder(this)">Email/</span></div>
+      <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="folder" data-folder="extapis" onclick="showFolder(this)">ExternalAPIs/</span></div>
+      <div>&nbsp;&nbsp;<span class="folder" data-folder="pres" onclick="showFolder(this)">Presentation/</span> <span class="badge badge-blue">UI</span></div>
+      <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="folder" data-folder="controllers" onclick="showFolder(this)">Controllers/</span></div>
+    </div>
+    <div id="folderDetail" class="tree-detail active" style="display:block">
+      <div style="color:var(--cyan);font-weight:600;margin-bottom:.5rem">Selecciona una carpeta</div>
+      <div style="color:var(--text-secondary);font-size:.82rem">Haz clic en cualquier carpeta del &aacute;rbol para ver su contenido y un ejemplo de c&oacute;digo.</div>
+    </div>
+  </div>
+</div>
+
+<!-- Flow Simulator -->
+<div class="card">
+  <div class="card-header">
+    <div class="card-icon" style="background:linear-gradient(135deg,var(--green),var(--cyan));color:var(--bg-primary)">FL</div>
+    <div class="card-title">Simulador de Flujo de Request</div>
+  </div>
+  <p class="card-desc">Sigue el camino de un request HTTP paso a paso. Haz clic en cada paso para avanzar:</p>
+
+  <div class="flow-steps" id="flowSteps">
+    <div class="flow-step" onclick="flowAdvance(0)">HTTP Request</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step" onclick="flowAdvance(1)">Controller</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step" onclick="flowAdvance(2)">App Service</div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step" onclick="flowAdvance(3)">IRepository<br><span style="font-size:.7rem;color:var(--purple)">(Interfaz DIP)</span></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step" onclick="flowAdvance(4)">DI Container<br><span style="font-size:.7rem;color:var(--orange)">Resuelve impl.</span></div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-step" onclick="flowAdvance(5)">Infraestructura<br><span style="font-size:.7rem;color:var(--green)">SQL Server</span></div>
+  </div>
+  <div id="flowDesc" style="text-align:center;margin-top:1rem;padding:1rem;background:var(--bg-secondary);border-radius:var(--radius-sm);font-size:.85rem;color:var(--text-secondary);min-height:3rem">
+    Haz clic en &quot;HTTP Request&quot; para comenzar la simulaci&oacute;n
+  </div>
+</div>
+
+<!-- DI Container Visual -->
+<div class="card">
+  <div class="card-header">
+    <div class="card-icon" style="background:linear-gradient(135deg,var(--purple),var(--cyan));color:#fff">DI</div>
+    <div class="card-title">Contenedor de Inyecci&oacute;n de Dependencias</div>
+  </div>
+  <p class="card-desc">El contenedor DI es el &quot;pegamento&quot; que conecta interfaces con implementaciones sin que los m&oacute;dulos se conozcan entre s&iacute;.</p>
+
+  <div class="code-block"><span class="code-label">C# &mdash; Program.cs / ServiceRegistration</span>
+<span class="cm">// Registro: Interfaz &rarr; Implementaci&oacute;n</span>
+services.<span class="fn">AddScoped</span>&lt;<span class="tp">IPedidoRepository</span>, <span class="tp">PedidoRepositoryEF</span>&gt;();
+services.<span class="fn">AddScoped</span>&lt;<span class="tp">INotificador</span>, <span class="tp">EmailNotificador</span>&gt;();
+services.<span class="fn">AddScoped</span>&lt;<span class="tp">IPedidoService</span>, <span class="tp">PedidoService</span>&gt;();
+
+<span class="cm">// Resoluci&oacute;n autom&aacute;tica:</span>
+<span class="cm">// Cuando alguien pide IPedidoRepository</span>
+<span class="cm">//   &rarr; el contenedor entrega PedidoRepositoryEF</span>
+<span class="cm">// &iexcl;Sin que PedidoService sepa qu&eacute; implementaci&oacute;n recibe!</span></div>
+
+  <div class="diagram-container" style="text-align:center">
+    <div class="ibox-row" style="justify-content:center;gap:1.5rem">
+      <div>
+        <div style="font-size:.8rem;font-weight:600;color:var(--purple);margin-bottom:.5rem">Interfaces (Contratos)</div>
+        <div class="ibox" style="border-color:var(--purple)"><div class="ibox-label" style="color:var(--purple);font-size:.78rem">IPedidoRepository</div></div>
+        <div class="ibox" style="border-color:var(--purple);margin-top:.5rem"><div class="ibox-label" style="color:var(--purple);font-size:.78rem">INotificador</div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;justify-content:center;align-items:center;gap:.5rem">
+        <div style="font-size:1.5rem;color:var(--cyan)">&harr;</div>
+        <div style="background:var(--cyan);color:var(--bg-primary);padding:.3rem .6rem;border-radius:var(--radius-sm);font-size:.75rem;font-weight:700">DI Container</div>
+        <div style="font-size:1.5rem;color:var(--cyan)">&harr;</div>
+      </div>
+      <div>
+        <div style="font-size:.8rem;font-weight:600;color:var(--green);margin-bottom:.5rem">Implementaciones</div>
+        <div class="ibox" style="border-color:var(--green)"><div class="ibox-label" style="color:var(--green);font-size:.78rem">PedidoRepositoryEF</div></div>
+        <div class="ibox" style="border-color:var(--green);margin-top:.5rem"><div class="ibox-label" style="color:var(--green);font-size:.78rem">EmailNotificador</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CQRS -->
+<div class="card">
+  <div class="card-header">
+    <div class="card-icon" style="background:linear-gradient(135deg,var(--orange),var(--blue));color:#fff">CQ</div>
+    <div><div class="card-title">CQRS (Command Query Responsibility Segregation)</div><div class="badge badge-orange">Bonus</div></div>
+  </div>
+  <p class="card-desc">Separaci&oacute;n entre operaciones de escritura (Commands) y lectura (Queries). Cada lado puede optimizarse independientemente.</p>
+
+  <div class="diagram-container" style="text-align:center">
+    <div class="ibox-row" style="justify-content:center;gap:2rem">
+      <div style="text-align:center">
+        <div class="ibox" style="border-color:var(--orange);cursor:pointer;min-width:180px" onclick="cqrsDemo('cmd')">
+          <div class="ibox-label" style="color:var(--orange)">Command</div>
+          <div class="ibox-sub">CrearPedidoCommand</div>
+        </div>
+        <div class="arrow-down" style="color:var(--orange)">&darr;</div>
+        <div class="ibox" style="border-color:var(--orange)"><div class="ibox-label" style="color:var(--orange);font-size:.8rem">Command Handler</div></div>
+        <div class="arrow-down" style="color:var(--orange)">&darr;</div>
+        <div class="ibox" style="border-color:var(--orange)"><div class="ibox-label" style="color:var(--orange);font-size:.8rem">Write Model (DB)</div></div>
+      </div>
+      <div style="text-align:center">
+        <div class="ibox" style="border-color:var(--blue);cursor:pointer;min-width:180px" onclick="cqrsDemo('qry')">
+          <div class="ibox-label" style="color:var(--blue)">Query</div>
+          <div class="ibox-sub">ObtenerPedidosQuery</div>
+        </div>
+        <div class="arrow-down" style="color:var(--blue)">&darr;</div>
+        <div class="ibox" style="border-color:var(--blue)"><div class="ibox-label" style="color:var(--blue);font-size:.8rem">Query Handler</div></div>
+        <div class="arrow-down" style="color:var(--blue)">&darr;</div>
+        <div class="ibox" style="border-color:var(--blue)"><div class="ibox-label" style="color:var(--blue);font-size:.8rem">Read Model (DB/Cache)</div></div>
+      </div>
+    </div>
+    <div id="cqrs-desc" style="margin-top:1rem;font-size:.85rem;color:var(--text-secondary);min-height:1.5rem">Haz clic en Command o Query para ver el flujo</div>
+  </div>
+</div>
+
+<!-- Testing -->
+<div class="card">
+  <div class="card-header">
+    <div class="card-icon" style="background:linear-gradient(135deg,var(--green),var(--cyan));color:var(--bg-primary)">TS</div>
+    <div class="card-title">Ventajas para Testing</div>
+  </div>
+  <p class="card-desc">DIP permite reemplazar dependencias reales con mocks en tests unitarios. El servicio no sabe si usa la BD real o un fake.</p>
+
+  <div class="grid-2">
+    <div>
+      <div style="font-weight:600;font-size:.85rem;color:var(--red);margin-bottom:.5rem">Sin DIP &mdash; no testeable</div>
+      <div class="code-block" style="font-size:.78rem"><span class="cm">// Necesita SQL Server real para testear</span>
+<span class="kw">var</span> svc = <span class="kw">new</span> <span class="tp">PedidoService</span>();
+<span class="cm">// Internamente crea SqlServerRepository</span>
+<span class="cm">// No puedes aislar la l&oacute;gica</span></div>
+    </div>
+    <div>
+      <div style="font-weight:600;font-size:.85rem;color:var(--green);margin-bottom:.5rem">Con DIP &mdash; totalmente testeable</div>
+      <div class="code-block" style="font-size:.78rem"><span class="cm">// Mock en lugar de BD real</span>
+<span class="kw">var</span> mockRepo = <span class="kw">new</span> <span class="tp">MockPedidoRepository</span>();
+<span class="kw">var</span> mockNotif = <span class="kw">new</span> <span class="tp">MockNotificador</span>();
+<span class="kw">var</span> svc = <span class="kw">new</span> <span class="tp">PedidoService</span>(mockRepo, mockNotif);
+<span class="cm">// Test r&aacute;pido, sin infraestructura</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- FINAL QUIZ -->
+<div class="card" style="border:1px solid rgba(168,85,247,.3)">
+  <div class="card-header">
+    <div class="card-icon" style="background:linear-gradient(135deg,var(--purple),var(--pink));color:#fff">Q</div>
+    <div class="card-title">Quiz Final Comprehensivo</div>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="quizProgress"></div></div>
+  <div id="quizContainer"></div>
+  <div class="score-display" id="quizScore" style="display:none"></div>
+  <div style="text-align:center;margin-top:1rem">
+    <button class="btn btn-purple" onclick="resetFinalQuiz()" id="quizResetBtn" style="display:none">Reiniciar Quiz</button>
+  </div>
+</div>
+
+</div><!-- /tab5 -->
+
+</main>
+
+<!-- ============ SCRIPTS ============ -->
+<script>
+// ============ CANVAS BACKGROUND ============
+(function(){
+  const c=document.getElementById('bgCanvas'),x=c.getContext('2d');
+  let w,h,pts=[];
+  function resize(){w=c.width=window.innerWidth;h=c.height=window.innerHeight;pts=[];for(let i=0;i<60;i++)pts.push({x:Math.random()*w,y:Math.random()*h,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,r:Math.random()*2+1})}
+  function draw(){x.clearRect(0,0,w,h);pts.forEach((p,i)=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>w)p.vx*=-1;if(p.y<0||p.y>h)p.vy*=-1;x.beginPath();x.arc(p.x,p.y,p.r,0,Math.PI*2);x.fillStyle='rgba(0,229,255,.15)';x.fill();for(let j=i+1;j<pts.length;j++){const d=Math.hypot(pts[j].x-p.x,pts[j].y-p.y);if(d<150){x.beginPath();x.moveTo(p.x,p.y);x.lineTo(pts[j].x,pts[j].y);x.strokeStyle=`rgba(0,229,255,${.06*(1-d/150)})`;x.stroke()}}});requestAnimationFrame(draw)}
+  resize();draw();window.addEventListener('resize',resize);
+})();
+
+// ============ TABS ============
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.tab).classList.add('active');
+    window.scrollTo({top:0,behavior:'smooth'});
+  });
+});
+
+// ============ TOGGLE CODE ============
+function toggleCode(btn,group){
+  const btns=btn.parentElement.querySelectorAll('.toggle-btn');
+  const panels=btn.parentElement.parentElement.querySelectorAll(`.toggle-panel[data-group="${group}"]`);
+  const idx=Array.from(btns).indexOf(btn);
+  btns.forEach(b=>b.classList.remove('active'));
+  panels.forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  if(panels[idx])panels[idx].classList.add('active');
+}
+
+// ============ QUIZ ============
+function checkQuiz(el,correct){
+  const opts=el.parentElement.querySelectorAll('.quiz-opt');
+  const fb=el.parentElement.nextElementSibling;
+  opts.forEach(o=>{o.classList.add('disabled');o.classList.remove('correct','wrong')});
+  if(correct){el.classList.add('correct');fb.textContent='Correcto!';fb.className='quiz-feedback show ok';}
+  else{el.classList.add('wrong');opts.forEach(o=>{/*find correct*/});fb.textContent='Incorrecto. Revisa la explicaci\u00f3n arriba.';fb.className='quiz-feedback show nok';}
+}
+
+// ============ SRP REFACTOR ============
+function srpRefactor(){
+  const box=document.getElementById('srpBigBox');
+  box.style.opacity='.3';box.style.transform='scale(.9)';
+  setTimeout(()=>{document.getElementById('srp-refactored').style.display='block'},400);
+}
+
+// ============ OCP ADD TYPE ============
+let ocpCount=0;
+const ocpTypes=[{name:'VIP',pct:'30%',color:'var(--orange)'},{name:'Corporativo',pct:'25%',color:'var(--pink)'},{name:'Mayorista',pct:'35%',color:'var(--cyan)'}];
+function ocpAddType(){
+  if(ocpCount>=ocpTypes.length){document.getElementById('ocpBtn').textContent='Sin m\u00e1s tipos';document.getElementById('ocpBtn').disabled=true;return;}
+  const t=ocpTypes[ocpCount++];
+  const d=document.createElement('div');d.className='ibox';d.style.borderColor=t.color;d.style.animation='fadeUp .4s ease';
+  d.innerHTML=`<div class="ibox-label" style="color:${t.color}">${t.name}</div><div class="ibox-sub">${t.pct}</div>`;
+  document.getElementById('ocp-types').appendChild(d);
+}
+
+// ============ ISP SEGMENT ============
+function ispSegment(){
+  document.getElementById('isp-fat').style.opacity='.3';
+  setTimeout(()=>document.getElementById('isp-split').style.display='block',300);
+}
+
+// ============ ENTITY STATE ============
+const entityStates=['Borrador','Confirmado','En Proceso','Enviado','Entregado'];
+const entityColors=['var(--orange)','var(--cyan)','var(--blue)','var(--purple)','var(--green)'];
+let entityIdx=0;
+function entityAdvance(){entityIdx=(entityIdx+1)%entityStates.length;const el=document.getElementById('entityState');el.textContent=entityStates[entityIdx];el.style.color=entityColors[entityIdx];}
+
+// ============ AGGREGATE ACCESS ============
+function aggAccess(el,type){
+  const msg=document.getElementById('agg-msg');
+  if(type==='root'){msg.innerHTML='<span style="color:var(--green)">Acceso por Root: pedido.AgregarLinea(producto, cantidad) &mdash; CORRECTO</span>';}
+  else{msg.innerHTML='<span style="color:var(--red)">Acceso directo a entidad interna &mdash; INCORRECTO. Siempre acceder mediante el Aggregate Root.</span>';}
+}
+
+// ============ EVENT TIMELINE ============
+const evtDescs=['<strong>1. Acci\u00f3n:</strong> El usuario confirma un pedido','<strong>2. Evento emitido:</strong> PedidoConfirmadoEvent','<strong>3. Handler A:</strong> EnviarEmailConfirmaci\u00f3n','<strong>4. Handler B:</strong> ActualizarInventario','<strong>5. Resultado:</strong> Email enviado + Stock actualizado'];
+function evtAdvance(idx){
+  const nodes=document.querySelectorAll('#eventTimeline .evt-node');
+  const lines=document.querySelectorAll('#eventTimeline .evt-line');
+  for(let i=0;i<=idx;i++){nodes[i].classList.add('active');if(i>0)lines[i-1].classList.add('active');}
+  document.getElementById('evt-desc').innerHTML=evtDescs[idx];
+}
+
+// ============ SPECIFICATION TOGGLE ============
+function specToggle(id){document.getElementById(id).classList.toggle('active');updateSpec();}
+function specOp(op){/* visual only */}
+function updateSpec(){
+  const a=document.getElementById('sp1').classList.contains('active');
+  const b=document.getElementById('sp2').classList.contains('active');
+  const c=document.getElementById('sp3').classList.contains('active');
+  let parts=[];if(a)parts.push('EsClientePremium');if(b)parts.push('TieneCr\u00e9ditoDisponible');if(c)parts.push('NOT PedidoPendiente');
+  const r=document.getElementById('specResult');
+  if(!parts.length){r.textContent='Selecciona especificaciones para ver el resultado combinado';return;}
+  const expr=parts.join(' AND ');
+  r.innerHTML=`<span style="color:var(--cyan);font-weight:600">Expresi\u00f3n:</span> ${expr}<br><span style="color:var(--text-muted)">Filtra clientes que cumplen TODAS las condiciones seleccionadas.</span>`;
+}
+
+// ============ GLOSSARY ============
+function addGlossary(){
+  const t=document.getElementById('glossaryTerm'),d=document.getElementById('glossaryDef');
+  if(!t.value.trim()||!d.value.trim())return;
+  const item=document.createElement('div');item.className='glossary-item';
+  item.innerHTML=`<span class="term">${t.value}</span><span class="def">${d.value}</span><button class="del-btn" onclick="this.parentElement.remove()">&times;</button>`;
+  document.getElementById('glossaryList').appendChild(item);
+  t.value='';d.value='';t.focus();
+}
+
+// ============ BOUNDED CONTEXT TOGGLE ============
+function toggleCtx(el){
+  const wasOpen=el.classList.contains('open');
+  document.querySelectorAll('.ctx-box').forEach(b=>b.classList.remove('open'));
+  if(!wasOpen)el.classList.add('open');
+}
+
+// ============ SUBDOMAIN DRAG & DROP ============
+function dragSD(e){e.dataTransfer.setData('text/plain',e.target.outerHTML);e.dataTransfer.setData('correct',e.target.dataset.correct);e.target.style.opacity='.4';setTimeout(()=>e.target.remove(),0);}
+function allowDrop(e){e.preventDefault();e.currentTarget.classList.add('over');}
+function dropSD(e){
+  e.preventDefault();e.currentTarget.classList.remove('over');
+  const html=e.dataTransfer.getData('text/plain');
+  const correct=e.dataTransfer.getData('correct');
+  const zone=e.currentTarget.id;
+  const div=document.createElement('div');div.innerHTML=html;const item=div.firstChild;
+  const isCorrect=(zone==='dz-core'&&correct==='core')||(zone==='dz-support'&&correct==='support')||(zone==='dz-generic'&&correct==='generic')||zone==='dz-items';
+  if(!isCorrect&&zone!=='dz-items'){item.style.borderColor='var(--red)';item.style.color='var(--red)';setTimeout(()=>{item.style.borderColor='var(--border)';item.style.color='var(--text-primary)'},1500);}
+  else if(isCorrect&&zone!=='dz-items'){item.style.borderColor='var(--green)';item.style.color='var(--green)';}
+  item.setAttribute('draggable','true');item.ondragstart=dragSD;
+  e.currentTarget.appendChild(item);
+}
+document.querySelectorAll('.drag-zone').forEach(z=>{z.addEventListener('dragleave',()=>z.classList.remove('over'));});
+
+// ============ ONION CLICK ============
+const onionDescs={
+  core:'<strong style="color:var(--cyan)">Core (Domain Model):</strong> Entidades, Value Objects, Aggregate Roots. Sin dependencias externas. Es el coraz\u00f3n del sistema.',
+  domsvc:'<strong style="color:var(--purple)">Domain Services:</strong> L\u00f3gica que opera sobre m\u00faltiples entidades. Interfaces de repositorios definidas aqu\u00ed.',
+  app:'<strong style="color:var(--blue)">Application Services:</strong> Casos de uso, orquestaci\u00f3n. Depende del dominio, NO de infraestructura.',
+  outer:'<strong style="color:var(--text-muted)">Infraestructura / UI / Tests:</strong> Implementaciones de repositorios, controladores HTTP, bases de datos, servicios externos.'
+};
+function onionClick(el,layer){document.getElementById('onion-desc').innerHTML=onionDescs[layer];}
+
+// ============ HEXAGONAL PORT ============
+const hexDescs={
+  rest:'<span style="color:var(--green)">REST API (Driving):</span> Adaptador primario que traduce HTTP requests en llamadas al Application Service. Puerto: ICommandHandler.',
+  cli:'<span style="color:var(--green)">CLI (Driving):</span> Interfaz de l\u00ednea de comandos que invoca casos de uso. Mismo puerto que REST.',
+  ui:'<span style="color:var(--green)">UI Web (Driving):</span> Frontend Angular/React que consume la API. Adaptador primario visual.',
+  db:'<span style="color:var(--orange)">Base de Datos (Driven):</span> Adaptador secundario. Implementa IPedidoRepository usando EF Core/SQL.',
+  email:'<span style="color:var(--orange)">Email Service (Driven):</span> Implementa INotificador usando SMTP/SendGrid. El dominio no sabe qu\u00e9 servicio de email se usa.',
+  extapi:'<span style="color:var(--orange)">API Externa (Driven):</span> Adaptador para servicios de terceros (Fracttal, SAP, etc). Implementa interfaz del dominio.'
+};
+function hexPort(p){document.getElementById('hex-desc').innerHTML=hexDescs[p];}
+
+// ============ CLEAN ARCH CLICK ============
+const cleanDescs={
+  ent:'<strong style="color:var(--cyan)">Entities:</strong> Reglas de negocio empresariales. Las m\u00e1s estables. No dependen de nada.',
+  uc:'<strong style="color:var(--blue)">Use Cases:</strong> Reglas de la aplicaci\u00f3n. Orquestan el flujo de datos. Dependen solo de Entities.',
+  ia:'<strong style="color:var(--green)">Interface Adapters:</strong> Controllers, Presenters, Gateways. Convierten datos entre formatos de Use Cases y externos.',
+  fw:'<strong style="color:var(--red)">Frameworks & Drivers:</strong> DB, Web Framework, UI. La capa m\u00e1s externa y vol\u00e1til. F\u00e1cil de reemplazar.'
+};
+function cleanClick(layer){document.getElementById('clean-desc').innerHTML=cleanDescs[layer];}
+
+// ============ FOLDER DETAIL ============
+const folderData={
+  domain:{title:'Domain/',desc:'Capa central sin dependencias externas. Contiene todo el modelo de dominio.',code:''},
+  entities:{title:'Domain/Entities/',desc:'Objetos con identidad \u00fanica que persisten a trav\u00e9s del tiempo.',code:`<span class="kw">public class</span> <span class="tp">Pedido</span> : <span class="tp">Entity</span>
+{
+    <span class="kw">public</span> <span class="tp">Guid</span> ClienteId { <span class="kw">get</span>; }
+    <span class="kw">public</span> <span class="tp">EstadoPedido</span> Estado { <span class="kw">get</span>; <span class="kw">private set</span>; }
+    <span class="kw">private readonly</span> <span class="tp">List</span>&lt;<span class="tp">LineaPedido</span>&gt; _lineas;
+}`},
+  vo:{title:'Domain/ValueObjects/',desc:'Objetos inmutables definidos por sus valores, sin identidad propia.',code:`<span class="kw">public record</span> <span class="tp">Direccion</span>(
+    <span class="str">string</span> Calle,
+    <span class="str">string</span> Ciudad,
+    <span class="str">string</span> CodigoPostal);`},
+  aggregates:{title:'Domain/Aggregates/',desc:'Ra\u00edces de agregados que protegen invariantes de consistencia.',code:`<span class="cm">// El Pedido ES el Aggregate Root</span>
+<span class="cm">// Solo Pedido puede modificar sus LineaPedido</span>
+pedido.<span class="fn">AgregarLinea</span>(producto, <span class="nr">3</span>);`},
+  'repos-iface':{title:'Domain/Repositories/',desc:'SOLO interfaces. Las implementaciones van en Infrastructure. Esto es DIP.',code:`<span class="kw">public interface</span> <span class="tp">IPedidoRepository</span>
+{
+    <span class="tp">Task</span>&lt;<span class="tp">Pedido</span>?&gt; <span class="fn">ObtenerPorIdAsync</span>(<span class="tp">Guid</span> id);
+    <span class="tp">Task</span> <span class="fn">GuardarAsync</span>(<span class="tp">Pedido</span> pedido);
+}`},
+  domsvc:{title:'Domain/Services/',desc:'L\u00f3gica que involucra m\u00faltiples entidades o agregados.',code:`<span class="kw">public class</span> <span class="tp">PrecioService</span>
+{
+    <span class="kw">public</span> <span class="tp">Dinero</span> <span class="fn">CalcularTotal</span>(<span class="tp">Pedido</span> p, <span class="tp">Descuento</span> d)
+    {
+        <span class="kw">return</span> p.Subtotal.<span class="fn">Aplicar</span>(d);
+    }
+}`},
+  events:{title:'Domain/Events/',desc:'Eventos de dominio que representan hechos que ocurrieron.',code:`<span class="kw">public record</span> <span class="tp">PedidoCreado</span>(
+    <span class="tp">Guid</span> PedidoId,
+    <span class="tp">Guid</span> ClienteId,
+    <span class="tp">DateTime</span> Fecha) : <span class="tp">IDomainEvent</span>;`},
+  app:{title:'Application/',desc:'Casos de uso. Orquesta el dominio. Depende SOLO del dominio.',code:''},
+  commands:{title:'Application/Commands/',desc:'Operaciones de escritura (CQRS). Cada command tiene su handler.',code:`<span class="kw">public record</span> <span class="tp">CrearPedidoCommand</span>(<span class="tp">Guid</span> ClienteId, <span class="tp">List</span>&lt;<span class="tp">ItemDTO</span>&gt; Items);
+
+<span class="kw">public class</span> <span class="tp">CrearPedidoHandler</span>
+{
+    <span class="kw">private readonly</span> <span class="tp">IPedidoRepository</span> _repo; <span class="cm">// DIP!</span>
+    <span class="kw">public async</span> <span class="tp">Task</span> <span class="fn">Handle</span>(<span class="tp">CrearPedidoCommand</span> cmd) { ... }
+}`},
+  queries:{title:'Application/Queries/',desc:'Operaciones de lectura (CQRS). Optimizadas para consulta.',code:`<span class="kw">public record</span> <span class="tp">ObtenerPedidosQuery</span>(<span class="tp">Guid</span> ClienteId);
+<span class="kw">public class</span> <span class="tp">ObtenerPedidosHandler</span>
+{
+    <span class="kw">public async</span> <span class="tp">Task</span>&lt;<span class="tp">List</span>&lt;<span class="tp">PedidoDTO</span>&gt;&gt; <span class="fn">Handle</span>(...) { ... }
+}`},
+  dtos:{title:'Application/DTOs/',desc:'Objetos de transferencia de datos entre capas.',code:`<span class="kw">public record</span> <span class="tp">PedidoDTO</span>(
+    <span class="tp">Guid</span> Id,
+    <span class="str">string</span> Estado,
+    <span class="kw">decimal</span> Total,
+    <span class="tp">DateTime</span> Fecha);`},
+  infra:{title:'Infrastructure/',desc:'Implementaciones concretas. Aqu\u00ed vive DIP: implementa las interfaces del dominio.',code:''},
+  persistence:{title:'Infrastructure/Persistence/',desc:'Implementaciones de repositorios usando EF Core, Dapper, etc.',code:`<span class="kw">public class</span> <span class="tp">PedidoRepositoryEF</span> : <span class="tp">IPedidoRepository</span>
+{
+    <span class="kw">private readonly</span> <span class="tp">AppDbContext</span> _ctx;
+    <span class="kw">public async</span> <span class="tp">Task</span>&lt;<span class="tp">Pedido</span>?&gt; <span class="fn">ObtenerPorIdAsync</span>(<span class="tp">Guid</span> id)
+        => <span class="kw">await</span> _ctx.Pedidos.<span class="fn">FindAsync</span>(id);
+}`},
+  emailimpl:{title:'Infrastructure/Email/',desc:'Implementaci\u00f3n del servicio de notificaciones.',code:`<span class="kw">public class</span> <span class="tp">SmtpNotificador</span> : <span class="tp">INotificador</span>
+{
+    <span class="kw">public async</span> <span class="tp">Task</span> <span class="fn">Notificar</span>(<span class="str">string</span> msg)
+    {
+        <span class="cm">// Usa SmtpClient para enviar email</span>
+    }
+}`},
+  extapis:{title:'Infrastructure/ExternalAPIs/',desc:'Integraciones con servicios externos (Fracttal, SAP, etc).',code:`<span class="kw">public class</span> <span class="tp">FracttalClient</span> : <span class="tp">IMantenimientoService</span>
+{
+    <span class="kw">public async</span> <span class="tp">Task</span>&lt;<span class="tp">List</span>&lt;<span class="tp">OrdenTrabajo</span>&gt;&gt; <span class="fn">ObtenerOTs</span>() { ... }
+}`},
+  pres:{title:'Presentation/',desc:'Capa de presentaci\u00f3n: controllers HTTP y view models.',code:''},
+  controllers:{title:'Presentation/Controllers/',desc:'Endpoints HTTP. Inyectan servicios de aplicaci\u00f3n (no dominio directamente).',code:`[<span class="at">ApiController</span>]
+<span class="kw">public class</span> <span class="tp">PedidoController</span> : <span class="tp">ControllerBase</span>
+{
+    <span class="kw">private readonly</span> <span class="tp">IPedidoService</span> _svc; <span class="cm">// Inyectado via DI</span>
+
+    [<span class="at">HttpPost</span>]
+    <span class="kw">public async</span> <span class="tp">Task</span>&lt;<span class="tp">IActionResult</span>&gt; <span class="fn">Crear</span>(<span class="tp">CrearPedidoDTO</span> dto)
+        => <span class="fn">Ok</span>(<span class="kw">await</span> _svc.<span class="fn">CrearAsync</span>(dto));
+}`}
+};
+function showFolder(el){
+  document.querySelectorAll('.folder').forEach(f=>f.classList.remove('active'));
+  el.classList.add('active');
+  const key=el.dataset.folder;
+  const data=folderData[key];
+  if(!data)return;
+  let html=`<div style="color:var(--cyan);font-weight:600;margin-bottom:.5rem">${data.title}</div><div style="color:var(--text-secondary);font-size:.85rem;margin-bottom:.75rem">${data.desc}</div>`;
+  if(data.code)html+=`<div class="code-block" style="font-size:.78rem">${data.code}</div>`;
+  document.getElementById('folderDetail').innerHTML=html;
+}
+
+// ============ FLOW SIMULATOR ============
+const flowDescs=[
+  'Un cliente env\u00eda POST /api/pedidos con los datos del pedido.',
+  'El <strong>Controller</strong> recibe el request, valida el DTO y llama al Application Service.',
+  'El <strong>Application Service</strong> orquesta: crea la entidad Pedido y necesita persistirla. Llama a <code>IPedidoRepository.Guardar()</code>.',
+  'El servicio usa <strong>IPedidoRepository</strong> (interfaz del dominio). No sabe qu\u00e9 implementaci\u00f3n existe. <span style="color:var(--purple)">Aqu\u00ed act\u00faa DIP.</span>',
+  'El <strong>DI Container</strong> resuelve IPedidoRepository &rarr; PedidoRepositoryEF. Inyecta autom\u00e1ticamente la implementaci\u00f3n concreta.',
+  'La <strong>Infraestructura</strong> (EF Core + SQL Server) persiste el pedido. Los datos fluyen de vuelta hacia el Controller.'
+];
+let flowIdx=-1;
+function flowAdvance(idx){
+  const steps=document.querySelectorAll('#flowSteps .flow-step');
+  for(let i=0;i<steps.length;i++){steps[i].classList.remove('active','done');if(i<idx)steps[i].classList.add('done');if(i===idx)steps[i].classList.add('active');}
+  document.getElementById('flowDesc').innerHTML=flowDescs[idx];
+  flowIdx=idx;
+}
+
+// ============ CQRS DEMO ============
+function cqrsDemo(type){
+  const d=document.getElementById('cqrs-desc');
+  if(type==='cmd')d.innerHTML='<span style="color:var(--orange)"><strong>Command path:</strong> CrearPedidoCommand &rarr; Validaci\u00f3n &rarr; Domain Logic &rarr; Persistencia (Write DB) &rarr; Evento emitido</span>';
+  else d.innerHTML='<span style="color:var(--blue)"><strong>Query path:</strong> ObtenerPedidosQuery &rarr; Read-optimized Query &rarr; DTO projection &rarr; Response (puede usar cache o read replica)</span>';
+}
+
+// ============ FINAL QUIZ ============
+const finalQuiz=[
+  {q:'\u00bfQu\u00e9 principio SOLID establece que una clase debe tener una sola raz\u00f3n para cambiar?',opts:['Open/Closed','Single Responsibility','Liskov Substitution','Interface Segregation'],correct:1,exp:'SRP: Single Responsibility Principle. Cada clase encapsula una \u00fanica responsabilidad.'},
+  {q:'\u00bfQu\u00e9 significa que las dependencias \"apunten hacia adentro\" en Clean Architecture?',opts:['Las capas externas importan las internas','Las capas internas importan las externas','Todas las capas se conocen entre s\u00ed','Solo la capa de presentaci\u00f3n tiene dependencias'],correct:0,exp:'La Dependency Rule dice que las capas externas (infra, UI) dependen de las internas (dominio), nunca al rev\u00e9s.'},
+  {q:'\u00bfD\u00f3nde vive la interfaz IRepository en una arquitectura DDD?',opts:['En Infrastructure/','En Presentation/','En Domain/','En Application/'],correct:2,exp:'La interfaz del repositorio se define en el dominio; la implementaci\u00f3n vive en infraestructura (DIP).'},
+  {q:'\u00bfQu\u00e9 es un Aggregate Root?',opts:['Una tabla de base de datos','El punto de entrada \u00fanico a un grupo de entidades relacionadas','Un patr\u00f3n de UI','Un tipo de Value Object'],correct:1,exp:'El Aggregate Root es la entidad principal que protege las invariantes del agregado. Todo acceso pasa por \u00e9l.'},
+  {q:'\u00bfCu\u00e1l es la diferencia entre Entity y Value Object?',opts:['Entity es inmutable, VO es mutable','Entity tiene identidad \u00fanica, VO se define por sus valores','No hay diferencia','VO tiene m\u00e9todos, Entity no'],correct:1,exp:'Entity tiene identidad que persiste; Value Object es inmutable y dos VOs con mismos valores son iguales.'},
+  {q:'\u00bfQu\u00e9 patr\u00f3n de Context Map protege tu modelo de modelos externos legacy?',opts:['Shared Kernel','Conformist','Anticorruption Layer','Open Host Service'],correct:2,exp:'Anticorruption Layer traduce y a\u00edsla tu modelo del modelo externo, protegi\u00e9ndolo de corrupci\u00f3n.'},
+  {q:'En CQRS, \u00bfqu\u00e9 se separa?',opts:['Frontend de Backend','Tests de C\u00f3digo','Operaciones de lectura de escritura','Clases de Interfaces'],correct:2,exp:'CQRS separa Commands (escritura) de Queries (lectura) para optimizar cada lado independientemente.'},
+  {q:'\u00bfQu\u00e9 permite DIP en relaci\u00f3n con testing?',opts:['Eliminar la necesidad de tests','Usar mocks en lugar de implementaciones reales','Ejecutar tests m\u00e1s lento pero m\u00e1s seguro','Testear solo la UI'],correct:1,exp:'DIP permite inyectar mocks/fakes en lugar de dependencias reales, habilitando tests unitarios r\u00e1pidos.'},
+  {q:'\u00bfQu\u00e9 arquitectura usa la met\u00e1fora de Puertos y Adaptadores?',opts:['Clean Architecture','Arquitectura por Capas','Hexagonal Architecture','MVC'],correct:2,exp:'Hexagonal Architecture (Alistair Cockburn) usa Ports (interfaces) y Adapters (implementaciones) para conectar el dominio con el mundo exterior.'},
+  {q:'\u00bfQu\u00e9 subdomain merece la mayor inversi\u00f3n de dise\u00f1o en DDD?',opts:['Generic Subdomain','Supporting Subdomain','Core Domain','Infrastructure Subdomain'],correct:2,exp:'El Core Domain es lo que diferencia tu negocio. Merece el mejor dise\u00f1o, los mejores desarrolladores y la mayor inversi\u00f3n.'}
+];
+let fqIdx=0,fqScore=0,fqAnswered=[];
+
+function renderFinalQuiz(){
+  const c=document.getElementById('quizContainer');
+  if(fqIdx>=finalQuiz.length){showFinalScore();return;}
+  const q=finalQuiz[fqIdx];
+  let html=`<div style="font-size:.82rem;color:var(--text-muted);margin-bottom:.5rem">Pregunta ${fqIdx+1} de ${finalQuiz.length}</div>`;
+  html+=`<div class="quiz-box"><div class="quiz-question">${q.q}</div><div class="quiz-options">`;
+  q.opts.forEach((o,i)=>{html+=`<div class="quiz-opt" onclick="answerFinal(${i})">${o}</div>`;});
+  html+=`</div><div class="quiz-feedback"></div></div>`;
+  c.innerHTML=html;
+  document.getElementById('quizProgress').style.width=((fqIdx/finalQuiz.length)*100)+'%';
+}
+function answerFinal(idx){
+  const q=finalQuiz[fqIdx];
+  const opts=document.querySelectorAll('#quizContainer .quiz-opt');
+  const fb=document.querySelector('#quizContainer .quiz-feedback');
+  opts.forEach((o,i)=>{o.classList.add('disabled');if(i===q.correct)o.classList.add('correct');if(i===idx&&i!==q.correct)o.classList.add('wrong');});
+  if(idx===q.correct){fqScore++;fb.className='quiz-feedback show ok';fb.textContent='Correcto! '+q.exp;}
+  else{fb.className='quiz-feedback show nok';fb.textContent='Incorrecto. '+q.exp;}
+  setTimeout(()=>{fqIdx++;renderFinalQuiz();},2200);
+}
+function showFinalScore(){
+  document.getElementById('quizProgress').style.width='100%';
+  document.getElementById('quizContainer').innerHTML='';
+  const sc=document.getElementById('quizScore');sc.style.display='block';
+  sc.textContent=`Puntuaci\u00f3n: ${fqScore} / ${finalQuiz.length} (${Math.round(fqScore/finalQuiz.length*100)}%)`;
+  document.getElementById('quizResetBtn').style.display='inline-block';
+}
+function resetFinalQuiz(){fqIdx=0;fqScore=0;document.getElementById('quizScore').style.display='none';document.getElementById('quizResetBtn').style.display='none';renderFinalQuiz();}
+
+// Init final quiz when tab5 becomes visible
+const observer=new MutationObserver(()=>{if(document.getElementById('tab5').classList.contains('active')&&!document.querySelector('#quizContainer .quiz-box'))renderFinalQuiz();});
+observer.observe(document.getElementById('tab5'),{attributes:true,attributeFilter:['class']});
+// Also render if tab5 starts active
+if(document.getElementById('tab5').classList.contains('active'))renderFinalQuiz();
+// Render on first visit
+document.querySelector('[data-tab="tab5"]').addEventListener('click',()=>{setTimeout(()=>{if(!document.querySelector('#quizContainer .quiz-box'))renderFinalQuiz();},100);});
+</script>
+</body>
+</html>

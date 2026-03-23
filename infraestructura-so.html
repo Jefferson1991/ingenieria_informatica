@@ -1,0 +1,2069 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Infraestructura & Sistemas Operativos — Cloud, Docker & Linux</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════ RESET & ROOT ═══════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg-primary:#0a0e1a;--bg-secondary:#111827;--bg-card:rgba(17,24,39,0.7);
+  --glass:rgba(255,255,255,0.05);--glass-border:rgba(255,255,255,0.1);
+  --text-primary:#e2e8f0;--text-secondary:#94a3b8;--text-muted:#64748b;
+  --accent-blue:#3b82f6;--accent-purple:#8b5cf6;--accent-cyan:#06b6d4;
+  --accent-green:#10b981;--accent-orange:#f59e0b;--accent-red:#ef4444;
+  --accent-pink:#ec4899;--accent-lime:#84cc16;
+  --glow-blue:0 0 20px rgba(59,130,246,0.3);--glow-purple:0 0 20px rgba(139,92,246,0.3);
+  --glow-cyan:0 0 20px rgba(6,182,212,0.3);--glow-green:0 0 20px rgba(16,185,129,0.3);
+  --glow-orange:0 0 20px rgba(245,158,11,0.3);
+  --font-ui:'Inter',system-ui,sans-serif;--font-mono:'JetBrains Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-ui);background:var(--bg-primary);color:var(--text-primary);
+  line-height:1.7;overflow-x:hidden;min-height:100vh}
+body::before{content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse at 20% 50%,rgba(6,182,212,0.08) 0%,transparent 50%),
+  radial-gradient(ellipse at 80% 20%,rgba(139,92,246,0.08) 0%,transparent 50%),
+  radial-gradient(ellipse at 50% 80%,rgba(16,185,129,0.06) 0%,transparent 50%);
+  pointer-events:none;z-index:0;animation:bgPulse 15s ease-in-out infinite alternate}
+@keyframes bgPulse{0%{opacity:.6}50%{opacity:1}100%{opacity:.7}}
+
+/* ═══════════════════════════ SCROLLBAR ═══════════════════════════ */
+::-webkit-scrollbar{width:8px}
+::-webkit-scrollbar-track{background:var(--bg-primary)}
+::-webkit-scrollbar-thumb{background:var(--accent-cyan);border-radius:4px}
+
+/* ═══════════════════════════ PARTICLES CANVAS ═══════════════════════════ */
+#particlesCanvas{position:fixed;inset:0;z-index:0;pointer-events:none}
+
+/* ═══════════════════════════ LAYOUT ═══════════════════════════ */
+.wrapper{position:relative;z-index:1;max-width:1360px;margin:0 auto;padding:0 24px}
+
+/* ═══════════════════════════ HEADER ═══════════════════════════ */
+.header{text-align:center;padding:60px 0 30px;animation:fadeIn .8s ease}
+.header-icon{font-size:4rem;margin-bottom:16px;display:block;
+  filter:drop-shadow(0 0 30px rgba(6,182,212,0.4))}
+.header h1{font-size:clamp(2rem,5vw,3.5rem);font-weight:900;
+  background:linear-gradient(135deg,var(--accent-cyan),var(--accent-blue),var(--accent-purple));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  letter-spacing:-1px;margin-bottom:12px}
+.header .subtitle{font-size:clamp(1rem,2.5vw,1.25rem);color:var(--text-secondary);
+  font-weight:300;max-width:700px;margin:0 auto}
+.header .badge-row{display:flex;gap:10px;justify-content:center;margin-top:20px;flex-wrap:wrap}
+.header .badge{padding:6px 16px;border-radius:20px;font-size:.8rem;font-weight:600;
+  border:1px solid var(--glass-border);backdrop-filter:blur(8px)}
+.badge-cyan{background:rgba(6,182,212,0.15);color:var(--accent-cyan)}
+.badge-green{background:rgba(16,185,129,0.15);color:var(--accent-green)}
+.badge-purple{background:rgba(139,92,246,0.15);color:var(--accent-purple)}
+.badge-orange{background:rgba(245,158,11,0.15);color:var(--accent-orange)}
+.badge-blue{background:rgba(59,130,246,0.15);color:var(--accent-blue)}
+
+/* ═══════════════════════════ TABS ═══════════════════════════ */
+.tabs-container{position:sticky;top:0;z-index:100;
+  background:rgba(10,14,26,0.95);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--glass-border);padding:0 20px;
+  margin-bottom:40px}
+.tabs-scroll{display:flex;overflow-x:auto;gap:0;scrollbar-width:none}
+.tabs-scroll::-webkit-scrollbar{display:none}
+.tab-btn{flex-shrink:0;padding:16px 28px;border:none;border-bottom:3px solid transparent;
+  background:none;color:var(--text-secondary);font-family:var(--font-ui);
+  font-size:.95rem;font-weight:600;cursor:pointer;transition:all .3s;
+  display:flex;align-items:center;gap:8px;white-space:nowrap}
+.tab-btn:hover{color:var(--text-primary);background:rgba(255,255,255,0.03)}
+.tab-btn.active{border-bottom-color:var(--accent-cyan);color:var(--accent-cyan)}
+.tab-btn[data-tab="so"].active{color:var(--accent-orange);border-bottom-color:var(--accent-orange)}
+.tab-btn[data-tab="linux"].active{color:var(--accent-orange);border-bottom-color:var(--accent-orange)}
+.tab-btn[data-tab="cloud"].active{color:var(--accent-blue);border-bottom-color:var(--accent-blue)}
+.tab-btn[data-tab="docker"].active{color:var(--accent-cyan);border-bottom-color:var(--accent-cyan)}
+.tab-btn[data-tab="devops"].active{color:var(--accent-green);border-bottom-color:var(--accent-green)}
+.tab-btn[data-tab="quiz"].active{color:var(--accent-purple);border-bottom-color:var(--accent-purple)}
+
+/* ═══════════════════════════ PANELS ═══════════════════════════ */
+.tab-panel{display:none;animation:fadeIn .5s ease}
+.tab-panel.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes cardIn{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideRight{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
+@keyframes pulseGlow{0%,100%{box-shadow:0 0 5px rgba(6,182,212,0.2)}50%{box-shadow:0 0 25px rgba(6,182,212,0.4)}}
+
+/* ═══════════════════════════ SECTIONS ═══════════════════════════ */
+.section-title{font-size:clamp(1.3rem,3vw,1.8rem);font-weight:800;margin-bottom:8px;
+  display:flex;align-items:center;gap:12px}
+.section-title .icon{font-size:1.5rem}
+.section-desc{color:var(--text-secondary);margin-bottom:28px;font-size:.95rem}
+
+/* ═══════════════════════════ CARDS ═══════════════════════════ */
+.card{background:var(--bg-card);border:1px solid var(--glass-border);border-radius:16px;
+  padding:28px;backdrop-filter:blur(10px);transition:transform .3s,box-shadow .3s;
+  animation:cardIn .6s ease both}
+.card:hover{transform:translateY(-4px);box-shadow:var(--glow-cyan)}
+.card h3{font-size:1.15rem;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:10px}
+.card p,.card li{color:var(--text-secondary);font-size:.9rem}
+.card ul{list-style:none;padding:0}
+.card ul li{padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.04)}
+.card ul li::before{content:'▸ ';color:var(--accent-cyan);font-weight:700}
+
+.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;margin-bottom:40px}
+.card-grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(400px,1fr));gap:24px;margin-bottom:40px}
+.card-grid-4{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;margin-bottom:40px}
+
+/* ═══════════════════════════ TAGS ═══════════════════════════ */
+.tag{display:inline-block;padding:4px 12px;border-radius:20px;font-size:.75rem;font-weight:600;margin:4px 4px 4px 0}
+.tag-blue{background:rgba(59,130,246,0.15);color:var(--accent-blue)}
+.tag-purple{background:rgba(139,92,246,0.15);color:var(--accent-purple)}
+.tag-green{background:rgba(16,185,129,0.15);color:var(--accent-green)}
+.tag-cyan{background:rgba(6,182,212,0.15);color:var(--accent-cyan)}
+.tag-orange{background:rgba(245,158,11,0.15);color:var(--accent-orange)}
+.tag-red{background:rgba(239,68,68,0.15);color:var(--accent-red)}
+.tag-pink{background:rgba(236,72,153,0.15);color:var(--accent-pink)}
+
+/* ═══════════════════════════ TABLES ═══════════════════════════ */
+.comp-table{width:100%;border-collapse:collapse;margin:20px 0 40px;border-radius:16px;overflow:hidden}
+.comp-table th,.comp-table td{padding:14px 18px;text-align:left;border-bottom:1px solid var(--glass-border);font-size:.9rem}
+.comp-table th{background:rgba(6,182,212,0.12);font-weight:700;color:var(--accent-cyan)}
+.comp-table tr:hover{background:rgba(255,255,255,0.03)}
+.comp-table td:first-child{font-weight:600;color:var(--text-primary)}
+
+/* ═══════════════════════════ TERMINAL ═══════════════════════════ */
+.terminal{background:#0d1117;border:1px solid #30363d;border-radius:12px;overflow:hidden;
+  margin:24px 0;font-family:var(--font-mono);animation:cardIn .6s ease both}
+.terminal-bar{background:#161b22;padding:10px 16px;display:flex;align-items:center;gap:8px;
+  border-bottom:1px solid #30363d}
+.terminal-dot{width:12px;height:12px;border-radius:50%}
+.terminal-dot.red{background:#ff5f56}.terminal-dot.yellow{background:#ffbd2e}.terminal-dot.green{background:#27c93f}
+.terminal-title{color:#8b949e;font-size:.8rem;margin-left:12px}
+.terminal-body{padding:20px;max-height:420px;overflow-y:auto;font-size:.85rem;line-height:1.8}
+.terminal-body .prompt{color:var(--accent-green)}
+.terminal-body .cmd{color:#c9d1d9}
+.terminal-body .output{color:#8b949e}
+.terminal-body .comment{color:#6e7681;font-style:italic}
+.terminal-body .highlight{color:var(--accent-cyan)}
+.terminal-body .warn{color:var(--accent-orange)}
+.terminal-body .err{color:var(--accent-red)}
+
+/* Interactive terminal */
+.terminal-interactive .terminal-body{max-height:500px}
+.terminal-input-line{display:flex;align-items:center;gap:0;margin-top:8px}
+.terminal-input-line .prompt{flex-shrink:0}
+.terminal-input{background:none;border:none;color:#c9d1d9;font-family:var(--font-mono);
+  font-size:.85rem;flex:1;outline:none;caret-color:var(--accent-green)}
+.terminal-cursor{display:inline-block;width:8px;height:16px;background:var(--accent-green);
+  animation:blink 1s step-end infinite;vertical-align:middle;margin-left:2px}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+/* ═══════════════════════════ PIPELINE / FLOW ═══════════════════════════ */
+.pipeline{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;
+  padding:30px;margin:24px 0;background:var(--glass);border:1px solid var(--glass-border);
+  border-radius:16px}
+.pipeline-step{padding:14px 22px;border-radius:12px;font-weight:700;font-size:.85rem;
+  text-align:center;border:1px solid var(--glass-border);min-width:120px;
+  transition:all .3s;cursor:default}
+.pipeline-step:hover{transform:scale(1.05)}
+.pipeline-arrow{color:var(--accent-cyan);font-size:1.5rem;animation:arrowMove 1.5s ease infinite}
+@keyframes arrowMove{0%,100%{transform:translateX(0);opacity:1}50%{transform:translateX(6px);opacity:.5}}
+
+/* ═══════════════════════════ CLOUD ARCHITECTURE DIAGRAM ═══════════════════════════ */
+.arch-diagram{position:relative;background:var(--glass);border:1px solid var(--glass-border);
+  border-radius:20px;padding:40px 30px;margin:30px 0;min-height:500px;overflow:hidden}
+.arch-layer{margin-bottom:30px;position:relative}
+.arch-layer-label{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;
+  color:var(--text-muted);margin-bottom:14px;padding-left:4px}
+.arch-nodes{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
+.arch-node{padding:16px 24px;border-radius:14px;border:2px solid;text-align:center;
+  font-size:.85rem;font-weight:600;min-width:130px;cursor:pointer;
+  transition:all .4s;position:relative}
+.arch-node:hover{transform:translateY(-6px) scale(1.05)}
+.arch-node .node-icon{font-size:1.8rem;display:block;margin-bottom:6px}
+.arch-node.n-blue{border-color:var(--accent-blue);background:rgba(59,130,246,0.1);color:var(--accent-blue)}
+.arch-node.n-blue:hover{box-shadow:var(--glow-blue)}
+.arch-node.n-cyan{border-color:var(--accent-cyan);background:rgba(6,182,212,0.1);color:var(--accent-cyan)}
+.arch-node.n-cyan:hover{box-shadow:var(--glow-cyan)}
+.arch-node.n-green{border-color:var(--accent-green);background:rgba(16,185,129,0.1);color:var(--accent-green)}
+.arch-node.n-green:hover{box-shadow:var(--glow-green)}
+.arch-node.n-purple{border-color:var(--accent-purple);background:rgba(139,92,246,0.1);color:var(--accent-purple)}
+.arch-node.n-purple:hover{box-shadow:var(--glow-purple)}
+.arch-node.n-orange{border-color:var(--accent-orange);background:rgba(245,158,11,0.1);color:var(--accent-orange)}
+.arch-node.n-orange:hover{box-shadow:var(--glow-orange)}
+
+.arch-connector{display:flex;justify-content:center;margin:10px 0}
+.arch-connector .arrow-down{color:var(--accent-cyan);font-size:1.5rem;animation:arrowDown 1.5s ease infinite}
+@keyframes arrowDown{0%,100%{transform:translateY(0);opacity:1}50%{transform:translateY(6px);opacity:.5}}
+
+/* ═══════════════════════════ DOCKER CONTAINER VIS ═══════════════════════════ */
+.docker-host{background:linear-gradient(135deg,rgba(6,182,212,0.08),rgba(59,130,246,0.05));
+  border:2px solid rgba(6,182,212,0.3);border-radius:20px;padding:30px;margin:24px 0;position:relative}
+.docker-host-label{position:absolute;top:-14px;left:24px;background:var(--bg-primary);
+  padding:4px 16px;border-radius:8px;font-family:var(--font-mono);font-size:.8rem;
+  font-weight:700;color:var(--accent-cyan);border:1px solid rgba(6,182,212,0.3)}
+.docker-engine{background:rgba(0,0,0,0.3);border:1px dashed rgba(6,182,212,0.2);
+  border-radius:14px;padding:24px;margin-top:10px}
+.docker-engine-label{font-size:.7rem;text-transform:uppercase;letter-spacing:2px;
+  color:var(--text-muted);margin-bottom:16px;font-weight:700}
+.containers-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px}
+.container-box{border-radius:12px;padding:18px;text-align:center;border:2px solid;
+  cursor:pointer;transition:all .4s;position:relative;overflow:hidden}
+.container-box::before{content:'';position:absolute;inset:0;opacity:0;
+  background:radial-gradient(circle at center,rgba(255,255,255,0.1),transparent 70%);
+  transition:opacity .4s}
+.container-box:hover::before{opacity:1}
+.container-box:hover{transform:translateY(-4px) scale(1.03)}
+.container-box .c-icon{font-size:2rem;margin-bottom:8px;display:block}
+.container-box .c-name{font-weight:700;font-size:.85rem;margin-bottom:4px}
+.container-box .c-port{font-family:var(--font-mono);font-size:.75rem;opacity:.7}
+.container-box .c-status{display:inline-block;width:8px;height:8px;border-radius:50%;
+  margin-right:6px;animation:statusPulse 2s ease infinite}
+@keyframes statusPulse{0%,100%{opacity:1;box-shadow:0 0 4px currentColor}50%{opacity:.5;box-shadow:0 0 12px currentColor}}
+
+.c-nginx{border-color:var(--accent-green);background:rgba(16,185,129,0.08)}
+.c-nginx .c-status{background:var(--accent-green);color:var(--accent-green)}
+.c-node{border-color:var(--accent-lime);background:rgba(132,204,22,0.08)}
+.c-node .c-status{background:var(--accent-lime);color:var(--accent-lime)}
+.c-postgres{border-color:var(--accent-blue);background:rgba(59,130,246,0.08)}
+.c-postgres .c-status{background:var(--accent-blue);color:var(--accent-blue)}
+.c-redis{border-color:var(--accent-red);background:rgba(239,68,68,0.08)}
+.c-redis .c-status{background:var(--accent-red);color:var(--accent-red)}
+.c-monitor{border-color:var(--accent-orange);background:rgba(245,158,11,0.08)}
+.c-monitor .c-status{background:var(--accent-orange);color:var(--accent-orange)}
+
+/* Docker image layers */
+.image-layers{display:flex;flex-direction:column;gap:0;margin:24px auto;max-width:500px}
+.image-layer{padding:14px 24px;text-align:center;font-family:var(--font-mono);font-size:.8rem;
+  font-weight:600;border:1px solid var(--glass-border);position:relative;
+  transition:all .3s;cursor:default}
+.image-layer:hover{transform:scale(1.02);z-index:2}
+.image-layer:first-child{border-radius:14px 14px 0 0}
+.image-layer:last-child{border-radius:0 0 14px 14px}
+.layer-base{background:rgba(59,130,246,0.15);color:var(--accent-blue)}
+.layer-deps{background:rgba(139,92,246,0.12);color:var(--accent-purple)}
+.layer-config{background:rgba(245,158,11,0.12);color:var(--accent-orange)}
+.layer-app{background:rgba(16,185,129,0.12);color:var(--accent-green)}
+.layer-cmd{background:rgba(6,182,212,0.15);color:var(--accent-cyan)}
+.layer-size{position:absolute;right:16px;top:50%;transform:translateY(-50%);
+  font-size:.7rem;opacity:.6}
+
+/* ═══════════════════════════ LINUX FS TREE ═══════════════════════════ */
+.fs-tree{font-family:var(--font-mono);font-size:.85rem;background:var(--glass);
+  border:1px solid var(--glass-border);border-radius:16px;padding:24px;margin:24px 0}
+.fs-tree ul{list-style:none;padding-left:24px}
+.fs-tree>ul{padding-left:0}
+.fs-tree li{padding:4px 0;cursor:pointer;transition:color .2s}
+.fs-tree li:hover{color:var(--accent-cyan)}
+.fs-tree .dir{color:var(--accent-blue);font-weight:700}
+.fs-tree .dir::before{content:'📁 '}
+.fs-tree .file{color:var(--text-secondary)}
+.fs-tree .file::before{content:'📄 '}
+.fs-tree .exec{color:var(--accent-green)}
+.fs-tree .exec::before{content:'⚙️ '}
+.fs-tree .desc{color:var(--text-muted);font-size:.75rem;margin-left:8px;font-family:var(--font-ui)}
+
+/* ═══════════════════════════ QUIZ ═══════════════════════════ */
+.quiz-section{background:var(--glass);border:1px solid var(--glass-border);border-radius:16px;
+  padding:32px;margin:30px 0}
+.quiz-section h3{font-size:1.2rem;font-weight:800;margin-bottom:20px;display:flex;align-items:center;gap:10px}
+.quiz-q{margin-bottom:24px;padding:20px;background:rgba(0,0,0,0.2);border-radius:12px;
+  border:1px solid var(--glass-border)}
+.quiz-q p{font-weight:600;margin-bottom:12px;font-size:.95rem}
+.quiz-q label{display:block;padding:8px 14px;margin:6px 0;border-radius:8px;cursor:pointer;
+  transition:background .2s;font-size:.9rem;color:var(--text-secondary)}
+.quiz-q label:hover{background:rgba(255,255,255,0.05)}
+.quiz-q input[type="radio"]{margin-right:10px;accent-color:var(--accent-cyan)}
+.quiz-result{padding:16px;border-radius:12px;font-weight:700;text-align:center;display:none;margin-top:16px}
+.quiz-result.show{display:block}
+.quiz-correct{background:rgba(16,185,129,0.15);color:var(--accent-green)}
+.quiz-wrong{background:rgba(239,68,68,0.15);color:var(--accent-red)}
+.btn{padding:12px 28px;border-radius:10px;border:1px solid var(--glass-border);background:var(--glass);
+  color:var(--text-primary);font-weight:600;cursor:pointer;transition:all .3s;font-family:var(--font-ui);font-size:.9rem}
+.btn:hover{background:rgba(6,182,212,0.2);border-color:var(--accent-cyan)}
+.btn-primary{background:rgba(6,182,212,0.2);border-color:var(--accent-cyan)}
+
+/* ═══════════════════════════ TIMELINE ═══════════════════════════ */
+.timeline{position:relative;padding:20px 0;margin:30px 0}
+.timeline::before{content:'';position:absolute;left:30px;top:0;bottom:0;width:2px;
+  background:linear-gradient(180deg,var(--accent-cyan),var(--accent-purple),var(--accent-green))}
+.timeline-item{position:relative;padding-left:70px;margin-bottom:30px;animation:slideRight .6s ease both}
+.timeline-dot{position:absolute;left:22px;top:8px;width:18px;height:18px;border-radius:50%;
+  border:3px solid var(--accent-cyan);background:var(--bg-primary);z-index:2;
+  box-shadow:0 0 12px rgba(6,182,212,0.4)}
+.timeline-year{font-family:var(--font-mono);font-size:.8rem;color:var(--accent-cyan);font-weight:700;margin-bottom:4px}
+.timeline-content{background:var(--bg-card);border:1px solid var(--glass-border);border-radius:12px;
+  padding:20px;transition:all .3s}
+.timeline-content:hover{transform:translateX(4px);box-shadow:var(--glow-cyan)}
+.timeline-content h4{font-weight:700;margin-bottom:6px}
+.timeline-content p{color:var(--text-secondary);font-size:.88rem}
+
+/* ═══════════════════════════ PROGRESS BARS ═══════════════════════════ */
+.skill-bar{margin-bottom:16px}
+.skill-bar-label{display:flex;justify-content:space-between;margin-bottom:6px;font-size:.85rem;font-weight:600}
+.skill-bar-track{height:10px;background:rgba(255,255,255,0.06);border-radius:6px;overflow:hidden}
+.skill-bar-fill{height:100%;border-radius:6px;transition:width 1.5s ease;position:relative}
+.skill-bar-fill::after{content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);
+  animation:shimmer 2s ease infinite}
+@keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+
+/* ═══════════════════════════ MINI CARDS ═══════════════════════════ */
+.mini-card{background:var(--glass);border:1px solid var(--glass-border);border-radius:12px;
+  padding:20px;text-align:center;transition:all .3s}
+.mini-card:hover{transform:translateY(-4px);box-shadow:var(--glow-cyan)}
+.mini-card .mc-icon{font-size:2.5rem;margin-bottom:10px;display:block}
+.mini-card .mc-title{font-weight:700;font-size:.95rem;margin-bottom:6px}
+.mini-card .mc-desc{color:var(--text-secondary);font-size:.82rem}
+
+/* ═══════════════════════════ COMMAND REF ═══════════════════════════ */
+.cmd-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;margin:24px 0}
+.cmd-item{display:flex;gap:14px;padding:14px 18px;background:var(--glass);border:1px solid var(--glass-border);
+  border-radius:12px;transition:all .3s;align-items:flex-start}
+.cmd-item:hover{background:rgba(6,182,212,0.08);border-color:rgba(6,182,212,0.3)}
+.cmd-item code{font-family:var(--font-mono);font-size:.82rem;color:var(--accent-cyan);
+  background:rgba(6,182,212,0.1);padding:4px 10px;border-radius:6px;white-space:nowrap;flex-shrink:0}
+.cmd-item span{color:var(--text-secondary);font-size:.85rem}
+
+/* ═══════════════════════════ KERNEL DIAGRAM ═══════════════════════════ */
+.kernel-diagram{display:flex;flex-direction:column;align-items:center;gap:0;margin:30px 0}
+.kernel-ring{width:100%;max-width:600px;padding:18px 30px;text-align:center;font-weight:700;
+  border:2px solid;border-radius:0;position:relative;transition:all .3s}
+.kernel-ring:first-child{border-radius:20px 20px 0 0}
+.kernel-ring:last-child{border-radius:0 0 20px 20px}
+.kernel-ring:hover{transform:scale(1.02);z-index:2}
+.kr-user{background:rgba(139,92,246,0.1);border-color:rgba(139,92,246,0.3);color:var(--accent-purple)}
+.kr-shell{background:rgba(59,130,246,0.1);border-color:rgba(59,130,246,0.3);color:var(--accent-blue)}
+.kr-syscall{background:rgba(6,182,212,0.1);border-color:rgba(6,182,212,0.3);color:var(--accent-cyan)}
+.kr-kernel{background:rgba(245,158,11,0.1);border-color:rgba(245,158,11,0.3);color:var(--accent-orange)}
+.kr-hw{background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.3);color:var(--accent-red)}
+.kr-sub{font-weight:400;font-size:.8rem;color:var(--text-secondary);display:block;margin-top:4px}
+
+/* ═══════════════════════════ RESPONSIVE ═══════════════════════════ */
+@media(max-width:768px){
+  .card-grid,.card-grid-2{grid-template-columns:1fr}
+  .pipeline{flex-direction:column}
+  .pipeline-arrow{transform:rotate(90deg)}
+  .arch-nodes{flex-direction:column;align-items:center}
+  .containers-row{grid-template-columns:1fr 1fr}
+  .cmd-grid{grid-template-columns:1fr}
+  .tab-btn{padding:14px 18px;font-size:.85rem}
+}
+@media(max-width:480px){
+  .containers-row{grid-template-columns:1fr}
+  .header{padding:40px 0 20px}
+}
+
+/* ═══════════════════════════ FOOTER ═══════════════════════════ */
+.footer{text-align:center;padding:50px 0 30px;color:var(--text-muted);font-size:.8rem;
+  border-top:1px solid var(--glass-border);margin-top:60px}
+</style>
+</head>
+<body>
+
+<canvas id="particlesCanvas"></canvas>
+
+<div class="wrapper">
+<!-- ═══════════════════════════ HEADER ═══════════════════════════ -->
+<header class="header">
+  <span class="header-icon">🖥️</span>
+  <h1>Infraestructura & Sistemas Operativos</h1>
+  <p class="subtitle">Cloud Computing, Contenedores, Linux y la ingeniería detrás de los sistemas modernos</p>
+  <div class="badge-row">
+    <span class="badge badge-orange">🐧 Linux</span>
+    <span class="badge badge-blue">☁️ Cloud Computing</span>
+    <span class="badge badge-cyan">🐳 Docker & Contenedores</span>
+    <span class="badge badge-green">🔄 DevOps & IaC</span>
+    <span class="badge badge-purple">📝 Evaluación</span>
+  </div>
+</header>
+
+<!-- ═══════════════════════════ TABS ═══════════════════════════ -->
+<nav class="tabs-container">
+  <div class="tabs-scroll">
+    <button class="tab-btn active" data-tab="so">🖥️ Sistemas Operativos</button>
+    <button class="tab-btn" data-tab="linux">🐧 Linux & SO</button>
+    <button class="tab-btn" data-tab="cloud">☁️ Cloud Computing</button>
+    <button class="tab-btn" data-tab="docker">🐳 Contenedores & Docker</button>
+    <button class="tab-btn" data-tab="devops">🔄 DevOps & IaC</button>
+    <button class="tab-btn" data-tab="quiz">📝 Evaluación</button>
+  </div>
+</nav>
+
+<!-- ╔═══════════════════════════════════════════════════════════════════╗ -->
+<!-- ║                TAB 1: FUNDAMENTOS DE SISTEMAS OPERATIVOS         ║ -->
+<!-- ╚═══════════════════════════════════════════════════════════════════╝ -->
+<div id="panel-so" class="tab-panel active">
+
+  <h2 class="section-title"><span class="icon">🖥️</span> Fundamentos de Sistemas Operativos</h2>
+  <p class="section-desc">Antes de Linux y cloud, todo parte de entender qué hace un sistema operativo y cómo administra recursos: procesos, memoria, archivos, dispositivos y seguridad.</p>
+
+  <h3 style="font-size:1.1rem;font-weight:700;margin:30px 0 10px;color:var(--accent-orange)">🧭 ¿Qué es un SO? (5 funciones base)</h3>
+  <div class="card-grid">
+    <div class="card" style="animation-delay:.1s">
+      <h3>1) Gestión de procesos</h3>
+      <p>Crea, planifica y finaliza procesos/hilos para usar la CPU de forma eficiente y justa.</p>
+      <ul style="margin-top:12px">
+        <li>Planificación (scheduler)</li>
+        <li>Conmutación de contexto</li>
+        <li>Sincronización e IPC</li>
+      </ul>
+    </div>
+    <div class="card" style="animation-delay:.2s">
+      <h3>2) Gestión de memoria</h3>
+      <p>Asigna RAM y memoria virtual a cada proceso con aislamiento y protección.</p>
+      <ul style="margin-top:12px">
+        <li>Memoria física y virtual</li>
+        <li>Paginación y swapping</li>
+        <li>Protección por espacios de direcciones</li>
+      </ul>
+    </div>
+    <div class="card" style="animation-delay:.3s">
+      <h3>3) Sistema de archivos</h3>
+      <p>Organiza datos en estructuras persistentes y controla permisos de acceso.</p>
+      <ul style="margin-top:12px">
+        <li>Directorios y metadatos</li>
+        <li>Permisos y propietarios</li>
+        <li>Lectura/escritura con buffer</li>
+      </ul>
+    </div>
+    <div class="card" style="animation-delay:.4s">
+      <h3>4) Entrada/Salida (E/S)</h3>
+      <p>Abstrae dispositivos físicos (teclado, disco, red, impresora) vía drivers.</p>
+      <ul style="margin-top:12px">
+        <li>Controladores (drivers)</li>
+        <li>Interrupciones</li>
+        <li>Colas y buffers de I/O</li>
+      </ul>
+    </div>
+    <div class="card" style="animation-delay:.5s">
+      <h3>5) Seguridad y usuarios</h3>
+      <p>Autentica usuarios, aplica permisos y mantiene aislamiento entre procesos.</p>
+      <ul style="margin-top:12px">
+        <li>Cuentas y grupos</li>
+        <li>Control de acceso</li>
+        <li>Auditoría y trazabilidad</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 style="font-size:1.1rem;font-weight:700;margin:30px 0 10px;color:var(--accent-orange)">🎛️ Modos de uso del SO</h3>
+  <div class="card-grid-2">
+    <div class="card">
+      <h3>🧑‍💻 Interactivo (CLI/GUI)</h3>
+      <p>Usuario ejecuta comandos o apps en tiempo real. Ejemplo: Linux de escritorio, Windows, macOS.</p>
+      <div style="margin-top:12px">
+        <span class="tag tag-orange">CLI</span><span class="tag tag-blue">GUI</span><span class="tag tag-cyan">Tiempo compartido</span>
+      </div>
+    </div>
+    <div class="card">
+      <h3>📦 Por lotes (Batch)</h3>
+      <p>Trabajos en cola sin interacción directa, ideal para procesos nocturnos o ETL.</p>
+      <div style="margin-top:12px">
+        <span class="tag tag-purple">Batch</span><span class="tag tag-green">Automatización</span>
+      </div>
+    </div>
+    <div class="card">
+      <h3>⏱️ Tiempo real (RTOS)</h3>
+      <p>Responde dentro de plazos estrictos. Usado en control industrial, automotriz y embebidos.</p>
+      <div style="margin-top:12px">
+        <span class="tag tag-red">Hard real-time</span><span class="tag tag-orange">Soft real-time</span>
+      </div>
+    </div>
+    <div class="card">
+      <h3>🌐 Multiusuario / Servidor</h3>
+      <p>Varios usuarios y servicios concurrentes, con aislamiento, cuotas y control de privilegios.</p>
+      <div style="margin-top:12px">
+        <span class="tag tag-blue">Multiusuario</span><span class="tag tag-green">Servidor</span>
+      </div>
+    </div>
+  </div>
+
+  <h3 style="font-size:1.1rem;font-weight:700;margin:30px 0 10px;color:var(--accent-orange)">🗂️ Clasificación de SO por diseño de kernel</h3>
+  <table class="comp-table">
+    <thead>
+      <tr><th>Tipo</th><th>Descripción breve</th><th>Ventaja principal</th><th>Ejemplos</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Monolítico</td><td>Servicios del kernel (procesos, memoria, FS, drivers) en un único espacio privilegiado.</td><td>Alto rendimiento por menor sobrecarga de comunicación interna.</td><td>Linux, UNIX clásico</td></tr>
+      <tr><td>Microkernel</td><td>Kernel mínimo (IPC, planificación, memoria básica); servicios como procesos de usuario.</td><td>Mayor aislamiento y robustez ante fallos de servicios.</td><td>MINIX 3, QNX, Mach (base)</td></tr>
+      <tr><td>Híbrido</td><td>Combina base tipo microkernel con componentes en modo kernel para rendimiento.</td><td>Balance entre desempeño y modularidad.</td><td>Windows NT/11, XNU (macOS/iOS)</td></tr>
+    </tbody>
+  </table>
+
+  <h3 style="font-size:1.1rem;font-weight:700;margin:30px 0 10px;color:var(--accent-orange)">⚙️ Tipos de proceso y estado de proceso</h3>
+  <div class="card-grid-2">
+    <div class="card">
+      <h3>Tipos de proceso</h3>
+      <ul>
+        <li><strong>CPU-bound:</strong> consume más CPU que I/O (cálculo intensivo).</li>
+        <li><strong>I/O-bound:</strong> espera disco/red con frecuencia.</li>
+        <li><strong>Foreground:</strong> ligado a terminal/interfaz activa.</li>
+        <li><strong>Background / Daemon:</strong> corre en segundo plano como servicio.</li>
+        <li><strong>Batch:</strong> ejecutado por cola o planificador.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Estados del proceso</h3>
+      <div class="pipeline" style="padding:20px">
+        <div class="pipeline-step" style="background:rgba(16,185,129,0.12);color:var(--accent-green)">Nuevo</div>
+        <span class="pipeline-arrow">→</span>
+        <div class="pipeline-step" style="background:rgba(59,130,246,0.12);color:var(--accent-blue)">Listo</div>
+        <span class="pipeline-arrow">→</span>
+        <div class="pipeline-step" style="background:rgba(6,182,212,0.12);color:var(--accent-cyan)">Ejecución</div>
+        <span class="pipeline-arrow">→</span>
+        <div class="pipeline-step" style="background:rgba(245,158,11,0.12);color:var(--accent-orange)">Bloqueado</div>
+        <span class="pipeline-arrow">→</span>
+        <div class="pipeline-step" style="background:rgba(239,68,68,0.12);color:var(--accent-red)">Terminado</div>
+      </div>
+      <ul>
+        <li>El scheduler decide cuándo un proceso pasa de <em>Listo</em> a <em>Ejecución</em>.</li>
+        <li>Un proceso pasa a <em>Bloqueado</em> al esperar I/O o evento externo.</li>
+        <li>Con interrupciones y quantum vuelve a <em>Listo</em>.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 style="font-size:1.1rem;font-weight:700;margin:30px 0 10px;color:var(--accent-orange)">🧮 Asignación de memoria</h3>
+  <div class="card-grid-2">
+    <div class="card">
+      <h3>Técnicas principales</h3>
+      <ul>
+        <li><strong>Particiones fijas:</strong> simples, pero con fragmentación interna.</li>
+        <li><strong>Particiones variables:</strong> más flexibles, fragmentación externa.</li>
+        <li><strong>Paginación:</strong> divide memoria en páginas/marcos, base de la memoria virtual.</li>
+        <li><strong>Segmentación:</strong> organiza por bloques lógicos (código, datos, stack).</li>
+        <li><strong>Memoria virtual:</strong> usa disco como extensión de RAM (swap).</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Criterios de rendimiento</h3>
+      <table class="comp-table" style="margin:10px 0 0">
+        <thead>
+          <tr><th>Criterio</th><th>Qué evaluar</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Fragmentación</td><td>Espacio desaprovechado (interna/externa)</td></tr>
+          <tr><td>Latencia</td><td>Tiempo de acceso y fallos de página</td></tr>
+          <tr><td>Throughput</td><td>Procesos completados por unidad de tiempo</td></tr>
+          <tr><td>Aislamiento</td><td>Protección entre espacios de memoria</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="quiz-section" id="quiz-so">
+    <h3>📝 Mini Quiz: Fundamentos de Sistemas Operativos</h3>
+
+    <div class="quiz-q" data-correct="b">
+      <p>1. ¿Cuál de estas es una función esencial de un sistema operativo?</p>
+      <label><input type="radio" name="q1so" value="a"> Diseñar circuitos electrónicos</label>
+      <label><input type="radio" name="q1so" value="b"> Gestionar procesos y memoria</label>
+      <label><input type="radio" name="q1so" value="c"> Reemplazar al compilador</label>
+      <label><input type="radio" name="q1so" value="d"> Crear protocolos de red físicos</label>
+    </div>
+
+    <div class="quiz-q" data-correct="c">
+      <p>2. ¿Qué modo de uso del SO prioriza tiempos de respuesta estrictos y determinísticos?</p>
+      <label><input type="radio" name="q2so" value="a"> Batch</label>
+      <label><input type="radio" name="q2so" value="b"> Tiempo compartido</label>
+      <label><input type="radio" name="q2so" value="c"> Tiempo real (RTOS)</label>
+      <label><input type="radio" name="q2so" value="d"> Multiusuario web</label>
+    </div>
+
+    <div class="quiz-q" data-correct="a">
+      <p>3. ¿Cuál estado representa a un proceso esperando CPU para ejecutarse?</p>
+      <label><input type="radio" name="q3so" value="a"> Listo</label>
+      <label><input type="radio" name="q3so" value="b"> Bloqueado</label>
+      <label><input type="radio" name="q3so" value="c"> Terminado</label>
+      <label><input type="radio" name="q3so" value="d"> Swap</label>
+    </div>
+
+    <div class="quiz-q" data-correct="d">
+      <p>4. En asignación de memoria, ¿qué técnica es base de la memoria virtual moderna?</p>
+      <label><input type="radio" name="q4so" value="a"> Particiones fijas</label>
+      <label><input type="radio" name="q4so" value="b"> Segmentación pura</label>
+      <label><input type="radio" name="q4so" value="c"> Overlay manual</label>
+      <label><input type="radio" name="q4so" value="d"> Paginación</label>
+    </div>
+
+    <div class="quiz-q" data-correct="b">
+      <p>5. ¿Qué tipo de proceso suele alternar ejecución con esperas de disco/red?</p>
+      <label><input type="radio" name="q5so" value="a"> CPU-bound</label>
+      <label><input type="radio" name="q5so" value="b"> I/O-bound</label>
+      <label><input type="radio" name="q5so" value="c"> Zombie</label>
+      <label><input type="radio" name="q5so" value="d"> Kernel panic</label>
+    </div>
+
+    <button class="btn btn-primary" onclick="checkQuiz('so')">Verificar Respuestas</button>
+    <div class="quiz-result" id="quiz-result-so"></div>
+  </div>
+
+</div>
+
+<!-- ╔═══════════════════════════════════════════════════════════════════╗ -->
+<!-- ║                     TAB 2: LINUX & SO                            ║ -->
+<!-- ╚═══════════════════════════════════════════════════════════════════╝ -->
+<div id="panel-linux" class="tab-panel">
+
+  <h2 class="section-title"><span class="icon">🐧</span> Fundamentos de Linux y Sistemas Operativos</h2>
+  <p class="section-desc">El sistema operativo es el intermediario entre el hardware y las aplicaciones. Linux domina la infraestructura mundial: servidores, nube, IoT y supercomputadoras.</p>
+
+  <!-- Arquitectura del Kernel -->
+  <h3 style="font-size:1.1rem;font-weight:700;margin:30px 0 10px;color:var(--accent-orange)">🧠 Arquitectura del Sistema Operativo Linux</h3>
+  <div class="kernel-diagram">
+    <div class="kernel-ring kr-user">👤 Espacio de Usuario (User Space)<span class="kr-sub">Aplicaciones, navegadores, editores, scripts</span></div>
+    <div class="kernel-ring kr-shell">💻 Shell & Librerías<span class="kr-sub">Bash, Zsh, glibc — Interpreta comandos y traduce llamadas</span></div>
+    <div class="kernel-ring kr-syscall">🔌 System Calls (Interfaz)<span class="kr-sub">open(), read(), write(), fork(), exec() — Puente user↔kernel</span></div>
+    <div class="kernel-ring kr-kernel">⚙️ Kernel de Linux<span class="kr-sub">Gestión de procesos, memoria, sistemas de archivos, red, drivers</span></div>
+    <div class="kernel-ring kr-hw">🔩 Hardware<span class="kr-sub">CPU, RAM, Disco, NIC, GPU — Recursos físicos</span></div>
+  </div>
+
+  <!-- Distribuciones -->
+  <h3 style="font-size:1.1rem;font-weight:700;margin:30px 0 10px;color:var(--accent-orange)">🗺️ Ecosistema de Distribuciones</h3>
+  <div class="card-grid">
+    <div class="card" style="animation-delay:.1s">
+      <h3><span style="color:var(--accent-red)">🎩</span> Familia Red Hat</h3>
+      <p>Enfocadas en el ámbito empresarial con soporte comercial y estabilidad.</p>
+      <div style="margin-top:12px">
+        <span class="tag tag-red">RHEL</span><span class="tag tag-red">CentOS Stream</span>
+        <span class="tag tag-red">Fedora</span><span class="tag tag-orange">Rocky Linux</span>
+        <span class="tag tag-orange">AlmaLinux</span>
+      </div>
+      <ul style="margin-top:12px">
+        <li>Gestor de paquetes: <code>dnf</code> / <code>rpm</code></li>
+        <li>Ciclos de soporte de 10+ años (RHEL)</li>
+        <li>SELinux integrado por defecto</li>
+      </ul>
+    </div>
+    <div class="card" style="animation-delay:.2s">
+      <h3><span style="color:var(--accent-orange)">🟠</span> Familia Debian</h3>
+      <p>Base de la mayoría de distribuciones de escritorio y servidores comunitarios.</p>
+      <div style="margin-top:12px">
+        <span class="tag tag-orange">Debian</span><span class="tag tag-orange">Ubuntu</span>
+        <span class="tag tag-green">Linux Mint</span><span class="tag tag-purple">Pop!_OS</span>
+        <span class="tag tag-cyan">Kali Linux</span>
+      </div>
+      <ul style="margin-top:12px">
+        <li>Gestor de paquetes: <code>apt</code> / <code>dpkg</code></li>
+        <li>Ubuntu LTS: soporte de 5 años</li>
+        <li>Enorme comunidad y documentación</li>
+      </ul>
+    </div>
+    <div class="card" style="animation-delay:.3s">
+      <h3><span style="color:var(--accent-green)">🌿</span> Otras Familias</h3>
+      <p>Distribuciones especializadas con enfoques únicos.</p>
+      <div style="margin-top:12px">
+        <span class="tag tag-green">Arch Linux</span><span class="tag tag-cyan">openSUSE</span>
+        <span class="tag tag-purple">Gentoo</span><span class="tag tag-blue">Alpine</span>
+        <span class="tag tag-pink">NixOS</span>
+      </div>
+      <ul style="margin-top:12px">
+        <li>Arch: rolling release, máximo control</li>
+        <li>Alpine: ultraligera (~5MB), ideal para contenedores</li>
+        <li>NixOS: configuración declarativa reproducible</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Sistema de Archivos -->
+  <h3 style="font-size:1.1rem;font-weight:700;margin:30px 0 10px;color:var(--accent-orange)">📂 Jerarquía del Sistema de Archivos (FHS)</h3>
+  <div class="fs-tree">
+    <ul>
+      <li class="dir">/ <span class="desc">— Raíz del sistema, todo parte de aquí</span>
+        <ul>
+          <li class="dir">/bin <span class="desc">— Binarios esenciales (ls, cp, mv, cat)</span></li>
+          <li class="dir">/boot <span class="desc">— Kernel, initramfs, GRUB</span></li>
+          <li class="dir">/dev <span class="desc">— Dispositivos como archivos (sda, tty, null)</span></li>
+          <li class="dir">/etc <span class="desc">— Configuración del sistema (fstab, passwd, nginx/)</span></li>
+          <li class="dir">/home <span class="desc">— Directorios personales de usuarios</span></li>
+          <li class="dir">/opt <span class="desc">— Software de terceros opcional</span></li>
+          <li class="dir">/proc <span class="desc">— Sistema de archivos virtual (info del kernel en vivo)</span></li>
+          <li class="dir">/root <span class="desc">— Home del superusuario</span></li>
+          <li class="dir">/tmp <span class="desc">— Archivos temporales (se limpian al reiniciar)</span></li>
+          <li class="dir">/usr <span class="desc">— Programas y librerías de usuario</span>
+            <ul>
+              <li class="dir">/usr/bin <span class="desc">— Binarios de usuario</span></li>
+              <li class="dir">/usr/lib <span class="desc">— Librerías compartidas</span></li>
+              <li class="dir">/usr/share <span class="desc">— Datos independientes de arquitectura</span></li>
+            </ul>
+          </li>
+          <li class="dir">/var <span class="desc">— Datos variables (logs, mail, spool)</span>
+            <ul>
+              <li class="dir">/var/log <span class="desc">— Logs del sistema y aplicaciones</span></li>
+              <li class="dir">/var/www <span class="desc">— Raíz web por defecto</span></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Permisos -->
+  <h3 style="font-size:1.1rem;font-weight:700;margin:30px 0 10px;color:var(--accent-orange)">🔐 Sistema de Permisos Unix</h3>
+  <div class="card" style="margin-bottom:30px">
+    <div class="terminal" style="margin:0">
+      <div class="terminal-bar">
+        <span class="terminal-dot red"></span><span class="terminal-dot yellow"></span><span class="terminal-dot green"></span>
+        <span class="terminal-title">permisos.sh</span>
+      </div>
+      <div class="terminal-body">
+        <span class="comment"># Formato: tipo | dueño | grupo | otros</span><br>
+        <span class="output">-rwxr-xr-- 1 jefferson devs 4096 mar 23 10:00 script.sh</span><br><br>
+        <span class="comment"># Desglose:</span><br>
+        <span class="highlight">-</span><span class="output">     → archivo regular (d = directorio, l = enlace)</span><br>
+        <span class="highlight">rwx</span><span class="output">   → dueño: leer + escribir + ejecutar (7)</span><br>
+        <span class="highlight">r-x</span><span class="output">   → grupo: leer + ejecutar (5)</span><br>
+        <span class="highlight">r--</span><span class="output">   → otros: solo leer (4)</span><br><br>
+        <span class="prompt">$ </span><span class="cmd">chmod 755 script.sh</span><span class="output">    # rwxr-xr-x</span><br>
+        <span class="prompt">$ </span><span class="cmd">chmod u+x archivo</span><span class="output">     # agregar ejecución al dueño</span><br>
+        <span class="prompt">$ </span><span class="cmd">chown jefferson:devs archivo</span><span class="output">  # cambiar dueño y grupo</span><br>
+        <span class="prompt">$ </span><span class="cmd">chmod 600 id_rsa</span><span class="output">       # rw------- (solo dueño, clave SSH)</span><br>
+      </div>
+    </div>
+  </div>
+
+  <!-- Comandos esenciales -->
+  <h3 style="font-size:1.1rem;font-weight:700;margin:30px 0 10px;color:var(--accent-orange)">⌨️ Comandos Linux por Categoría (Guía Pro)</h3>
+  <p style="color:var(--text-secondary);margin-bottom:14px">Organizados como en operación real: primero navegas, luego gestionas archivos, inspeccionas procesos/servicios y finalmente red + automatización.</p>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+    <span class="tag tag-green">Básico</span>
+    <span class="tag tag-blue">Intermedio</span>
+    <span class="tag tag-red">Avanzado</span>
+  </div>
+  <div class="card-grid">
+    <div class="card">
+      <h3>🧭 Navegación y exploración</h3>
+      <ul>
+        <li><code>pwd</code> — ruta actual de trabajo <span class="tag tag-green">Básico</span></li>
+        <li><code>ls -lah</code> — listar con detalles y ocultos <span class="tag tag-green">Básico</span></li>
+        <li><code>cd /ruta</code> — cambiar de directorio <span class="tag tag-green">Básico</span></li>
+        <li><code>tree -L 2</code> — estructura por niveles <span class="tag tag-blue">Intermedio</span></li>
+        <li><code>find / -name "*.log"</code> — buscar por nombre <span class="tag tag-blue">Intermedio</span></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>📁 Gestión de archivos y permisos</h3>
+      <ul>
+        <li><code>cp -r origen destino</code> — copiar recursivo <span class="tag tag-green">Básico</span></li>
+        <li><code>mv origen destino</code> — mover/renombrar <span class="tag tag-green">Básico</span></li>
+        <li><code>rm -rf carpeta</code> — eliminar recursivo <span class="tag tag-red">Avanzado</span></li>
+        <li><code>chmod 755 archivo</code> — permisos <span class="tag tag-blue">Intermedio</span></li>
+        <li><code>chown usuario:grupo archivo</code> — propietario <span class="tag tag-blue">Intermedio</span></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>📖 Visualización y edición rápida</h3>
+      <ul>
+        <li><code>cat archivo.txt</code> — contenido completo <span class="tag tag-green">Básico</span></li>
+        <li><code>less /var/log/syslog</code> — navegar archivos largos <span class="tag tag-blue">Intermedio</span></li>
+        <li><code>head -n 20 archivo</code> — primeras líneas <span class="tag tag-green">Básico</span></li>
+        <li><code>tail -f /var/log/nginx/access.log</code> — logs en vivo <span class="tag tag-blue">Intermedio</span></li>
+        <li><code>nano</code> / <code>vim</code> — edición rápida <span class="tag tag-blue">Intermedio</span></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>⚙️ Procesos y rendimiento</h3>
+      <ul>
+        <li><code>ps aux | grep nginx</code> — buscar procesos <span class="tag tag-blue">Intermedio</span></li>
+        <li><code>top</code> / <code>htop</code> — uso CPU/RAM <span class="tag tag-blue">Intermedio</span></li>
+        <li><code>kill -15 PID</code> / <code>kill -9 PID</code> — finalizar procesos <span class="tag tag-red">Avanzado</span></li>
+        <li><code>df -h</code> — espacio por partición <span class="tag tag-green">Básico</span></li>
+        <li><code>du -sh *</code> — tamaño de carpetas <span class="tag tag-blue">Intermedio</span></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>🛠️ Servicios y logs (systemd)</h3>
+      <ul>
+        <li><code>systemctl status nginx</code> — estado de servicio <span class="tag tag-blue">Intermedio</span></li>
+        <li><code>systemctl restart nginx</code> — reiniciar servicio <span class="tag tag-blue">Intermedio</span></li>
+        <li><code>systemctl enable nginx</code> — autoarranque <span class="tag tag-blue">Intermedio</span></li>
+        <li><code>journalctl -u sshd -f</code> — logs en vivo <span class="tag tag-red">Avanzado</span></li>
+        <li><code>journalctl --since "1 hour ago"</code> — logs recientes <span class="tag tag-red">Avanzado</span></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>🌐 Red, transferencia y automatización</h3>
+      <ul>
+        <li><code>ip addr</code> — interfaces e IPs <span class="tag tag-blue">Intermedio</span></li>
+        <li><code>ss -tulpn</code> — puertos y PID <span class="tag tag-red">Avanzado</span></li>
+        <li><code>curl -I https://example.com</code> — cabeceras HTTP <span class="tag tag-blue">Intermedio</span></li>
+        <li><code>ssh</code> / <code>scp</code> — acceso/copia remota <span class="tag tag-blue">Intermedio</span></li>
+        <li><code>crontab -e</code> — tareas programadas <span class="tag tag-red">Avanzado</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="card" style="margin-top:16px;border-top:3px solid var(--accent-cyan)">
+    <h3 style="color:var(--accent-cyan)">🏆 Top 10 para examen (imprescindibles)</h3>
+    <div class="cmd-grid" style="margin:12px 0 0">
+      <div class="cmd-item"><code>pwd</code><span>Ubicarte en el sistema</span></div>
+      <div class="cmd-item"><code>ls -lah</code><span>Listar contenido con detalle</span></div>
+      <div class="cmd-item"><code>cd /ruta</code><span>Navegación entre carpetas</span></div>
+      <div class="cmd-item"><code>cp -r</code> / <code>mv</code><span>Copiar y mover archivos</span></div>
+      <div class="cmd-item"><code>chmod</code> / <code>chown</code><span>Permisos y propietario</span></div>
+      <div class="cmd-item"><code>ps aux</code> / <code>top</code><span>Monitorear procesos</span></div>
+      <div class="cmd-item"><code>df -h</code> / <code>du -sh *</code><span>Uso de disco</span></div>
+      <div class="cmd-item"><code>systemctl status</code><span>Estado de servicios</span></div>
+      <div class="cmd-item"><code>journalctl -u servicio -f</code><span>Logs en vivo</span></div>
+      <div class="cmd-item"><code>ip addr</code> / <code>ss -tulpn</code><span>Diagnóstico de red</span></div>
+    </div>
+  </div>
+
+  <!-- Terminal Interactiva -->
+  <h3 style="font-size:1.1rem;font-weight:700;margin:30px 0 10px;color:var(--accent-orange)">🖥️ Terminal Interactiva — Prueba Comandos</h3>
+  <div class="terminal terminal-interactive" id="interactiveTerminal">
+    <div class="terminal-bar">
+      <span class="terminal-dot red"></span><span class="terminal-dot yellow"></span><span class="terminal-dot green"></span>
+      <span class="terminal-title">bash — simulador interactivo</span>
+    </div>
+    <div class="terminal-body" id="terminalOutput">
+      <span class="comment"># Bienvenido al simulador de terminal Linux</span><br>
+      <span class="comment"># Prueba comandos: ls, pwd, whoami, uname, cat, echo, help, clear</span><br>
+      <span class="comment"># Escribe 'help' para ver todos los comandos disponibles</span><br><br>
+    </div>
+    <div class="terminal-input-line" style="padding:0 20px 16px">
+      <span class="prompt">jefferson@server:~$ </span>
+      <input type="text" class="terminal-input" id="terminalInput" placeholder="Escribe un comando..." autocomplete="off" spellcheck="false">
+    </div>
+  </div>
+
+  <!-- Gestión de procesos -->
+  <h3 style="font-size:1.1rem;font-weight:700;margin:30px 0 10px;color:var(--accent-orange)">⚡ Gestión de Procesos y Servicios</h3>
+  <div class="card-grid-2">
+    <div class="card">
+      <h3>🔄 Ciclo de Vida de un Proceso</h3>
+      <div class="pipeline" style="padding:20px">
+        <div class="pipeline-step" style="background:rgba(16,185,129,0.12);color:var(--accent-green)">Created</div>
+        <span class="pipeline-arrow">→</span>
+        <div class="pipeline-step" style="background:rgba(59,130,246,0.12);color:var(--accent-blue)">Ready</div>
+        <span class="pipeline-arrow">→</span>
+        <div class="pipeline-step" style="background:rgba(6,182,212,0.12);color:var(--accent-cyan)">Running</div>
+        <span class="pipeline-arrow">→</span>
+        <div class="pipeline-step" style="background:rgba(245,158,11,0.12);color:var(--accent-orange)">Waiting</div>
+        <span class="pipeline-arrow">→</span>
+        <div class="pipeline-step" style="background:rgba(239,68,68,0.12);color:var(--accent-red)">Terminated</div>
+      </div>
+      <ul>
+        <li><strong>PID:</strong> Identificador único del proceso</li>
+        <li><strong>PPID:</strong> PID del proceso padre</li>
+        <li><strong>Señales:</strong> SIGTERM (15), SIGKILL (9), SIGHUP (1)</li>
+        <li><strong>Prioridad:</strong> nice (-20 a 19), renice para ajustar</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>🛠️ Systemd — Init System Moderno</h3>
+      <div class="terminal" style="margin:12px 0 0">
+        <div class="terminal-bar">
+          <span class="terminal-dot red"></span><span class="terminal-dot yellow"></span><span class="terminal-dot green"></span>
+          <span class="terminal-title">systemctl</span>
+        </div>
+        <div class="terminal-body" style="max-height:200px">
+          <span class="prompt">$ </span><span class="cmd">systemctl start nginx</span><br>
+          <span class="prompt">$ </span><span class="cmd">systemctl enable nginx</span><span class="output"> # inicio automático</span><br>
+          <span class="prompt">$ </span><span class="cmd">systemctl status nginx</span><br>
+          <span class="output">● nginx.service - A high performance web server</span><br>
+          <span class="output">   Loaded: loaded (/lib/systemd/system/nginx.service)</span><br>
+          <span class="output">   Active: <span class="highlight">active (running)</span> since Mon 2026-03-23</span><br>
+          <span class="prompt">$ </span><span class="cmd">systemctl list-units --type=service</span><br>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ╔═══════════════════════════════════════════════════════════════════╗ -->
+<!-- ║                    TAB 2: CLOUD COMPUTING                        ║ -->
+<!-- ╚═══════════════════════════════════════════════════════════════════╝ -->
+<div id="panel-cloud" class="tab-panel">
+
+  <h2 class="section-title"><span class="icon">☁️</span> Cloud Computing</h2>
+  <p class="section-desc">La nube transformó la infraestructura: de comprar servidores a consumir recursos como servicio, bajo demanda, con escalabilidad global.</p>
+
+  <!-- Modelos de Servicio -->
+  <h3 style="font-size:1.1rem;font-weight:700;margin:30px 0 10px;color:var(--accent-blue)">📊 Modelos de Servicio Cloud</h3>
+  <div class="card-grid">
+    <div class="card" style="border-top:3px solid var(--accent-blue);animation-delay:.1s">
+      <h3 style="color:var(--accent-blue)">🏗️ IaaS — Infrastructure as a Service</h3>
+      <p>Infraestructura virtualizada bajo demanda. Tú gestionas desde el SO hacia arriba.</p>
+      <div style="margin-top:12px">
+        <span class="tag tag-blue">EC2</span><span class="tag tag-blue">Azure VMs</span>
+        <span class="tag tag-blue">GCE</span><span class="tag tag-cyan">DigitalOcean</span>
+      </div>
+      <ul style="margin-top:12px">
+        <li>Control total del entorno</li>
+        <li>Tú: SO, runtime, apps, datos</li>
+        <li>Proveedor: virtualización, red, storage, DC</li>
+        <li>Ideal para migración lift-and-shift</li>
+      </ul>
+    </div>
+    <div class="card" style="border-top:3px solid var(--accent-purple);animation-delay:.2s">
+      <h3 style="color:var(--accent-purple)">⚙️ PaaS — Platform as a Service</h3>
+      <p>Plataforma lista para desplegar código. El proveedor gestiona la infraestructura subyacente.</p>
+      <div style="margin-top:12px">
+        <span class="tag tag-purple">Heroku</span><span class="tag tag-purple">Azure App Service</span>
+        <span class="tag tag-purple">Google App Engine</span><span class="tag tag-purple">Elastic Beanstalk</span>
+      </div>
+      <ul style="margin-top:12px">
+        <li>Foco en el código, no en infra</li>
+        <li>Tú: aplicación y datos</li>
+        <li>Proveedor: SO, middleware, runtime</li>
+        <li>Escalado automático incluido</li>
+      </ul>
+    </div>
+    <div class="card" style="border-top:3px solid var(--accent-green);animation-delay:.3s">
+      <h3 style="color:var(--accent-green)">📦 SaaS — Software as a Service</h3>
+      <p>Aplicaciones listas para usar vía navegador. Cero gestión de infraestructura.</p>
+      <div style="margin-top:12px">
+        <span class="tag tag-green">Gmail</span><span class="tag tag-green">Slack</span>
+        <span class="tag tag-green">Salesforce</span><span class="tag tag-green">Office 365</span>
+      </div>
+      <ul style="margin-top:12px">
+        <li>Solo consumir el servicio</li>
+        <li>Tú: datos y configuración</li>
+        <li>Proveedor: absolutamente todo lo demás</li>
+        <li>Modelo de suscripción mensual/anual</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Comparativa responsabilidad -->
+  <h3 style="font-size:1.1rem;font-weight:700;margin:30px 0 10px;color:var(--accent-blue)">🔀 Modelo de Responsabilidad Compartida</h3>
+  <table class="comp-table">
+    <thead>
+      <tr><th>Capa</th><th>On-Premises</th><th>IaaS</th><th>PaaS</th><th>SaaS</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Datos</td><td>👤 Tú</td><td>👤 Tú</td><td>👤 Tú</td><td>👤 Tú</td></tr>
+      <tr><td>Aplicaciones</td><td>👤 Tú</td><td>👤 Tú</td><td>👤 Tú</td><td>☁️ Proveedor</td></tr>
+      <tr><td>Runtime</td><td>👤 Tú</td><td>👤 Tú</td><td>☁️ Proveedor</td><td>☁️ Proveedor</td></tr>
+      <tr><td>Middleware</td><td>👤 Tú</td><td>👤 Tú</td><td>☁️ Proveedor</td><td>☁️ Proveedor</td></tr>
+      <tr><td>Sistema Operativo</td><td>👤 Tú</td><td>👤 Tú</td><td>☁️ Proveedor</td><td>☁️ Proveedor</td></tr>
+      <tr><td>Virtualización</td><td>👤 Tú</td><td>☁️ Proveedor</td><td>☁️ Proveedor</td><td>☁️ Proveedor</td></tr>
+      <tr><td>Servidores / Red</td><td>👤 Tú</td><td>☁️ Proveedor</td><td>☁️ Proveedor</td><td>☁️ Proveedor</td></tr>
+      <tr><td>Data Center</td><td>👤 Tú</td><td>☁️ Proveedor</td><td>☁️ Proveedor</td><td>☁️ Proveedor</td></tr>
+    </tbody>
+  </table>
+
+  <!-- Cloud Providers -->
+  <h3 style="font-size:1.1rem;font-weight:700;margin:30px 0 10px;color:var(--accent-blue)">🌐 Los Tres Grandes Proveedores</h3>
+  <div class="card-grid">
+    <div class="card" style="animation-delay:.1s">
+      <h3><span style="color:var(--accent-orange)">🟠</span> Amazon Web Services (AWS)</h3>
+      <p><strong>Cuota de mercado: ~31%</strong> — Líder histórico, mayor catálogo de servicios (200+).</p>
+      <div style="margin-top:12px">
+        <span class="tag tag-orange">EC2</span><span class="tag tag-orange">S3</span><span class="tag tag-orange">Lambda</span>
+        <span class="tag tag-orange">RDS</span><span class="tag tag-orange">EKS</span><span class="tag tag-orange">CloudFormation</span>
+      </div>
+      <div class="skill-bar" style="margin-top:16px">
+        <div class="skill-bar-label"><span>Adopción empresarial</span><span>95%</span></div>
+        <div class="skill-bar-track"><div class="skill-bar-fill" style="width:95%;background:linear-gradient(90deg,var(--accent-orange),#f97316)"></div></div>
+      </div>
+    </div>
+    <div class="card" style="animation-delay:.2s">
+      <h3><span style="color:var(--accent-blue)">🔵</span> Microsoft Azure</h3>
+      <p><strong>Cuota de mercado: ~25%</strong> — Integración nativa con ecosistema Microsoft.</p>
+      <div style="margin-top:12px">
+        <span class="tag tag-blue">Azure VMs</span><span class="tag tag-blue">Blob Storage</span><span class="tag tag-blue">Functions</span>
+        <span class="tag tag-blue">AKS</span><span class="tag tag-blue">Azure DevOps</span><span class="tag tag-blue">Entra ID</span>
+      </div>
+      <div class="skill-bar" style="margin-top:16px">
+        <div class="skill-bar-label"><span>Adopción empresarial</span><span>88%</span></div>
+        <div class="skill-bar-track"><div class="skill-bar-fill" style="width:88%;background:linear-gradient(90deg,var(--accent-blue),#60a5fa)"></div></div>
+      </div>
+    </div>
+    <div class="card" style="animation-delay:.3s">
+      <h3><span style="color:var(--accent-green)">🟢</span> Google Cloud Platform</h3>
+      <p><strong>Cuota de mercado: ~11%</strong> — Líder en datos, ML/AI y Kubernetes nativo.</p>
+      <div style="margin-top:12px">
+        <span class="tag tag-green">GCE</span><span class="tag tag-green">Cloud Storage</span><span class="tag tag-green">Cloud Run</span>
+        <span class="tag tag-green">GKE</span><span class="tag tag-green">BigQuery</span><span class="tag tag-green">Vertex AI</span>
+      </div>
+      <div class="skill-bar" style="margin-top:16px">
+        <div class="skill-bar-label"><span>Adopción empresarial</span><span>72%</span></div>
+        <div class="skill-bar-track"><div class="skill-bar-fill" style="width:72%;background:linear-gradient(90deg,var(--accent-green),#34d399)"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Arquitectura Cloud -->
+  <h3 style="font-size:1.1rem;font-weight:700;margin:30px 0 10px;color:var(--accent-blue)">🏛️ Arquitectura Cloud Moderna — Diagrama Interactivo</h3>
+  <div class="arch-diagram">
+    <div class="arch-layer">
+      <div class="arch-layer-label">🌐 Capa de Acceso (Edge / CDN)</div>
+      <div class="arch-nodes">
+        <div class="arch-node n-blue"><span class="node-icon">🌍</span>CDN<br><small>CloudFront / Akamai</small></div>
+        <div class="arch-node n-blue"><span class="node-icon">🔒</span>WAF<br><small>Web App Firewall</small></div>
+        <div class="arch-node n-blue"><span class="node-icon">🌐</span>DNS<br><small>Route 53 / Cloud DNS</small></div>
+        <div class="arch-node n-blue"><span class="node-icon">📜</span>TLS/SSL<br><small>Certificados</small></div>
+      </div>
+    </div>
+    <div class="arch-connector"><span class="arrow-down">⬇️</span></div>
+    <div class="arch-layer">
+      <div class="arch-layer-label">⚖️ Capa de Balanceo y API Gateway</div>
+      <div class="arch-nodes">
+        <div class="arch-node n-cyan"><span class="node-icon">⚖️</span>Load Balancer<br><small>ALB / NLB</small></div>
+        <div class="arch-node n-cyan"><span class="node-icon">🚪</span>API Gateway<br><small>Kong / AWS API GW</small></div>
+        <div class="arch-node n-cyan"><span class="node-icon">🔑</span>Auth Service<br><small>OAuth2 / JWT</small></div>
+      </div>
+    </div>
+    <div class="arch-connector"><span class="arrow-down">⬇️</span></div>
+    <div class="arch-layer">
+      <div class="arch-layer-label">🖥️ Capa de Cómputo</div>
+      <div class="arch-nodes">
+        <div class="arch-node n-green"><span class="node-icon">🐳</span>Containers<br><small>ECS / EKS / GKE</small></div>
+        <div class="arch-node n-green"><span class="node-icon">⚡</span>Serverless<br><small>Lambda / Functions</small></div>
+        <div class="arch-node n-green"><span class="node-icon">🖥️</span>VMs<br><small>EC2 / GCE</small></div>
+        <div class="arch-node n-green"><span class="node-icon">🔄</span>Auto Scaling<br><small>Grupos dinámicos</small></div>
+      </div>
+    </div>
+    <div class="arch-connector"><span class="arrow-down">⬇️</span></div>
+    <div class="arch-layer">
+      <div class="arch-layer-label">💾 Capa de Datos y Almacenamiento</div>
+      <div class="arch-nodes">
+        <div class="arch-node n-purple"><span class="node-icon">🗄️</span>SQL DB<br><small>RDS / Cloud SQL</small></div>
+        <div class="arch-node n-purple"><span class="node-icon">📊</span>NoSQL<br><small>DynamoDB / Firestore</small></div>
+        <div class="arch-node n-purple"><span class="node-icon">⚡</span>Cache<br><small>Redis / ElastiCache</small></div>
+        <div class="arch-node n-purple"><span class="node-icon">📦</span>Object Storage<br><small>S3 / GCS / Blob</small></div>
+      </div>
+    </div>
+    <div class="arch-connector"><span class="arrow-down">⬇️</span></div>
+    <div class="arch-layer">
+      <div class="arch-layer-label">📡 Capa de Observabilidad</div>
+      <div class="arch-nodes">
+        <div class="arch-node n-orange"><span class="node-icon">📈</span>Métricas<br><small>Prometheus / CloudWatch</small></div>
+        <div class="arch-node n-orange"><span class="node-icon">📋</span>Logs<br><small>ELK / CloudWatch Logs</small></div>
+        <div class="arch-node n-orange"><span class="node-icon">🔍</span>Tracing<br><small>Jaeger / X-Ray</small></div>
+        <div class="arch-node n-orange"><span class="node-icon">🚨</span>Alertas<br><small>PagerDuty / OpsGenie</small></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Serverless vs Containers -->
+  <h3 style="font-size:1.1rem;font-weight:700;margin:30px 0 10px;color:var(--accent-blue)">⚡ Serverless vs Contenedores vs VMs</h3>
+  <table class="comp-table">
+    <thead>
+      <tr><th>Aspecto</th><th>VMs</th><th>Contenedores</th><th>Serverless</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Arranque</td><td>Minutos</td><td>Segundos</td><td>Milisegundos</td></tr>
+      <tr><td>Aislamiento</td><td>Completo (hypervisor)</td><td>A nivel de proceso</td><td>Función individual</td></tr>
+      <tr><td>Escalado</td><td>Vertical/Horizontal manual</td><td>Orquestación (K8s)</td><td>Automático, infinito</td></tr>
+      <tr><td>Costo</td><td>Siempre encendido</td><td>Por pod activo</td><td>Solo por ejecución</td></tr>
+      <tr><td>Portabilidad</td><td>AMI / Snapshots</td><td>Imagen Docker universal</td><td>Vendor lock-in</td></tr>
+      <tr><td>Complejidad Ops</td><td>Alta (parches, SO)</td><td>Media (orquestación)</td><td>Baja (solo código)</td></tr>
+      <tr><td>Caso ideal</td><td>Apps legacy, compliance</td><td>Microservicios</td><td>Eventos, APIs ligeras</td></tr>
+    </tbody>
+  </table>
+
+  <!-- Modelos de despliegue -->
+  <h3 style="font-size:1.1rem;font-weight:700;margin:30px 0 10px;color:var(--accent-blue)">🏢 Modelos de Despliegue Cloud</h3>
+  <div class="card-grid-4">
+    <div class="mini-card">
+      <span class="mc-icon">☁️</span>
+      <div class="mc-title" style="color:var(--accent-blue)">Public Cloud</div>
+      <div class="mc-desc">Recursos compartidos entre múltiples clientes. Máxima elasticidad y mínimo CAPEX. AWS, Azure, GCP.</div>
+    </div>
+    <div class="mini-card">
+      <span class="mc-icon">🏠</span>
+      <div class="mc-title" style="color:var(--accent-purple)">Private Cloud</div>
+      <div class="mc-desc">Infraestructura dedicada a una organización. Mayor control y seguridad. OpenStack, VMware.</div>
+    </div>
+    <div class="mini-card">
+      <span class="mc-icon">🔀</span>
+      <div class="mc-title" style="color:var(--accent-cyan)">Hybrid Cloud</div>
+      <div class="mc-desc">Combina pública + privada. Datos sensibles on-prem, workloads elásticos en nube. Más común en enterprise.</div>
+    </div>
+    <div class="mini-card">
+      <span class="mc-icon">🌐</span>
+      <div class="mc-title" style="color:var(--accent-green)">Multi-Cloud</div>
+      <div class="mc-desc">Múltiples proveedores simultáneos. Evita vendor lock-in. Requiere herramientas de gestión unificada.</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ╔═══════════════════════════════════════════════════════════════════╗ -->
+<!-- ║                  TAB 3: CONTENEDORES & DOCKER                    ║ -->
+<!-- ╚═══════════════════════════════════════════════════════════════════╝ -->
+<div id="panel-docker" class="tab-panel">
+
+  <h2 class="section-title"><span class="icon">🐳</span> Contenedores & Docker</h2>
+  <p class="section-desc">Los contenedores empaquetan aplicaciones con todas sus dependencias, garantizando que funcionen igual en cualquier entorno: desarrollo, testing y producción.</p>
+
+  <!-- VM vs Container -->
+  <h3 style="font-size:1.1rem;font-weight:700;margin:30px 0 10px;color:var(--accent-cyan)">🆚 Máquinas Virtuales vs Contenedores</h3>
+  <div class="card-grid-2">
+    <div class="card" style="border-top:3px solid var(--accent-orange)">
+      <h3 style="color:var(--accent-orange)">🖥️ Máquina Virtual</h3>
+      <div class="kernel-diagram" style="margin:16px 0">
+        <div class="kernel-ring" style="background:rgba(139,92,246,0.1);border-color:rgba(139,92,246,0.3);color:var(--accent-purple);font-size:.85rem">App A + Libs + Bins</div>
+        <div class="kernel-ring" style="background:rgba(245,158,11,0.1);border-color:rgba(245,158,11,0.3);color:var(--accent-orange);font-size:.85rem">SO Invitado Completo (GB)</div>
+        <div class="kernel-ring" style="background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.3);color:var(--accent-red);font-size:.85rem">Hypervisor (VMware/KVM/Hyper-V)</div>
+        <div class="kernel-ring" style="background:rgba(59,130,246,0.1);border-color:rgba(59,130,246,0.3);color:var(--accent-blue);font-size:.85rem;border-radius:0 0 20px 20px">Hardware Host</div>
+      </div>
+      <ul>
+        <li>Cada VM incluye un SO completo (pesado)</li>
+        <li>Aislamiento fuerte vía hypervisor</li>
+        <li>Arranque en minutos</li>
+        <li>Consumo: GBs de RAM por VM</li>
+      </ul>
+    </div>
+    <div class="card" style="border-top:3px solid var(--accent-cyan)">
+      <h3 style="color:var(--accent-cyan)">🐳 Contenedor</h3>
+      <div class="kernel-diagram" style="margin:16px 0">
+        <div class="kernel-ring" style="background:rgba(6,182,212,0.1);border-color:rgba(6,182,212,0.3);color:var(--accent-cyan);font-size:.85rem;display:flex;gap:10px;justify-content:center">
+          <span style="background:rgba(16,185,129,0.2);padding:4px 14px;border-radius:8px">App A</span>
+          <span style="background:rgba(139,92,246,0.2);padding:4px 14px;border-radius:8px">App B</span>
+          <span style="background:rgba(245,158,11,0.2);padding:4px 14px;border-radius:8px">App C</span>
+        </div>
+        <div class="kernel-ring" style="background:rgba(16,185,129,0.1);border-color:rgba(16,185,129,0.3);color:var(--accent-green);font-size:.85rem">Docker Engine (Container Runtime)</div>
+        <div class="kernel-ring" style="background:rgba(59,130,246,0.1);border-color:rgba(59,130,246,0.3);color:var(--accent-blue);font-size:.85rem">SO Host (Kernel compartido)</div>
+        <div class="kernel-ring" style="background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.3);color:var(--accent-red);font-size:.85rem;border-radius:0 0 20px 20px">Hardware Host</div>
+      </div>
+      <ul>
+        <li>Comparten el kernel del host (ligeros)</li>
+        <li>Aislamiento vía namespaces + cgroups</li>
+        <li>Arranque en segundos / milisegundos</li>
+        <li>Consumo: MBs de RAM por contenedor</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Docker Concepts -->
+  <h3 style="font-size:1.1rem;font-weight:700;margin:30px 0 10px;color:var(--accent-cyan)">📦 Conceptos Clave de Docker</h3>
+  <div class="card-grid">
+    <div class="card" style="animation-delay:.1s">
+      <h3>📋 Dockerfile</h3>
+      <p>Receta de texto que define cómo construir una imagen paso a paso. Cada instrucción crea una capa.</p>
+      <div style="margin-top:10px"><span class="tag tag-cyan">FROM</span><span class="tag tag-green">RUN</span><span class="tag tag-blue">COPY</span><span class="tag tag-purple">EXPOSE</span><span class="tag tag-orange">CMD</span></div>
+    </div>
+    <div class="card" style="animation-delay:.2s">
+      <h3>💿 Imagen (Image)</h3>
+      <p>Template inmutable de solo lectura con el SO base, dependencias y la aplicación. Se versiona con tags.</p>
+      <div style="margin-top:10px"><span class="tag tag-cyan">Capas (Layers)</span><span class="tag tag-blue">Registry</span><span class="tag tag-green">Tags</span></div>
+    </div>
+    <div class="card" style="animation-delay:.3s">
+      <h3>📦 Contenedor</h3>
+      <p>Instancia en ejecución de una imagen. Tiene su propio filesystem, red y procesos aislados.</p>
+      <div style="margin-top:10px"><span class="tag tag-orange">Efímero</span><span class="tag tag-red">Stateless</span><span class="tag tag-green">Aislado</span></div>
+    </div>
+  </div>
+
+  <!-- Dockerfile Example -->
+  <h3 style="font-size:1.1rem;font-weight:700;margin:30px 0 10px;color:var(--accent-cyan)">📝 Anatomía de un Dockerfile</h3>
+  <div class="terminal">
+    <div class="terminal-bar">
+      <span class="terminal-dot red"></span><span class="terminal-dot yellow"></span><span class="terminal-dot green"></span>
+      <span class="terminal-title">Dockerfile</span>
+    </div>
+    <div class="terminal-body">
+      <span class="comment"># 1. Imagen base — Elegir la más ligera posible</span><br>
+      <span class="highlight">FROM</span> <span class="cmd">node:20-alpine</span><br><br>
+      <span class="comment"># 2. Directorio de trabajo dentro del contenedor</span><br>
+      <span class="highlight">WORKDIR</span> <span class="cmd">/app</span><br><br>
+      <span class="comment"># 3. Copiar archivos de dependencias primero (cache de capas)</span><br>
+      <span class="highlight">COPY</span> <span class="cmd">package*.json ./</span><br>
+      <span class="highlight">RUN</span> <span class="cmd">npm ci --only=production</span><br><br>
+      <span class="comment"># 4. Copiar el código fuente</span><br>
+      <span class="highlight">COPY</span> <span class="cmd">. .</span><br><br>
+      <span class="comment"># 5. Exponer puerto (documentación)</span><br>
+      <span class="highlight">EXPOSE</span> <span class="cmd">3000</span><br><br>
+      <span class="comment"># 6. Usuario no-root (seguridad)</span><br>
+      <span class="highlight">USER</span> <span class="cmd">node</span><br><br>
+      <span class="comment"># 7. Comando de inicio</span><br>
+      <span class="highlight">CMD</span> <span class="cmd">["node", "server.js"]</span><br>
+    </div>
+  </div>
+
+  <!-- Image Layers Visualization -->
+  <h3 style="font-size:1.1rem;font-weight:700;margin:30px 0 10px;color:var(--accent-cyan)">🧅 Capas de una Imagen Docker</h3>
+  <div class="image-layers">
+    <div class="image-layer layer-cmd">CMD ["node", "server.js"]<span class="layer-size">0 B</span></div>
+    <div class="image-layer layer-app">COPY . . (código fuente)<span class="layer-size">~2 MB</span></div>
+    <div class="image-layer layer-config">EXPOSE 3000 / USER node<span class="layer-size">0 B</span></div>
+    <div class="image-layer layer-deps">RUN npm ci (node_modules)<span class="layer-size">~85 MB</span></div>
+    <div class="image-layer layer-base">FROM node:20-alpine (SO + Node)<span class="layer-size">~180 MB</span></div>
+  </div>
+  <p style="text-align:center;color:var(--text-muted);font-size:.82rem;margin-top:-10px">↑ Las capas inferiores se cachean. Ordenar de menos a más cambiante optimiza el build.</p>
+
+  <!-- Docker Compose Visualization -->
+  <h3 style="font-size:1.1rem;font-weight:700;margin:30px 0 10px;color:var(--accent-cyan)">🐙 Docker Compose — Orquestación Multi-Contenedor</h3>
+  <div class="docker-host">
+    <span class="docker-host-label">🖥️ Docker Host</span>
+    <div class="docker-engine">
+      <div class="docker-engine-label">🐳 Docker Engine — docker-compose.yml</div>
+      <div class="containers-row">
+        <div class="container-box c-nginx" onclick="toggleContainerInfo(this)">
+          <span class="c-icon">🌐</span>
+          <div class="c-name"><span class="c-status"></span>Nginx</div>
+          <div class="c-port">:80 → :443</div>
+          <div class="c-info" style="display:none;margin-top:10px;font-size:.78rem;color:var(--text-secondary);text-align:left">
+            Reverse proxy y load balancer. Sirve archivos estáticos y redirige peticiones API al backend.
+          </div>
+        </div>
+        <div class="container-box c-node" onclick="toggleContainerInfo(this)">
+          <span class="c-icon">🟢</span>
+          <div class="c-name"><span class="c-status"></span>Node API</div>
+          <div class="c-port">:3000</div>
+          <div class="c-info" style="display:none;margin-top:10px;font-size:.78rem;color:var(--text-secondary);text-align:left">
+            Backend REST API. Procesa lógica de negocio y se conecta a PostgreSQL y Redis.
+          </div>
+        </div>
+        <div class="container-box c-postgres" onclick="toggleContainerInfo(this)">
+          <span class="c-icon">🐘</span>
+          <div class="c-name"><span class="c-status"></span>PostgreSQL</div>
+          <div class="c-port">:5432</div>
+          <div class="c-info" style="display:none;margin-top:10px;font-size:.78rem;color:var(--text-secondary);text-align:left">
+            Base de datos relacional. Volumen persistente montado en /var/lib/postgresql/data.
+          </div>
+        </div>
+        <div class="container-box c-redis" onclick="toggleContainerInfo(this)">
+          <span class="c-icon">🔴</span>
+          <div class="c-name"><span class="c-status"></span>Redis</div>
+          <div class="c-port">:6379</div>
+          <div class="c-info" style="display:none;margin-top:10px;font-size:.78rem;color:var(--text-secondary);text-align:left">
+            Cache en memoria y message broker. Sessions, rate limiting, pub/sub.
+          </div>
+        </div>
+        <div class="container-box c-monitor" onclick="toggleContainerInfo(this)">
+          <span class="c-icon">📊</span>
+          <div class="c-name"><span class="c-status"></span>Prometheus</div>
+          <div class="c-port">:9090</div>
+          <div class="c-info" style="display:none;margin-top:10px;font-size:.78rem;color:var(--text-secondary);text-align:left">
+            Recolección de métricas. Scraping de endpoints /metrics cada 15s. Alertmanager integrado.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Docker Compose YAML -->
+  <div class="terminal" style="margin-top:20px">
+    <div class="terminal-bar">
+      <span class="terminal-dot red"></span><span class="terminal-dot yellow"></span><span class="terminal-dot green"></span>
+      <span class="terminal-title">docker-compose.yml</span>
+    </div>
+    <div class="terminal-body">
+      <span class="highlight">version:</span> <span class="cmd">'3.8'</span><br>
+      <span class="highlight">services:</span><br>
+      <span class="cmd">  nginx:</span><br>
+      <span class="output">    image: nginx:alpine</span><br>
+      <span class="output">    ports: ["80:80", "443:443"]</span><br>
+      <span class="output">    depends_on: [api]</span><br>
+      <span class="cmd">  api:</span><br>
+      <span class="output">    build: ./backend</span><br>
+      <span class="output">    environment:</span><br>
+      <span class="output">      - DATABASE_URL=postgres://db:5432/app</span><br>
+      <span class="output">      - REDIS_URL=redis://cache:6379</span><br>
+      <span class="output">    depends_on: [db, cache]</span><br>
+      <span class="cmd">  db:</span><br>
+      <span class="output">    image: postgres:16-alpine</span><br>
+      <span class="output">    volumes: [pgdata:/var/lib/postgresql/data]</span><br>
+      <span class="output">    environment:</span><br>
+      <span class="output">      - POSTGRES_DB=app</span><br>
+      <span class="cmd">  cache:</span><br>
+      <span class="output">    image: redis:7-alpine</span><br>
+      <span class="highlight">volumes:</span><br>
+      <span class="output">  pgdata:</span><br>
+    </div>
+  </div>
+
+  <!-- Docker Commands -->
+  <h3 style="font-size:1.1rem;font-weight:700;margin:30px 0 10px;color:var(--accent-cyan)">⌨️ Comandos Docker Esenciales</h3>
+  <div class="cmd-grid">
+    <div class="cmd-item"><code>docker build -t app .</code><span>Construir imagen desde Dockerfile</span></div>
+    <div class="cmd-item"><code>docker run -d -p 80:3000 app</code><span>Ejecutar contenedor en background con port mapping</span></div>
+    <div class="cmd-item"><code>docker ps -a</code><span>Listar todos los contenedores (activos e inactivos)</span></div>
+    <div class="cmd-item"><code>docker logs -f container_id</code><span>Ver logs en tiempo real de un contenedor</span></div>
+    <div class="cmd-item"><code>docker exec -it app bash</code><span>Abrir shell interactiva dentro de un contenedor</span></div>
+    <div class="cmd-item"><code>docker compose up -d</code><span>Levantar todos los servicios en background</span></div>
+    <div class="cmd-item"><code>docker images</code><span>Listar imágenes locales con tamaños</span></div>
+    <div class="cmd-item"><code>docker system prune -a</code><span>Limpiar imágenes, contenedores y caché sin usar</span></div>
+    <div class="cmd-item"><code>docker network ls</code><span>Listar redes Docker (bridge, host, overlay)</span></div>
+    <div class="cmd-item"><code>docker volume inspect data</code><span>Ver detalles de un volumen persistente</span></div>
+  </div>
+
+  <!-- Kubernetes intro -->
+  <h3 style="font-size:1.1rem;font-weight:700;margin:30px 0 10px;color:var(--accent-cyan)">☸️ Kubernetes — Orquestación a Escala</h3>
+  <div class="card" style="margin-bottom:30px">
+    <h3 style="color:var(--accent-blue)">☸️ Arquitectura de un Cluster K8s</h3>
+    <div class="pipeline" style="flex-direction:column;gap:20px;padding:30px">
+      <div style="display:flex;gap:16px;flex-wrap:wrap;justify-content:center">
+        <div class="pipeline-step" style="background:rgba(59,130,246,0.15);color:var(--accent-blue);min-width:140px">
+          <strong>Control Plane</strong><br><small>API Server, etcd, Scheduler, Controller Manager</small>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:center"><span class="pipeline-arrow" style="transform:rotate(90deg);font-size:2rem">→</span></div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;justify-content:center">
+        <div class="pipeline-step" style="background:rgba(16,185,129,0.12);color:var(--accent-green);min-width:130px">
+          <strong>Worker Node 1</strong><br><small>kubelet, kube-proxy</small><br>
+          <span class="tag tag-cyan" style="margin-top:6px">Pod A</span><span class="tag tag-green">Pod B</span>
+        </div>
+        <div class="pipeline-step" style="background:rgba(16,185,129,0.12);color:var(--accent-green);min-width:130px">
+          <strong>Worker Node 2</strong><br><small>kubelet, kube-proxy</small><br>
+          <span class="tag tag-purple" style="margin-top:6px">Pod C</span><span class="tag tag-orange">Pod D</span>
+        </div>
+        <div class="pipeline-step" style="background:rgba(16,185,129,0.12);color:var(--accent-green);min-width:130px">
+          <strong>Worker Node 3</strong><br><small>kubelet, kube-proxy</small><br>
+          <span class="tag tag-blue" style="margin-top:6px">Pod E</span><span class="tag tag-red">Pod F</span>
+        </div>
+      </div>
+    </div>
+    <table class="comp-table" style="margin-top:20px">
+      <thead><tr><th>Concepto K8s</th><th>Descripción</th><th>Equivalencia Docker</th></tr></thead>
+      <tbody>
+        <tr><td>Pod</td><td>Unidad mínima de despliegue (1+ contenedores)</td><td>docker run</td></tr>
+        <tr><td>Deployment</td><td>Declaración de estado deseado de réplicas</td><td>docker compose (parcial)</td></tr>
+        <tr><td>Service</td><td>Punto de acceso estable a un grupo de Pods</td><td>docker network</td></tr>
+        <tr><td>Ingress</td><td>Enrutamiento HTTP/HTTPS externo</td><td>nginx reverse proxy</td></tr>
+        <tr><td>ConfigMap / Secret</td><td>Configuración y credenciales externalizadas</td><td>env_file / secrets</td></tr>
+        <tr><td>PersistentVolume</td><td>Almacenamiento persistente desacoplado del Pod</td><td>docker volume</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- ╔═══════════════════════════════════════════════════════════════════╗ -->
+<!-- ║                      TAB 4: DEVOPS & IaC                         ║ -->
+<!-- ╚═══════════════════════════════════════════════════════════════════╝ -->
+<div id="panel-devops" class="tab-panel">
+
+  <h2 class="section-title"><span class="icon">🔄</span> DevOps & Infrastructure as Code</h2>
+  <p class="section-desc">DevOps unifica desarrollo y operaciones mediante automatización, cultura colaborativa y entrega continua. IaC trata la infraestructura como software versionable.</p>
+
+  <!-- DevOps Lifecycle -->
+  <h3 style="font-size:1.1rem;font-weight:700;margin:30px 0 10px;color:var(--accent-green)">♾️ Ciclo de Vida DevOps — Infinity Loop</h3>
+  <div class="pipeline" style="padding:30px">
+    <div class="pipeline-step" style="background:rgba(59,130,246,0.12);color:var(--accent-blue)">📋 Plan</div>
+    <span class="pipeline-arrow">→</span>
+    <div class="pipeline-step" style="background:rgba(139,92,246,0.12);color:var(--accent-purple)">💻 Code</div>
+    <span class="pipeline-arrow">→</span>
+    <div class="pipeline-step" style="background:rgba(6,182,212,0.12);color:var(--accent-cyan)">🔨 Build</div>
+    <span class="pipeline-arrow">→</span>
+    <div class="pipeline-step" style="background:rgba(16,185,129,0.12);color:var(--accent-green)">🧪 Test</div>
+    <span class="pipeline-arrow">→</span>
+    <div class="pipeline-step" style="background:rgba(245,158,11,0.12);color:var(--accent-orange)">🚀 Release</div>
+    <span class="pipeline-arrow">→</span>
+    <div class="pipeline-step" style="background:rgba(239,68,68,0.12);color:var(--accent-red)">📦 Deploy</div>
+    <span class="pipeline-arrow">→</span>
+    <div class="pipeline-step" style="background:rgba(236,72,153,0.12);color:var(--accent-pink)">⚙️ Operate</div>
+    <span class="pipeline-arrow">→</span>
+    <div class="pipeline-step" style="background:rgba(132,204,22,0.12);color:var(--accent-lime)">📈 Monitor</div>
+  </div>
+
+  <!-- CI/CD Pipeline -->
+  <h3 style="font-size:1.1rem;font-weight:700;margin:30px 0 10px;color:var(--accent-green)">🚀 Pipeline CI/CD — De Código a Producción</h3>
+  <div class="timeline">
+    <div class="timeline-item" style="animation-delay:.1s">
+      <div class="timeline-dot" style="border-color:var(--accent-blue)"></div>
+      <div class="timeline-year">Paso 1</div>
+      <div class="timeline-content">
+        <h4 style="color:var(--accent-blue)">📝 Git Push / Pull Request</h4>
+        <p>El desarrollador sube código a una rama feature. Se abre un PR para revisión. El pipeline CI se activa automáticamente.</p>
+        <div><span class="tag tag-blue">Git</span><span class="tag tag-blue">GitHub</span><span class="tag tag-blue">GitLab</span></div>
+      </div>
+    </div>
+    <div class="timeline-item" style="animation-delay:.2s">
+      <div class="timeline-dot" style="border-color:var(--accent-purple)"></div>
+      <div class="timeline-year">Paso 2</div>
+      <div class="timeline-content">
+        <h4 style="color:var(--accent-purple)">🔨 Build & Lint</h4>
+        <p>Compilación del código, análisis estático (ESLint, SonarQube) y verificación de dependencias. Fallo = PR bloqueado.</p>
+        <div><span class="tag tag-purple">Webpack</span><span class="tag tag-purple">ESLint</span><span class="tag tag-purple">SonarQube</span></div>
+      </div>
+    </div>
+    <div class="timeline-item" style="animation-delay:.3s">
+      <div class="timeline-dot" style="border-color:var(--accent-cyan)"></div>
+      <div class="timeline-year">Paso 3</div>
+      <div class="timeline-content">
+        <h4 style="color:var(--accent-cyan)">🧪 Testing Automatizado</h4>
+        <p>Ejecución de tests unitarios, integración y E2E. Reporte de cobertura de código. Gate de calidad mínimo.</p>
+        <div><span class="tag tag-cyan">Jest</span><span class="tag tag-cyan">Cypress</span><span class="tag tag-cyan">xUnit</span></div>
+      </div>
+    </div>
+    <div class="timeline-item" style="animation-delay:.4s">
+      <div class="timeline-dot" style="border-color:var(--accent-green)"></div>
+      <div class="timeline-year">Paso 4</div>
+      <div class="timeline-content">
+        <h4 style="color:var(--accent-green)">🐳 Build & Push de Imagen</h4>
+        <p>Construcción de imagen Docker multi-stage, escaneo de vulnerabilidades (Trivy) y push al container registry.</p>
+        <div><span class="tag tag-green">Docker</span><span class="tag tag-green">ECR</span><span class="tag tag-green">Trivy</span></div>
+      </div>
+    </div>
+    <div class="timeline-item" style="animation-delay:.5s">
+      <div class="timeline-dot" style="border-color:var(--accent-orange)"></div>
+      <div class="timeline-year">Paso 5</div>
+      <div class="timeline-content">
+        <h4 style="color:var(--accent-orange)">🌍 Deploy a Staging</h4>
+        <p>Despliegue automático al entorno de staging. Pruebas de humo y validación de integración con servicios reales.</p>
+        <div><span class="tag tag-orange">ArgoCD</span><span class="tag tag-orange">Helm</span><span class="tag tag-orange">Terraform</span></div>
+      </div>
+    </div>
+    <div class="timeline-item" style="animation-delay:.6s">
+      <div class="timeline-dot" style="border-color:var(--accent-red)"></div>
+      <div class="timeline-year">Paso 6</div>
+      <div class="timeline-content">
+        <h4 style="color:var(--accent-red)">🚀 Deploy a Producción</h4>
+        <p>Aprobación manual o automática. Estrategia de despliegue: blue-green, canary o rolling update. Rollback automático si hay errores.</p>
+        <div><span class="tag tag-red">Blue-Green</span><span class="tag tag-red">Canary</span><span class="tag tag-orange">Rolling</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CI/CD Tools -->
+  <h3 style="font-size:1.1rem;font-weight:700;margin:30px 0 10px;color:var(--accent-green)">🛠️ Herramientas del Ecosistema DevOps</h3>
+  <div class="card-grid-4">
+    <div class="mini-card"><span class="mc-icon">🔧</span><div class="mc-title" style="color:var(--accent-blue)">CI/CD</div><div class="mc-desc">GitHub Actions, GitLab CI, Jenkins, CircleCI, Azure Pipelines</div></div>
+    <div class="mini-card"><span class="mc-icon">📦</span><div class="mc-title" style="color:var(--accent-cyan)">Contenedores</div><div class="mc-desc">Docker, Podman, containerd, BuildKit, Kaniko</div></div>
+    <div class="mini-card"><span class="mc-icon">☸️</span><div class="mc-title" style="color:var(--accent-green)">Orquestación</div><div class="mc-desc">Kubernetes, Docker Swarm, Nomad, ECS</div></div>
+    <div class="mini-card"><span class="mc-icon">🏗️</span><div class="mc-title" style="color:var(--accent-purple)">IaC</div><div class="mc-desc">Terraform, Pulumi, CloudFormation, CDK, Bicep</div></div>
+    <div class="mini-card"><span class="mc-icon">⚙️</span><div class="mc-title" style="color:var(--accent-orange)">Config Mgmt</div><div class="mc-desc">Ansible, Chef, Puppet, SaltStack</div></div>
+    <div class="mini-card"><span class="mc-icon">📈</span><div class="mc-title" style="color:var(--accent-red)">Monitoreo</div><div class="mc-desc">Prometheus, Grafana, Datadog, New Relic, ELK</div></div>
+    <div class="mini-card"><span class="mc-icon">🔐</span><div class="mc-title" style="color:var(--accent-pink)">Seguridad</div><div class="mc-desc">Vault, Trivy, Snyk, Falco, OPA, SonarQube</div></div>
+    <div class="mini-card"><span class="mc-icon">📋</span><div class="mc-title" style="color:var(--accent-lime)">GitOps</div><div class="mc-desc">ArgoCD, Flux, Kustomize, Helm Charts</div></div>
+  </div>
+
+  <!-- Terraform Example -->
+  <h3 style="font-size:1.1rem;font-weight:700;margin:30px 0 10px;color:var(--accent-green)">🏗️ Terraform — Infrastructure as Code</h3>
+  <div class="card-grid-2">
+    <div class="card">
+      <h3 style="color:var(--accent-purple)">📝 Ejemplo: Crear un servidor en AWS</h3>
+      <div class="terminal" style="margin:12px 0 0">
+        <div class="terminal-bar">
+          <span class="terminal-dot red"></span><span class="terminal-dot yellow"></span><span class="terminal-dot green"></span>
+          <span class="terminal-title">main.tf</span>
+        </div>
+        <div class="terminal-body" style="max-height:280px">
+          <span class="highlight">provider</span> <span class="cmd">"aws"</span> {<br>
+          <span class="output">  region = "us-east-1"</span><br>
+          }<br><br>
+          <span class="highlight">resource</span> <span class="cmd">"aws_instance" "web"</span> {<br>
+          <span class="output">  ami           = "ami-0c55b159cbfafe1f0"</span><br>
+          <span class="output">  instance_type = "t3.micro"</span><br><br>
+          <span class="output">  tags = {</span><br>
+          <span class="output">    Name = "WebServer-Prod"</span><br>
+          <span class="output">    Env  = "production"</span><br>
+          <span class="output">  }</span><br>
+          }<br>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h3 style="color:var(--accent-green)">🔄 Flujo de Trabajo Terraform</h3>
+      <div class="pipeline" style="flex-direction:column;gap:12px;padding:20px;margin-top:12px">
+        <div class="pipeline-step" style="background:rgba(139,92,246,0.12);color:var(--accent-purple);width:100%">
+          <strong>terraform init</strong><br><small>Descarga providers y módulos</small>
+        </div>
+        <span class="pipeline-arrow" style="transform:rotate(90deg)">→</span>
+        <div class="pipeline-step" style="background:rgba(59,130,246,0.12);color:var(--accent-blue);width:100%">
+          <strong>terraform plan</strong><br><small>Preview de cambios (sin aplicar)</small>
+        </div>
+        <span class="pipeline-arrow" style="transform:rotate(90deg)">→</span>
+        <div class="pipeline-step" style="background:rgba(16,185,129,0.12);color:var(--accent-green);width:100%">
+          <strong>terraform apply</strong><br><small>Ejecuta los cambios en la infraestructura</small>
+        </div>
+        <span class="pipeline-arrow" style="transform:rotate(90deg)">→</span>
+        <div class="pipeline-step" style="background:rgba(239,68,68,0.12);color:var(--accent-red);width:100%">
+          <strong>terraform destroy</strong><br><small>Elimina toda la infraestructura creada</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GitHub Actions -->
+  <h3 style="font-size:1.1rem;font-weight:700;margin:30px 0 10px;color:var(--accent-green)">⚡ GitHub Actions — CI/CD en Acción</h3>
+  <div class="terminal">
+    <div class="terminal-bar">
+      <span class="terminal-dot red"></span><span class="terminal-dot yellow"></span><span class="terminal-dot green"></span>
+      <span class="terminal-title">.github/workflows/deploy.yml</span>
+    </div>
+    <div class="terminal-body">
+      <span class="highlight">name:</span> <span class="cmd">CI/CD Pipeline</span><br>
+      <span class="highlight">on:</span><br>
+      <span class="output">  push:</span><br>
+      <span class="output">    branches: [main]</span><br>
+      <span class="output">  pull_request:</span><br>
+      <span class="output">    branches: [main]</span><br><br>
+      <span class="highlight">jobs:</span><br>
+      <span class="cmd">  build-and-test:</span><br>
+      <span class="output">    runs-on: ubuntu-latest</span><br>
+      <span class="output">    steps:</span><br>
+      <span class="output">      - uses: actions/checkout@v4</span><br>
+      <span class="output">      - uses: actions/setup-node@v4</span><br>
+      <span class="output">        with: { node-version: '20' }</span><br>
+      <span class="output">      - run: npm ci</span><br>
+      <span class="output">      - run: npm test</span><br>
+      <span class="output">      - run: npm run build</span><br><br>
+      <span class="cmd">  deploy:</span><br>
+      <span class="output">    needs: build-and-test</span><br>
+      <span class="output">    if: github.ref == 'refs/heads/main'</span><br>
+      <span class="output">    runs-on: ubuntu-latest</span><br>
+      <span class="output">    steps:</span><br>
+      <span class="output">      - run: </span><span class="highlight">docker build -t app .</span><br>
+      <span class="output">      - run: </span><span class="highlight">docker push registry/app:latest</span><br>
+      <span class="output">      - run: </span><span class="highlight">kubectl rollout restart deploy/app</span><br>
+    </div>
+  </div>
+
+  <!-- Estrategias de despliegue -->
+  <h3 style="font-size:1.1rem;font-weight:700;margin:30px 0 10px;color:var(--accent-green)">🎯 Estrategias de Despliegue</h3>
+  <div class="card-grid">
+    <div class="card" style="border-left:4px solid var(--accent-blue)">
+      <h3 style="color:var(--accent-blue)">🔵🟢 Blue-Green</h3>
+      <p>Dos entornos idénticos. Se redirige el tráfico del blue (actual) al green (nuevo) de golpe. Rollback instantáneo volviendo al blue.</p>
+      <ul>
+        <li><strong>Pro:</strong> Rollback inmediato, zero-downtime</li>
+        <li><strong>Con:</strong> Costo doble de infraestructura</li>
+      </ul>
+    </div>
+    <div class="card" style="border-left:4px solid var(--accent-orange)">
+      <h3 style="color:var(--accent-orange)">🐤 Canary</h3>
+      <p>Se envía un pequeño % del tráfico a la versión nueva. Si las métricas son buenas, se aumenta gradualmente hasta el 100%.</p>
+      <ul>
+        <li><strong>Pro:</strong> Detección temprana de errores</li>
+        <li><strong>Con:</strong> Más complejo de implementar</li>
+      </ul>
+    </div>
+    <div class="card" style="border-left:4px solid var(--accent-green)">
+      <h3 style="color:var(--accent-green)">🔄 Rolling Update</h3>
+      <p>Las instancias se actualizan una por una (o en lotes). Siempre hay instancias activas sirviendo tráfico.</p>
+      <ul>
+        <li><strong>Pro:</strong> Eficiente en recursos, nativo de K8s</li>
+        <li><strong>Con:</strong> Ambas versiones coexisten temporalmente</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<!-- ╔═══════════════════════════════════════════════════════════════════╗ -->
+<!-- ║                       TAB 5: EVALUACIÓN                          ║ -->
+<!-- ╚═══════════════════════════════════════════════════════════════════╝ -->
+<div id="panel-quiz" class="tab-panel">
+
+  <h2 class="section-title"><span class="icon">📝</span> Evaluación de Conocimientos</h2>
+  <p class="section-desc">Pon a prueba lo aprendido con estas evaluaciones interactivas sobre Linux, Cloud, Docker y DevOps.</p>
+
+  <!-- Quiz 1: Linux -->
+  <div class="quiz-section" id="quiz-linux">
+    <h3>🐧 Quiz: Linux & Sistemas Operativos</h3>
+
+    <div class="quiz-q" data-correct="c">
+      <p>1. ¿Qué directorio contiene los archivos de configuración del sistema en Linux?</p>
+      <label><input type="radio" name="q1l" value="a"> /bin</label>
+      <label><input type="radio" name="q1l" value="b"> /home</label>
+      <label><input type="radio" name="q1l" value="c"> /etc</label>
+      <label><input type="radio" name="q1l" value="d"> /var</label>
+    </div>
+
+    <div class="quiz-q" data-correct="b">
+      <p>2. ¿Qué comando muestra los procesos en ejecución con uso de CPU y RAM en tiempo real?</p>
+      <label><input type="radio" name="q2l" value="a"> ls -la</label>
+      <label><input type="radio" name="q2l" value="b"> top / htop</label>
+      <label><input type="radio" name="q2l" value="c"> df -h</label>
+      <label><input type="radio" name="q2l" value="d"> cat /proc</label>
+    </div>
+
+    <div class="quiz-q" data-correct="d">
+      <p>3. El permiso 755 en formato simbólico equivale a:</p>
+      <label><input type="radio" name="q3l" value="a"> rw-rw-rw-</label>
+      <label><input type="radio" name="q3l" value="b"> rwx------</label>
+      <label><input type="radio" name="q3l" value="c"> r-xr-xr-x</label>
+      <label><input type="radio" name="q3l" value="d"> rwxr-xr-x</label>
+    </div>
+
+    <div class="quiz-q" data-correct="a">
+      <p>4. ¿Cuál componente del kernel gestiona la asignación de tiempo de CPU a los procesos?</p>
+      <label><input type="radio" name="q4l" value="a"> Scheduler (planificador)</label>
+      <label><input type="radio" name="q4l" value="b"> File System</label>
+      <label><input type="radio" name="q4l" value="c"> Device Driver</label>
+      <label><input type="radio" name="q4l" value="d"> Shell</label>
+    </div>
+
+    <div class="quiz-q" data-correct="c">
+      <p>5. ¿Qué distribución Linux es conocida por ser ultraligera (~5MB) e ideal para contenedores?</p>
+      <label><input type="radio" name="q5l" value="a"> Ubuntu</label>
+      <label><input type="radio" name="q5l" value="b"> Fedora</label>
+      <label><input type="radio" name="q5l" value="c"> Alpine Linux</label>
+      <label><input type="radio" name="q5l" value="d"> CentOS</label>
+    </div>
+
+    <button class="btn btn-primary" onclick="checkQuiz('linux')">Verificar Respuestas</button>
+    <div class="quiz-result" id="quiz-result-linux"></div>
+  </div>
+
+  <!-- Quiz 2: Cloud -->
+  <div class="quiz-section" id="quiz-cloud">
+    <h3>☁️ Quiz: Cloud Computing</h3>
+
+    <div class="quiz-q" data-correct="b">
+      <p>1. ¿En qué modelo de servicio cloud el proveedor gestiona TODO excepto tus datos?</p>
+      <label><input type="radio" name="q1c" value="a"> IaaS</label>
+      <label><input type="radio" name="q1c" value="b"> SaaS</label>
+      <label><input type="radio" name="q1c" value="c"> PaaS</label>
+      <label><input type="radio" name="q1c" value="d"> On-Premises</label>
+    </div>
+
+    <div class="quiz-q" data-correct="c">
+      <p>2. ¿Qué tipo de despliegue cloud combina infraestructura privada y pública?</p>
+      <label><input type="radio" name="q2c" value="a"> Public Cloud</label>
+      <label><input type="radio" name="q2c" value="b"> Multi-Cloud</label>
+      <label><input type="radio" name="q2c" value="c"> Hybrid Cloud</label>
+      <label><input type="radio" name="q2c" value="d"> Private Cloud</label>
+    </div>
+
+    <div class="quiz-q" data-correct="a">
+      <p>3. AWS Lambda, Azure Functions y Google Cloud Functions son ejemplos de:</p>
+      <label><input type="radio" name="q3c" value="a"> Serverless / FaaS</label>
+      <label><input type="radio" name="q3c" value="b"> IaaS</label>
+      <label><input type="radio" name="q3c" value="c"> SaaS</label>
+      <label><input type="radio" name="q3c" value="d"> Bare Metal</label>
+    </div>
+
+    <div class="quiz-q" data-correct="d">
+      <p>4. ¿Cuál es el principal riesgo de usar un solo proveedor cloud?</p>
+      <label><input type="radio" name="q4c" value="a"> Mayor rendimiento</label>
+      <label><input type="radio" name="q4c" value="b"> Menor costo</label>
+      <label><input type="radio" name="q4c" value="c"> Mejor seguridad</label>
+      <label><input type="radio" name="q4c" value="d"> Vendor lock-in</label>
+    </div>
+
+    <div class="quiz-q" data-correct="b">
+      <p>5. En el modelo de responsabilidad compartida de IaaS, ¿quién gestiona el Sistema Operativo?</p>
+      <label><input type="radio" name="q5c" value="a"> El proveedor cloud</label>
+      <label><input type="radio" name="q5c" value="b"> El cliente</label>
+      <label><input type="radio" name="q5c" value="c"> Ambos por igual</label>
+      <label><input type="radio" name="q5c" value="d"> Nadie, es automático</label>
+    </div>
+
+    <button class="btn btn-primary" onclick="checkQuiz('cloud')">Verificar Respuestas</button>
+    <div class="quiz-result" id="quiz-result-cloud"></div>
+  </div>
+
+  <!-- Quiz 3: Docker -->
+  <div class="quiz-section" id="quiz-docker">
+    <h3>🐳 Quiz: Docker & Contenedores</h3>
+
+    <div class="quiz-q" data-correct="c">
+      <p>1. ¿Qué tecnología del kernel Linux permite el aislamiento de procesos en contenedores?</p>
+      <label><input type="radio" name="q1d" value="a"> SELinux</label>
+      <label><input type="radio" name="q1d" value="b"> iptables</label>
+      <label><input type="radio" name="q1d" value="c"> Namespaces + Cgroups</label>
+      <label><input type="radio" name="q1d" value="d"> systemd</label>
+    </div>
+
+    <div class="quiz-q" data-correct="a">
+      <p>2. ¿Cuál es la diferencia principal entre una imagen y un contenedor Docker?</p>
+      <label><input type="radio" name="q2d" value="a"> La imagen es inmutable/read-only; el contenedor es una instancia en ejecución</label>
+      <label><input type="radio" name="q2d" value="b"> Son lo mismo, solo cambia el nombre</label>
+      <label><input type="radio" name="q2d" value="c"> La imagen se ejecuta y el contenedor es el template</label>
+      <label><input type="radio" name="q2d" value="d"> El contenedor siempre es más grande que la imagen</label>
+    </div>
+
+    <div class="quiz-q" data-correct="b">
+      <p>3. ¿Qué instrucción del Dockerfile se debe colocar ANTES del COPY del código fuente para optimizar caché?</p>
+      <label><input type="radio" name="q3d" value="a"> CMD</label>
+      <label><input type="radio" name="q3d" value="b"> COPY package*.json + RUN npm install</label>
+      <label><input type="radio" name="q3d" value="c"> EXPOSE</label>
+      <label><input type="radio" name="q3d" value="d"> FROM</label>
+    </div>
+
+    <div class="quiz-q" data-correct="d">
+      <p>4. ¿Qué es un Pod en Kubernetes?</p>
+      <label><input type="radio" name="q4d" value="a"> Un cluster completo</label>
+      <label><input type="radio" name="q4d" value="b"> Una imagen de Docker</label>
+      <label><input type="radio" name="q4d" value="c"> Un nodo físico</label>
+      <label><input type="radio" name="q4d" value="d"> La unidad mínima de despliegue (1+ contenedores)</label>
+    </div>
+
+    <div class="quiz-q" data-correct="c">
+      <p>5. ¿Qué comando permite ver los logs en tiempo real de un contenedor?</p>
+      <label><input type="radio" name="q5d" value="a"> docker ps</label>
+      <label><input type="radio" name="q5d" value="b"> docker inspect</label>
+      <label><input type="radio" name="q5d" value="c"> docker logs -f</label>
+      <label><input type="radio" name="q5d" value="d"> docker exec</label>
+    </div>
+
+    <button class="btn btn-primary" onclick="checkQuiz('docker')">Verificar Respuestas</button>
+    <div class="quiz-result" id="quiz-result-docker"></div>
+  </div>
+
+  <!-- Quiz 4: DevOps -->
+  <div class="quiz-section" id="quiz-devops">
+    <h3>🔄 Quiz: DevOps & IaC</h3>
+
+    <div class="quiz-q" data-correct="b">
+      <p>1. ¿Qué herramienta de IaC usa archivos .tf y es cloud-agnostic?</p>
+      <label><input type="radio" name="q1v" value="a"> CloudFormation</label>
+      <label><input type="radio" name="q1v" value="b"> Terraform</label>
+      <label><input type="radio" name="q1v" value="c"> Ansible</label>
+      <label><input type="radio" name="q1v" value="d"> Docker Compose</label>
+    </div>
+
+    <div class="quiz-q" data-correct="c">
+      <p>2. ¿Qué estrategia de despliegue envía un pequeño % del tráfico a la nueva versión antes de un rollout completo?</p>
+      <label><input type="radio" name="q2v" value="a"> Blue-Green</label>
+      <label><input type="radio" name="q2v" value="b"> Rolling Update</label>
+      <label><input type="radio" name="q2v" value="c"> Canary</label>
+      <label><input type="radio" name="q2v" value="d"> Recreate</label>
+    </div>
+
+    <div class="quiz-q" data-correct="a">
+      <p>3. En un pipeline CI/CD, ¿qué fase ocurre PRIMERO?</p>
+      <label><input type="radio" name="q3v" value="a"> Build & Lint</label>
+      <label><input type="radio" name="q3v" value="b"> Deploy a producción</label>
+      <label><input type="radio" name="q3v" value="c"> Push de imagen Docker</label>
+      <label><input type="radio" name="q3v" value="d"> Pruebas de humo en staging</label>
+    </div>
+
+    <div class="quiz-q" data-correct="d">
+      <p>4. GitOps se basa en usar _____ como la fuente única de verdad para la infraestructura.</p>
+      <label><input type="radio" name="q4v" value="a"> Una base de datos</label>
+      <label><input type="radio" name="q4v" value="b"> Documentación en Confluence</label>
+      <label><input type="radio" name="q4v" value="c"> Scripts bash manuales</label>
+      <label><input type="radio" name="q4v" value="d"> Un repositorio Git</label>
+    </div>
+
+    <div class="quiz-q" data-correct="b">
+      <p>5. ¿Qué comando de Terraform muestra los cambios planificados SIN aplicarlos?</p>
+      <label><input type="radio" name="q5v" value="a"> terraform init</label>
+      <label><input type="radio" name="q5v" value="b"> terraform plan</label>
+      <label><input type="radio" name="q5v" value="c"> terraform apply</label>
+      <label><input type="radio" name="q5v" value="d"> terraform validate</label>
+    </div>
+
+    <button class="btn btn-primary" onclick="checkQuiz('devops')">Verificar Respuestas</button>
+    <div class="quiz-result" id="quiz-result-devops"></div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════ FOOTER ═══════════════════════════ -->
+<footer class="footer">
+  <p>🖥️ Infraestructura & Sistemas Operativos — Material de Estudio Interactivo</p>
+  <p style="margin-top:6px">Ingeniería Informática — 2026</p>
+</footer>
+
+</div><!-- wrapper -->
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!-- ║                        JAVASCRIPT                                ║ -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<script>
+// ═══════════════════ TAB NAVIGATION ═══════════════════
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+});
+
+// ═══════════════════ QUIZ ENGINE ═══════════════════
+function checkQuiz(quizId) {
+  const section = document.getElementById('quiz-' + quizId);
+  const questions = section.querySelectorAll('.quiz-q');
+  let correct = 0;
+  const total = questions.length;
+
+  questions.forEach(q => {
+    const correctAns = q.dataset.correct;
+    const selected = q.querySelector('input:checked');
+    // Reset styles
+    q.style.borderColor = 'var(--glass-border)';
+    q.style.background = 'rgba(15,23,42,0.4)';
+    if (selected && selected.value === correctAns) {
+      correct++;
+      q.style.borderColor = 'var(--accent-green)';
+      q.style.background = 'rgba(16,185,129,0.08)';
+    } else {
+      q.style.borderColor = 'var(--accent-red)';
+      q.style.background = 'rgba(239,68,68,0.08)';
+    }
+  });
+
+  const resultEl = document.getElementById('quiz-result-' + quizId);
+  const pct = Math.round(correct / total * 100);
+  resultEl.textContent = `Resultado: ${correct}/${total} correctas (${pct}%)`;
+  resultEl.className = 'quiz-result show ' + (pct >= 60 ? 'quiz-correct' : 'quiz-wrong');
+
+  if (pct === 100) resultEl.textContent += ' — ¡Perfecto! 🎉';
+  else if (pct >= 80) resultEl.textContent += ' — ¡Excelente!';
+  else if (pct >= 60) resultEl.textContent += ' — ¡Buen trabajo!';
+  else resultEl.textContent += ' — Revisa el material y vuelve a intentar.';
+}
+
+// ═══════════════════ DOCKER CONTAINER INFO TOGGLE ═══════════════════
+function toggleContainerInfo(el) {
+  const info = el.querySelector('.c-info');
+  if (info) info.style.display = info.style.display === 'none' ? 'block' : 'none';
+}
+
+// ═══════════════════ INTERACTIVE TERMINAL ═══════════════════
+(function() {
+  const input = document.getElementById('terminalInput');
+  const output = document.getElementById('terminalOutput');
+
+  const fileSystem = {
+    '~': ['Documentos', 'Descargas', 'Proyectos', '.bashrc', '.ssh'],
+    '~/Documentos': ['informe.pdf', 'notas.txt', 'presupuesto.xlsx'],
+    '~/Proyectos': ['app-web/', 'api-rest/', 'docker-compose.yml', 'README.md'],
+    '~/Proyectos/app-web': ['index.html', 'styles.css', 'app.js', 'package.json'],
+    '~/Descargas': ['ubuntu-24.04.iso', 'backup.tar.gz'],
+    '/etc': ['passwd', 'hosts', 'fstab', 'nginx/', 'ssh/', 'resolv.conf'],
+    '/var/log': ['syslog', 'auth.log', 'nginx/', 'kern.log']
+  };
+
+  const fileContents = {
+    '.bashrc': 'export PATH=$HOME/bin:$PATH\nalias ll="ls -lah"\nalias gs="git status"\nPS1="\\[\\e[32m\\]\\u@\\h:\\w\\$ \\[\\e[0m\\]"',
+    'notas.txt': 'Recordar: estudiar para el examen de infraestructura\n- Linux: permisos, procesos, systemd\n- Cloud: IaaS, PaaS, SaaS\n- Docker: Dockerfile, compose, volúmenes',
+    '/etc/hosts': '127.0.0.1   localhost\n::1         localhost\n192.168.1.10 servidor-db\n192.168.1.20 servidor-web',
+    'package.json': '{\n  "name": "app-web",\n  "version": "1.0.0",\n  "scripts": {\n    "start": "node server.js",\n    "test": "jest"\n  }\n}'
+  };
+
+  let currentDir = '~';
+  let history = [];
+  let historyIdx = -1;
+
+  const commands = {
+    help: () => `<span class="highlight">Comandos disponibles:</span>
+  <span class="cmd">ls</span>        — Listar archivos del directorio actual
+  <span class="cmd">pwd</span>       — Mostrar directorio actual
+  <span class="cmd">cd [dir]</span>  — Cambiar de directorio
+  <span class="cmd">cat [f]</span>   — Ver contenido de un archivo
+  <span class="cmd">whoami</span>    — Mostrar usuario actual
+  <span class="cmd">uname -a</span>  — Información del sistema
+  <span class="cmd">date</span>      — Fecha y hora actual
+  <span class="cmd">echo [t]</span>  — Imprimir texto
+  <span class="cmd">uptime</span>    — Tiempo activo del sistema
+  <span class="cmd">free -h</span>   — Uso de memoria RAM
+  <span class="cmd">df -h</span>     — Espacio en disco
+  <span class="cmd">ip addr</span>   — Interfaces de red
+  <span class="cmd">history</span>   — Historial de comandos
+  <span class="cmd">clear</span>     — Limpiar terminal
+  <span class="cmd">neofetch</span>  — Info del sistema con arte`,
+
+    ls: (args) => {
+      const dir = currentDir;
+      const files = fileSystem[dir];
+      if (!files) return '<span class="err">ls: no se puede acceder: No existe el directorio</span>';
+      const showAll = args && args.includes('-a');
+      const showLong = args && (args.includes('-l') || args.includes('-la') || args.includes('-lah'));
+      let items = showAll ? ['.', '..', ...files] : [...files];
+      if (showLong) {
+        return items.map(f => {
+          const isDir = f.endsWith('/') || f === '.' || f === '..' || fileSystem[dir + '/' + f];
+          const perm = isDir ? 'drwxr-xr-x' : '-rw-r--r--';
+          const size = isDir ? '4.0K' : (Math.random() * 100).toFixed(0) + 'K';
+          const color = isDir ? 'var(--accent-blue)' : f.startsWith('.') ? 'var(--text-muted)' : 'var(--text-primary)';
+          return `<span class="output">${perm}  jefferson devs  ${size.padStart(5)}  mar 23 10:00  </span><span style="color:${color};font-weight:${isDir?700:400}">${f}</span>`;
+        }).join('\n');
+      }
+      return items.map(f => {
+        const isDir = f.endsWith('/') || fileSystem[dir + '/' + f];
+        return `<span style="color:${isDir ? 'var(--accent-blue)' : 'var(--text-primary)'};font-weight:${isDir?700:400}">${f}</span>`;
+      }).join('  ');
+    },
+
+    pwd: () => `<span class="output">${currentDir.replace('~', '/home/jefferson')}</span>`,
+
+    cd: (args) => {
+      if (!args || args === '~') { currentDir = '~'; return ''; }
+      if (args === '..') {
+        const parts = currentDir.split('/');
+        if (parts.length > 1) { parts.pop(); currentDir = parts.join('/') || '~'; }
+        return '';
+      }
+      const target = currentDir + '/' + args.replace(/\/$/, '');
+      if (fileSystem[target]) { currentDir = target; return ''; }
+      if (args.startsWith('/') && fileSystem[args]) { currentDir = args; return ''; }
+      return `<span class="err">bash: cd: ${args}: No existe el directorio</span>`;
+    },
+
+    cat: (args) => {
+      if (!args) return '<span class="err">cat: falta el operando</span>';
+      if (fileContents[args]) return `<span class="output">${fileContents[args]}</span>`;
+      const files = fileSystem[currentDir];
+      if (files && files.includes(args)) return `<span class="output">[Contenido de ${args}]</span>`;
+      return `<span class="err">cat: ${args}: No existe el archivo</span>`;
+    },
+
+    whoami: () => '<span class="highlight">jefferson</span>',
+
+    'uname': (args) => {
+      if (args === '-a') return '<span class="output">Linux server 6.8.0-45-generic #45-Ubuntu SMP x86_64 GNU/Linux</span>';
+      return '<span class="output">Linux</span>';
+    },
+
+    date: () => `<span class="output">${new Date().toLocaleString('es-EC', {dateStyle:'full',timeStyle:'medium'})}</span>`,
+
+    echo: (args) => `<span class="output">${args || ''}</span>`,
+
+    uptime: () => '<span class="output"> 10:00:00 up 45 days, 3:22, 2 users, load average: 0.12, 0.08, 0.05</span>',
+
+    'free': () => `<span class="output">              total    used    free   shared  buff/cache  available
+Mem:          15Gi    4.2Gi   6.8Gi    256Mi     4.2Gi      10Gi
+Swap:          2Gi      0B     2Gi</span>`,
+
+    'df': () => `<span class="output">Filesystem      Size  Used  Avail  Use%  Mounted on
+/dev/sda1        50G   18G    30G   38%  /
+/dev/sda2       200G   85G   105G   45%  /home
+tmpfs            8G   256M   7.8G    3%  /tmp</span>`,
+
+    'ip': () => `<span class="output">1: lo: &lt;LOOPBACK,UP&gt; mtu 65536
+    inet 127.0.0.1/8 scope host lo
+2: eth0: &lt;BROADCAST,MULTICAST,UP&gt; mtu 1500
+    inet <span class="highlight">192.168.1.100/24</span> brd 192.168.1.255 scope global eth0
+3: docker0: &lt;BROADCAST,MULTICAST,UP&gt; mtu 1500
+    inet <span class="highlight">172.17.0.1/16</span> brd 172.17.255.255 scope global docker0</span>`,
+
+    history: () => history.map((c, i) => `<span class="output">  ${(i+1).toString().padStart(3)}  ${c}</span>`).join('\n'),
+
+    clear: () => { output.innerHTML = ''; return null; },
+
+    neofetch: () => `<span class="highlight">       _,met\$\$\$\$\$gg.          </span><span class="cmd">jefferson</span><span class="output">@</span><span class="highlight">server</span>
+<span class="highlight">    ,g\$\$\$\$\$\$\$\$\$\$\$\$\$\$\$P.       </span><span class="output">──────────────────</span>
+<span class="highlight">  ,g\$\$P"         """Y\$\$."     </span><span class="cmd">OS:</span><span class="output"> Ubuntu 24.04 LTS x86_64</span>
+<span class="highlight"> ,\$\$P'               \`\$\$\$.    </span><span class="cmd">Kernel:</span><span class="output"> 6.8.0-45-generic</span>
+<span class="highlight">,\$\$P       ,ggs.      \`\$\$b:   </span><span class="cmd">Uptime:</span><span class="output"> 45 days, 3 hours</span>
+<span class="highlight">d\$\$'     ,\$P"'   .     \$\$\$    </span><span class="cmd">Shell:</span><span class="output"> bash 5.2.21</span>
+<span class="highlight">\$\$P      d\$'     ,     \$\$P    </span><span class="cmd">CPU:</span><span class="output"> AMD EPYC 7543 (8) @ 2.80GHz</span>
+<span class="highlight">\$\$:      \$\$.   -       ,d\$\$'   </span><span class="cmd">Memory:</span><span class="output"> 4.2GiB / 15.6GiB (27%)</span>
+<span class="highlight">\$\$;      Y\$b._   _,d\$P'      </span><span class="cmd">Disk:</span><span class="output"> 103G / 250G (41%)</span>
+<span class="highlight">Y\$\$.     \`."\`"Y\$\$\$\$P"'        </span><span class="cmd">Docker:</span><span class="output"> 26.1.4</span>
+<span class="highlight">\`\$\$b       "-.__              </span><span class="cmd">Containers:</span><span class="output"> 5 running</span>
+<span class="highlight"> \`Y\$\$                         </span>
+<span class="highlight">  \`Y\$\$.                       </span>
+<span class="highlight">    \`\$\$b.                     </span>
+<span class="highlight">      \`Y\$\$b.                  </span>
+<span class="highlight">         \`"Y\$b._              </span>`
+  };
+
+  input.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      const raw = this.value.trim();
+      if (!raw) return;
+      history.push(raw);
+      historyIdx = history.length;
+
+      const parts = raw.split(/\s+/);
+      const cmd = parts[0].toLowerCase();
+      const args = parts.slice(1).join(' ');
+
+      // Display command
+      output.innerHTML += `<span class="prompt">jefferson@server:${currentDir}$ </span><span class="cmd">${raw}</span>\n`;
+
+      // Execute
+      let result;
+      if (cmd === 'uname') result = commands['uname'](args);
+      else if (cmd === 'free') result = commands['free']();
+      else if (cmd === 'df') result = commands['df']();
+      else if (cmd === 'ip') result = commands['ip']();
+      else if (commands[cmd]) result = commands[cmd](args);
+      else result = `<span class="err">bash: ${cmd}: comando no encontrado. Escribe 'help' para ver comandos disponibles.</span>`;
+
+      if (result !== null && result !== undefined && result !== '') output.innerHTML += result + '\n';
+      output.innerHTML += '\n';
+
+      this.value = '';
+      output.scrollTop = output.scrollHeight;
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (historyIdx > 0) { historyIdx--; this.value = history[historyIdx]; }
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (historyIdx < history.length - 1) { historyIdx++; this.value = history[historyIdx]; }
+      else { historyIdx = history.length; this.value = ''; }
+    }
+  });
+
+  // Focus terminal on click
+  document.getElementById('interactiveTerminal').addEventListener('click', () => input.focus());
+})();
+
+// ═══════════════════ PARTICLES ═══════════════════
+(function() {
+  const cvs = document.getElementById('particlesCanvas');
+  const ctx = cvs.getContext('2d');
+  let W, H;
+  const particles = [];
+  const COUNT = 55;
+
+  function resize() {
+    W = cvs.width = window.innerWidth;
+    H = cvs.height = window.innerHeight;
+    particles.length = 0;
+    for (let i = 0; i < COUNT; i++) {
+      particles.push({
+        x: Math.random() * W, y: Math.random() * H,
+        vx: (Math.random() - 0.5) * 0.3, vy: (Math.random() - 0.5) * 0.3
+      });
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    for (let i = 0; i < particles.length; i++) {
+      const p = particles[i];
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0 || p.x > W) p.vx *= -1;
+      if (p.y < 0 || p.y > H) p.vy *= -1;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 1.5, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(6,182,212,0.15)';
+      ctx.fill();
+      for (let j = i + 1; j < particles.length; j++) {
+        const q = particles[j];
+        const dx = p.x - q.x, dy = p.y - q.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 150) {
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(q.x, q.y);
+          ctx.strokeStyle = `rgba(6,182,212,${0.06 * (1 - dist / 150)})`;
+          ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+
+  resize(); draw();
+  window.addEventListener('resize', resize);
+})();
+
+// ═══════════════════ SCROLL ANIMATIONS ═══════════════════
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.style.opacity = '1';
+      entry.target.style.transform = 'translateY(0)';
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.card, .mini-card, .timeline-item, .cmd-item').forEach(el => {
+  el.style.opacity = '0';
+  el.style.transform = 'translateY(20px)';
+  el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+  observer.observe(el);
+});
+
+// ═══════════════════ SKILL BAR ANIMATION ═══════════════════
+const barObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const fill = entry.target.querySelector('.skill-bar-fill');
+      if (fill) {
+        const w = fill.style.width;
+        fill.style.width = '0%';
+        setTimeout(() => fill.style.width = w, 100);
+      }
+    }
+  });
+}, { threshold: 0.5 });
+
+document.querySelectorAll('.skill-bar').forEach(el => barObserver.observe(el));
+</script>
+
+</body>
+</html>

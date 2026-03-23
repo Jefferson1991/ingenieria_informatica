@@ -1,0 +1,3297 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NetMaster CCNA - Suite Completa de Redes</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #050a18;
+            --bg2: #0a1628;
+            --surface: #111d35;
+            --surface2: #1a2a4a;
+            --surface3: #243556;
+            --border: #2a3f65;
+            --text: #e8edf5;
+            --text-muted: #8899b8;
+            --accent: #00d4ff;
+            --accent-glow: rgba(0, 212, 255, 0.3);
+            --accent2: #7c5cfc;
+            --accent2-glow: rgba(124, 92, 252, 0.3);
+            --green: #00e88f;
+            --green-glow: rgba(0, 232, 143, 0.2);
+            --red: #ff5577;
+            --orange: #ff9f43;
+            --yellow: #ffe066;
+            --pink: #ff6b9d;
+            --cyan: #00e5ff;
+            --radius: 12px;
+            --radius-sm: 8px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(0,212,255,0.05) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(124,92,252,0.05) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 80%, rgba(0,232,143,0.03) 0%, transparent 50%);
+            animation: bgPulse 15s ease-in-out infinite alternate;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes bgPulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.7; }
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes glow { 0%, 100% { box-shadow: 0 0 5px var(--accent-glow); } 50% { box-shadow: 0 0 20px var(--accent-glow), 0 0 40px rgba(0,212,255,0.1); } }
+        @keyframes typewriter { from { width: 0; } to { width: 100%; } }
+
+        .container { max-width: 1400px; margin: 0 auto; padding: 0 20px; position: relative; z-index: 1; }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 40px 20px 20px;
+            position: relative;
+        }
+        .header h1 {
+            font-size: clamp(1.8rem, 4vw, 3rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--accent), var(--accent2), var(--green));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+        .header p {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: center;
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(5,10,24,0.92);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--border);
+        }
+        .tab-btn {
+            padding: 10px 20px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text-muted);
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        .tab-btn:hover {
+            background: var(--surface2);
+            color: var(--text);
+            border-color: var(--accent);
+        }
+        .tab-btn.active {
+            background: linear-gradient(135deg, rgba(0,212,255,0.15), rgba(124,92,252,0.15));
+            border-color: var(--accent);
+            color: var(--accent);
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+        .tab-content { display: none; animation: fadeIn 0.4s ease; }
+        .tab-content.active { display: block; }
+
+        /* Cards */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+        .card:hover {
+            border-color: rgba(0,212,255,0.3);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        .card h2 {
+            font-size: 1.4rem;
+            margin-bottom: 16px;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .card h3 {
+            font-size: 1.1rem;
+            margin: 16px 0 10px;
+            color: var(--accent2);
+        }
+        .card h4 {
+            font-size: 0.95rem;
+            margin: 12px 0 8px;
+            color: var(--green);
+        }
+
+        /* Tables */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0;
+            font-size: 0.88rem;
+        }
+        .data-table th {
+            background: var(--surface2);
+            color: var(--accent);
+            padding: 10px 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid var(--border);
+            position: sticky;
+            top: 0;
+        }
+        .data-table td {
+            padding: 8px 12px;
+            border-bottom: 1px solid rgba(42,63,101,0.4);
+            color: var(--text);
+        }
+        .data-table tr:hover td {
+            background: rgba(0,212,255,0.04);
+        }
+        .data-table .mono {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82rem;
+        }
+
+        /* Inputs */
+        input[type="text"], input[type="number"], select {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        input:focus, select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 10px 22px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 0.88rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: #fff;
+        }
+        .btn-primary:hover {
+            box-shadow: 0 4px 20px var(--accent-glow);
+            transform: translateY(-1px);
+        }
+        .btn-secondary {
+            background: var(--surface2);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        .btn-secondary:hover {
+            border-color: var(--accent);
+            background: var(--surface3);
+        }
+        .btn-danger {
+            background: rgba(255,85,119,0.15);
+            color: var(--red);
+            border: 1px solid rgba(255,85,119,0.3);
+        }
+        .btn-danger:hover {
+            background: rgba(255,85,119,0.25);
+        }
+        .btn-success {
+            background: rgba(0,232,143,0.15);
+            color: var(--green);
+            border: 1px solid rgba(0,232,143,0.3);
+        }
+        .btn-success:hover {
+            background: rgba(0,232,143,0.25);
+        }
+        .btn-sm { padding: 6px 14px; font-size: 0.8rem; }
+
+        /* Accordion */
+        .accordion-item {
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            margin-bottom: 8px;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        .accordion-item:hover { border-color: rgba(0,212,255,0.3); }
+        .accordion-header {
+            padding: 14px 18px;
+            background: var(--surface2);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            user-select: none;
+            transition: background 0.3s;
+        }
+        .accordion-header:hover { background: var(--surface3); }
+        .accordion-header .arrow {
+            transition: transform 0.3s;
+            color: var(--accent);
+        }
+        .accordion-item.open .accordion-header .arrow { transform: rotate(180deg); }
+        .accordion-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+            background: var(--surface);
+        }
+        .accordion-item.open .accordion-body { max-height: 2000px; }
+        .accordion-body-inner { padding: 16px 18px; }
+
+        /* Tags */
+        .tag {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin: 2px;
+        }
+        .tag-cyan { background: rgba(0,212,255,0.15); color: var(--accent); }
+        .tag-purple { background: rgba(124,92,252,0.15); color: var(--accent2); }
+        .tag-green { background: rgba(0,232,143,0.15); color: var(--green); }
+        .tag-orange { background: rgba(255,159,67,0.15); color: var(--orange); }
+        .tag-red { background: rgba(255,85,119,0.15); color: var(--red); }
+        .tag-yellow { background: rgba(255,224,102,0.15); color: var(--yellow); }
+
+        /* OSI Layer */
+        .osi-layer {
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            margin-bottom: 6px;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        .osi-layer:hover { border-color: rgba(0,212,255,0.4); transform: translateX(4px); }
+        .osi-layer-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            font-weight: 600;
+        }
+        .osi-layer-num {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.95rem;
+            flex-shrink: 0;
+        }
+        .osi-layer-detail {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+        }
+        .osi-layer.open .osi-layer-detail { max-height: 600px; }
+        .osi-layer-detail-inner {
+            padding: 0 16px 16px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+        .osi-info-box {
+            background: var(--bg2);
+            border-radius: var(--radius-sm);
+            padding: 10px 14px;
+        }
+        .osi-info-box label {
+            display: block;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        /* Interactive tools */
+        .tool-box {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin: 16px 0;
+        }
+        .tool-box h4 {
+            color: var(--accent);
+            margin-bottom: 12px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+        .input-group label {
+            font-weight: 500;
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            min-width: 80px;
+        }
+
+        .result-box {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 14px;
+            margin-top: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+        }
+
+        /* Grid layouts */
+        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; }
+
+        /* VLSM-specific */
+        .subnet-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            padding: 8px 0;
+            flex-wrap: wrap;
+        }
+        .subnet-row input[type="text"] { flex: 1; min-width: 120px; }
+        .subnet-row input[type="number"] { width: 100px; }
+
+        .vlsm-result-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 16px;
+            animation: slideUp 0.4s ease;
+        }
+        .vlsm-result-card h3 {
+            color: var(--accent);
+            margin-bottom: 12px;
+        }
+
+        .addr-bar {
+            height: 40px;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            display: flex;
+            margin: 12px 0;
+            border: 1px solid var(--border);
+        }
+        .addr-bar-segment {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #fff;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            padding: 0 4px;
+        }
+
+        .binary-display {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82rem;
+            word-break: break-all;
+            padding: 10px;
+            background: var(--bg2);
+            border-radius: var(--radius-sm);
+            margin: 8px 0;
+        }
+        .binary-display .net-bit { color: var(--accent); }
+        .binary-display .host-bit { color: var(--green); }
+        .binary-display .subnet-bit { color: var(--orange); }
+
+        /* Terminal */
+        .terminal {
+            background: #0a0e14;
+            border: 1px solid #1a2a3a;
+            border-radius: var(--radius);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82rem;
+            overflow: hidden;
+        }
+        .terminal-header {
+            background: #111920;
+            padding: 8px 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid #1a2a3a;
+        }
+        .terminal-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+        }
+        .terminal-output {
+            padding: 14px;
+            max-height: 500px;
+            overflow-y: auto;
+            color: #00ff88;
+            line-height: 1.5;
+        }
+        .terminal-output .cmd-line { color: #00ff88; }
+        .terminal-output .info-line { color: #66ccff; }
+        .terminal-output .error-line { color: #ff5577; }
+        .terminal-output .warn-line { color: #ffaa33; }
+        .terminal-input-line {
+            display: flex;
+            align-items: center;
+            padding: 0 14px 14px;
+            gap: 0;
+        }
+        .terminal-prompt {
+            color: #00ff88;
+            white-space: nowrap;
+        }
+        .terminal-input {
+            background: transparent;
+            border: none;
+            color: #00ff88;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82rem;
+            flex: 1;
+            outline: none;
+            caret-color: #00ff88;
+        }
+
+        /* Comparison boxes */
+        .compare-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        .compare-box {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 16px;
+        }
+        .compare-box h4 {
+            text-align: center;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 10px;
+        }
+
+        /* Wiring diagram */
+        .wire-pin {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            margin: 2px;
+        }
+
+        /* Quiz */
+        .quiz-box {
+            background: var(--bg2);
+            border: 1px solid var(--accent2);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin: 16px 0;
+        }
+        .quiz-box h4 { color: var(--accent2); margin-bottom: 10px; }
+        .quiz-option {
+            display: block;
+            padding: 10px 14px;
+            margin: 6px 0;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+            color: var(--text);
+            width: 100%;
+            text-align: left;
+            font-size: 0.88rem;
+        }
+        .quiz-option:hover { border-color: var(--accent2); background: var(--surface2); }
+        .quiz-option.correct { border-color: var(--green); background: rgba(0,232,143,0.1); color: var(--green); }
+        .quiz-option.wrong { border-color: var(--red); background: rgba(255,85,119,0.1); color: var(--red); }
+        .quiz-feedback {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: var(--radius-sm);
+            font-size: 0.88rem;
+            display: none;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg2); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .tabs { gap: 4px; }
+            .tab-btn { padding: 8px 12px; font-size: 0.75rem; }
+            .card { padding: 16px; }
+            .compare-grid { grid-template-columns: 1fr; }
+            .osi-layer-detail-inner { grid-template-columns: 1fr; }
+            .subnet-row { flex-direction: column; align-items: stretch; }
+            .subnet-row input[type="number"] { width: 100%; }
+        }
+
+        /* Color bar for VLSM */
+        .vlsm-colors { --c0: #00d4ff; --c1: #7c5cfc; --c2: #00e88f; --c3: #ff9f43; --c4: #ff5577; --c5: #ffe066; --c6: #ff6b9d; --c7: #00e5ff; --c8: #a78bfa; --c9: #34d399; }
+
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: var(--bg);
+            font-weight: 800;
+            font-size: 0.85rem;
+            margin-right: 8px;
+            flex-shrink: 0;
+        }
+
+        .highlight-box {
+            background: rgba(0,212,255,0.06);
+            border-left: 3px solid var(--accent);
+            padding: 12px 16px;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            margin: 10px 0;
+        }
+
+        .warning-box {
+            background: rgba(255,159,67,0.08);
+            border-left: 3px solid var(--orange);
+            padding: 12px 16px;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            margin: 10px 0;
+            color: var(--orange);
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .info-item {
+            background: var(--bg2);
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+        }
+        .info-item .label { font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; }
+        .info-item .value { font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; color: var(--accent); margin-top: 2px; }
+
+        .encap-visual {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .encap-box {
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-align: center;
+            border: 2px solid;
+            min-width: 60px;
+        }
+
+        .proto-list { list-style: none; padding: 0; }
+        .proto-list li {
+            padding: 4px 0;
+            font-size: 0.88rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .proto-list li::before {
+            content: '';
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--accent);
+            flex-shrink: 0;
+        }
+
+        .section-divider {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 24px 0;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .scroll-table-wrap {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .example-btn {
+            padding: 8px 16px;
+            margin: 4px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.82rem;
+            transition: all 0.3s;
+        }
+        .example-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: rgba(0,212,255,0.08);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>NetMaster CCNA</h1>
+        <p>Suite Completa de Redes &mdash; CCNA1, CCNA2, Subnetting, VLSM, Cisco IOS &amp; IPv6</p>
+    </div>
+
+    <div class="tabs" id="mainTabs">
+        <button class="tab-btn active" onclick="switchTab('tab1')">CCNA1 - Fundamentos</button>
+        <button class="tab-btn" onclick="switchTab('tab2')">CCNA2 - Routing &amp; Switching</button>
+        <button class="tab-btn" onclick="switchTab('tab3')">Subnetting</button>
+        <button class="tab-btn" onclick="switchTab('tab4')">Calculadora VLSM</button>
+        <button class="tab-btn" onclick="switchTab('tab5')">Cisco IOS</button>
+        <button class="tab-btn" onclick="switchTab('tab6')">IPv6 Intro</button>
+    </div>
+
+    <!-- ==================== TAB 1: CCNA1 ==================== -->
+    <div class="tab-content active" id="tab1">
+
+        <!-- 1.1 Modelo OSI -->
+        <div class="card">
+            <h2>1.1 Modelo OSI (7 Capas)</h2>
+            <p style="color:var(--text-muted);margin-bottom:16px;">El modelo OSI (Open Systems Interconnection) divide la comunicacion de red en 7 capas. Haz clic en cada capa para ver los detalles.</p>
+
+            <div id="osiStack"></div>
+
+            <h3>Encapsulamiento</h3>
+            <p style="color:var(--text-muted);margin-bottom:12px;">Al enviar datos, cada capa agrega su encabezado (header). Al recibir, cada capa lo retira.</p>
+            <div class="encap-visual">
+                <div class="encap-box" style="border-color:var(--red);color:var(--red);">L2 Header</div>
+                <div class="encap-box" style="border-color:var(--orange);color:var(--orange);">L3 Header</div>
+                <div class="encap-box" style="border-color:var(--yellow);color:var(--yellow);">L4 Header</div>
+                <div class="encap-box" style="border-color:var(--green);color:var(--green);">Datos</div>
+                <div class="encap-box" style="border-color:var(--red);color:var(--red);">L2 Trailer</div>
+            </div>
+            <div class="scroll-table-wrap">
+            <table class="data-table" style="margin-top:10px;">
+                <tr><th>Capa</th><th>PDU</th><th>Encapsulamiento</th></tr>
+                <tr><td>7-5 Aplicacion</td><td>Datos</td><td>Datos del usuario</td></tr>
+                <tr><td>4 Transporte</td><td>Segmento / Datagrama</td><td>+ Puerto origen/destino</td></tr>
+                <tr><td>3 Red</td><td>Paquete</td><td>+ IP origen/destino</td></tr>
+                <tr><td>2 Enlace</td><td>Trama (Frame)</td><td>+ MAC origen/destino + FCS</td></tr>
+                <tr><td>1 Fisica</td><td>Bits</td><td>Senal electrica/optica</td></tr>
+            </table>
+            </div>
+
+            <!-- Quiz OSI -->
+            <div class="quiz-box">
+                <h4>Quiz Rapido - Modelo OSI</h4>
+                <p>Cual capa del modelo OSI se encarga del enrutamiento y direccionamiento logico (IP)?</p>
+                <button class="quiz-option" onclick="checkQuiz(this,'wrong')">Capa 2 - Enlace de datos</button>
+                <button class="quiz-option" onclick="checkQuiz(this,'correct')">Capa 3 - Red</button>
+                <button class="quiz-option" onclick="checkQuiz(this,'wrong')">Capa 4 - Transporte</button>
+                <button class="quiz-option" onclick="checkQuiz(this,'wrong')">Capa 7 - Aplicacion</button>
+                <div class="quiz-feedback" id="qf1"></div>
+            </div>
+        </div>
+
+        <!-- 1.2 TCP/IP -->
+        <div class="card">
+            <h2>1.2 Modelo TCP/IP (4 Capas)</h2>
+            <p style="color:var(--text-muted);margin-bottom:16px;">El modelo TCP/IP es el modelo practico utilizado en Internet. Tiene 4 capas que se mapean al modelo OSI.</p>
+
+            <div class="compare-grid">
+                <div class="compare-box">
+                    <h4 style="color:var(--accent);">Modelo OSI (7 capas)</h4>
+                    <div style="display:flex;flex-direction:column;gap:4px;">
+                        <div style="background:rgba(255,85,119,0.12);padding:8px;border-radius:6px;text-align:center;border:1px solid rgba(255,85,119,0.2);">7. Aplicacion</div>
+                        <div style="background:rgba(255,107,157,0.12);padding:8px;border-radius:6px;text-align:center;border:1px solid rgba(255,107,157,0.2);">6. Presentacion</div>
+                        <div style="background:rgba(255,159,67,0.12);padding:8px;border-radius:6px;text-align:center;border:1px solid rgba(255,159,67,0.2);">5. Sesion</div>
+                        <div style="background:rgba(255,224,102,0.12);padding:8px;border-radius:6px;text-align:center;border:1px solid rgba(255,224,102,0.2);">4. Transporte</div>
+                        <div style="background:rgba(0,232,143,0.12);padding:8px;border-radius:6px;text-align:center;border:1px solid rgba(0,232,143,0.2);">3. Red</div>
+                        <div style="background:rgba(0,212,255,0.12);padding:8px;border-radius:6px;text-align:center;border:1px solid rgba(0,212,255,0.2);">2. Enlace de Datos</div>
+                        <div style="background:rgba(124,92,252,0.12);padding:8px;border-radius:6px;text-align:center;border:1px solid rgba(124,92,252,0.2);">1. Fisica</div>
+                    </div>
+                </div>
+                <div class="compare-box">
+                    <h4 style="color:var(--green);">Modelo TCP/IP (4 capas)</h4>
+                    <div style="display:flex;flex-direction:column;gap:4px;">
+                        <div style="background:rgba(255,85,119,0.12);padding:24px 8px;border-radius:6px;text-align:center;border:1px solid rgba(255,85,119,0.2);">Aplicacion<br><small style="color:var(--text-muted);">OSI 7+6+5</small></div>
+                        <div style="background:rgba(255,224,102,0.12);padding:8px;border-radius:6px;text-align:center;border:1px solid rgba(255,224,102,0.2);">Transporte<br><small style="color:var(--text-muted);">OSI 4</small></div>
+                        <div style="background:rgba(0,232,143,0.12);padding:8px;border-radius:6px;text-align:center;border:1px solid rgba(0,232,143,0.2);">Internet<br><small style="color:var(--text-muted);">OSI 3</small></div>
+                        <div style="background:rgba(0,212,255,0.12);padding:14px 8px;border-radius:6px;text-align:center;border:1px solid rgba(0,212,255,0.2);">Acceso a Red<br><small style="color:var(--text-muted);">OSI 2+1</small></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="scroll-table-wrap" style="margin-top:16px;">
+            <table class="data-table">
+                <tr><th>Capa TCP/IP</th><th>Capas OSI</th><th>Protocolos</th><th>PDU</th></tr>
+                <tr><td>Aplicacion</td><td>7, 6, 5</td><td class="mono">HTTP, FTP, DNS, DHCP, SMTP, SSH, Telnet</td><td>Datos</td></tr>
+                <tr><td>Transporte</td><td>4</td><td class="mono">TCP, UDP</td><td>Segmento / Datagrama</td></tr>
+                <tr><td>Internet</td><td>3</td><td class="mono">IP, ICMP, ARP, OSPF</td><td>Paquete</td></tr>
+                <tr><td>Acceso a Red</td><td>2, 1</td><td class="mono">Ethernet, Wi-Fi, PPP</td><td>Trama / Bits</td></tr>
+            </table>
+            </div>
+        </div>
+
+        <!-- 1.3 Direccionamiento IPv4 -->
+        <div class="card">
+            <h2>1.3 Direccionamiento IPv4</h2>
+
+            <h3>Estructura de una Direccion IPv4</h3>
+            <p>Una direccion IPv4 tiene 32 bits divididos en 4 octetos (bytes), escritos en notacion decimal con puntos.</p>
+            <div class="binary-display" style="margin:12px 0;">
+                <span class="net-bit">11000000.10101000.00000001</span>.<span class="host-bit">00001010</span><br>
+                <span style="color:var(--text-muted);">= </span><span class="net-bit">192.168.1</span>.<span class="host-bit">10</span>
+                <span style="color:var(--text-muted);font-size:0.75rem;"> (Porcion de red en <span style="color:var(--accent)">azul</span>, host en <span style="color:var(--green)">verde</span>)</span>
+            </div>
+
+            <h3>Clases de Direcciones IP</h3>
+            <div class="scroll-table-wrap">
+            <table class="data-table">
+                <tr><th>Clase</th><th>Rango Primer Octeto</th><th>Mascara por Defecto</th><th>CIDR</th><th>Redes</th><th>Hosts/Red</th><th>Uso</th></tr>
+                <tr><td><span class="tag tag-cyan">A</span></td><td class="mono">1 - 126</td><td class="mono">255.0.0.0</td><td class="mono">/8</td><td>126</td><td>16,777,214</td><td>Grandes organizaciones</td></tr>
+                <tr><td><span class="tag tag-purple">B</span></td><td class="mono">128 - 191</td><td class="mono">255.255.0.0</td><td class="mono">/16</td><td>16,384</td><td>65,534</td><td>Organizaciones medianas</td></tr>
+                <tr><td><span class="tag tag-green">C</span></td><td class="mono">192 - 223</td><td class="mono">255.255.255.0</td><td class="mono">/24</td><td>2,097,152</td><td>254</td><td>Redes pequenas</td></tr>
+                <tr><td><span class="tag tag-orange">D</span></td><td class="mono">224 - 239</td><td colspan="4">Multicast (no asignable a hosts)</td></tr>
+                <tr><td><span class="tag tag-red">E</span></td><td class="mono">240 - 255</td><td colspan="4">Experimental / Reservado</td></tr>
+            </table>
+            </div>
+
+            <h3>Direcciones Privadas (RFC 1918)</h3>
+            <div class="info-grid">
+                <div class="info-item"><div class="label">Clase A Privada</div><div class="value">10.0.0.0/8</div></div>
+                <div class="info-item"><div class="label">Clase B Privada</div><div class="value">172.16.0.0/12</div></div>
+                <div class="info-item"><div class="label">Clase C Privada</div><div class="value">192.168.0.0/16</div></div>
+            </div>
+
+            <h3>Direcciones Especiales</h3>
+            <div class="info-grid">
+                <div class="info-item"><div class="label">Loopback</div><div class="value">127.0.0.1</div></div>
+                <div class="info-item"><div class="label">APIPA</div><div class="value">169.254.x.x</div></div>
+                <div class="info-item"><div class="label">Broadcast Limitado</div><div class="value">255.255.255.255</div></div>
+                <div class="info-item"><div class="label">Red Actual</div><div class="value">0.0.0.0</div></div>
+            </div>
+
+            <!-- IP Analyzer tool -->
+            <div class="tool-box">
+                <h4>Analizador de Direccion IP</h4>
+                <div class="input-group">
+                    <label>Direccion IP:</label>
+                    <input type="text" id="ipAnalyzerInput" placeholder="Ej: 192.168.1.10" style="width:200px;">
+                    <button class="btn btn-primary btn-sm" onclick="analyzeIP()">Analizar</button>
+                </div>
+                <div id="ipAnalyzerResult" class="result-box" style="display:none;"></div>
+            </div>
+
+            <!-- Binary converter -->
+            <div class="tool-box">
+                <h4>Conversor Binario - Decimal</h4>
+                <div class="input-group">
+                    <label>Decimal:</label>
+                    <input type="number" id="decInput" min="0" max="255" placeholder="0-255" style="width:120px;" oninput="decToBin()">
+                    <span style="color:var(--text-muted);">=</span>
+                    <label>Binario:</label>
+                    <input type="text" id="binInput" placeholder="00000000" style="width:160px;" oninput="binToDec()">
+                </div>
+            </div>
+
+            <!-- Quiz -->
+            <div class="quiz-box">
+                <h4>Quiz - Direccionamiento</h4>
+                <p>La direccion 172.20.5.1 es una direccion...</p>
+                <button class="quiz-option" onclick="checkQuiz(this,'wrong')">Publica Clase B</button>
+                <button class="quiz-option" onclick="checkQuiz(this,'correct')">Privada (RFC 1918)</button>
+                <button class="quiz-option" onclick="checkQuiz(this,'wrong')">Multicast</button>
+                <button class="quiz-option" onclick="checkQuiz(this,'wrong')">Loopback</button>
+                <div class="quiz-feedback"></div>
+            </div>
+        </div>
+
+        <!-- 1.4 Subnetting Basico -->
+        <div class="card">
+            <h2>1.4 Subnetting Basico</h2>
+
+            <h3>Mascara de Subred</h3>
+            <p>La mascara de subred determina que parte de la IP es la red y cual es el host. Los bits en 1 representan la porcion de red; los bits en 0 representan la porcion de host.</p>
+
+            <div class="highlight-box">
+                <strong>Operacion AND:</strong> IP AND Mascara = Direccion de Red<br>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:0.85rem;">
+                192.168.1.130 AND 255.255.255.192 = 192.168.1.128
+                </span>
+            </div>
+
+            <!-- AND Calculator -->
+            <div class="tool-box">
+                <h4>Calculadora AND (IP & Mascara)</h4>
+                <div class="input-group">
+                    <label>IP:</label>
+                    <input type="text" id="andIpInput" placeholder="192.168.1.130" style="width:180px;">
+                </div>
+                <div class="input-group">
+                    <label>Mascara:</label>
+                    <input type="text" id="andMaskInput" placeholder="255.255.255.192" style="width:180px;">
+                    <button class="btn btn-primary btn-sm" onclick="calcAND()">Calcular AND</button>
+                </div>
+                <div id="andResult" class="result-box" style="display:none;"></div>
+            </div>
+
+            <h3>Notacion CIDR</h3>
+            <p>CIDR (Classless Inter-Domain Routing) usa la notacion /n donde n indica cuantos bits son de red.</p>
+
+            <h3>Potencias de 2</h3>
+            <div class="scroll-table-wrap">
+            <table class="data-table">
+                <tr><th>2^n</th><td class="mono">2^0</td><td class="mono">2^1</td><td class="mono">2^2</td><td class="mono">2^3</td><td class="mono">2^4</td><td class="mono">2^5</td><td class="mono">2^6</td><td class="mono">2^7</td><td class="mono">2^8</td></tr>
+                <tr><th>Valor</th><td class="mono">1</td><td class="mono">2</td><td class="mono">4</td><td class="mono">8</td><td class="mono">16</td><td class="mono">32</td><td class="mono">64</td><td class="mono">128</td><td class="mono">256</td></tr>
+                <tr><th>2^n</th><td class="mono">2^9</td><td class="mono">2^10</td><td class="mono">2^11</td><td class="mono">2^12</td><td class="mono">2^13</td><td class="mono">2^14</td><td class="mono">2^15</td><td class="mono">2^16</td><td></td></tr>
+                <tr><th>Valor</th><td class="mono">512</td><td class="mono">1,024</td><td class="mono">2,048</td><td class="mono">4,096</td><td class="mono">8,192</td><td class="mono">16,384</td><td class="mono">32,768</td><td class="mono">65,536</td><td></td></tr>
+            </table>
+            </div>
+
+            <h3>Tabla de Mascaras de Subred</h3>
+            <div class="scroll-table-wrap">
+            <table class="data-table" id="maskTable">
+                <tr><th>CIDR</th><th>Mascara</th><th>Wildcard</th><th>Direcciones</th><th>Hosts Usables</th></tr>
+            </table>
+            </div>
+        </div>
+
+        <!-- 1.5 Ethernet y Switching -->
+        <div class="card">
+            <h2>1.5 Ethernet y Switching</h2>
+
+            <h3>Direcciones MAC</h3>
+            <p>Una direccion MAC tiene 48 bits (6 bytes), escritos en hexadecimal: <span class="mono" style="color:var(--accent);">AA:BB:CC:DD:EE:FF</span></p>
+            <div class="info-grid">
+                <div class="info-item"><div class="label">Unicast</div><div class="value">Bit menos significativo del primer byte = 0</div></div>
+                <div class="info-item"><div class="label">Multicast</div><div class="value">Bit menos significativo del primer byte = 1</div></div>
+                <div class="info-item"><div class="label">Broadcast</div><div class="value">FF:FF:FF:FF:FF:FF</div></div>
+            </div>
+
+            <h3>Tabla CAM del Switch</h3>
+            <p>El switch aprende direcciones MAC observando la MAC de origen de cada trama recibida y asociandola con el puerto de entrada.</p>
+            <ol style="color:var(--text-muted);padding-left:20px;margin:8px 0;">
+                <li>Trama llega al puerto &rarr; switch lee MAC origen</li>
+                <li>Asocia MAC con el puerto en la tabla CAM</li>
+                <li>Busca MAC destino en la tabla</li>
+                <li>Si la encuentra &rarr; envia por ese puerto (unicast)</li>
+                <li>Si no la encuentra &rarr; inunda (flood) por todos los puertos excepto el de origen</li>
+            </ol>
+
+            <h3>Dominios de Colision vs Broadcast</h3>
+            <div class="grid-2">
+                <div class="tool-box">
+                    <h4 style="color:var(--orange);">Dominio de Colision</h4>
+                    <p style="font-size:0.88rem;">Segmento donde dos tramas pueden colisionar. Un switch separa dominios de colision (cada puerto es uno). Un hub comparte un solo dominio.</p>
+                </div>
+                <div class="tool-box">
+                    <h4 style="color:var(--accent2);">Dominio de Broadcast</h4>
+                    <p style="font-size:0.88rem;">Segmento alcanzado por una trama broadcast. Un switch NO separa dominios de broadcast. Un router SI los separa.</p>
+                </div>
+            </div>
+
+            <h3>Half-Duplex vs Full-Duplex</h3>
+            <div class="scroll-table-wrap">
+            <table class="data-table">
+                <tr><th></th><th>Half-Duplex</th><th>Full-Duplex</th></tr>
+                <tr><td>Direccion</td><td>Un sentido a la vez</td><td>Ambos sentidos simultaneamente</td></tr>
+                <tr><td>Colisiones</td><td>Posibles (usa CSMA/CD)</td><td>No hay colisiones</td></tr>
+                <tr><td>Ejemplo</td><td>Hub, Walkie-talkie</td><td>Switch, Telefono</td></tr>
+            </table>
+            </div>
+
+            <h3>CSMA/CD</h3>
+            <p>Carrier Sense Multiple Access / Collision Detection: antes de transmitir, el dispositivo escucha el medio. Si detecta una colision, envia una senal de jam y espera un tiempo aleatorio (backoff) antes de reintentar.</p>
+        </div>
+
+        <!-- 1.6 Cables y Medios -->
+        <div class="card">
+            <h2>1.6 Cables y Medios</h2>
+
+            <h3>Categorias de Cable UTP</h3>
+            <div class="scroll-table-wrap">
+            <table class="data-table">
+                <tr><th>Categoria</th><th>Velocidad Max</th><th>Ancho de Banda</th><th>Distancia Max</th></tr>
+                <tr><td>Cat 5</td><td>100 Mbps</td><td>100 MHz</td><td>100 m</td></tr>
+                <tr><td>Cat 5e</td><td>1 Gbps</td><td>100 MHz</td><td>100 m</td></tr>
+                <tr><td>Cat 6</td><td>1 Gbps (10G hasta 55m)</td><td>250 MHz</td><td>100 m</td></tr>
+                <tr><td>Cat 6a</td><td>10 Gbps</td><td>500 MHz</td><td>100 m</td></tr>
+            </table>
+            </div>
+
+            <h3>Tipos de Cable</h3>
+            <div class="scroll-table-wrap">
+            <table class="data-table">
+                <tr><th>Tipo</th><th>Uso</th><th>Conexion</th></tr>
+                <tr><td>Directo (Straight-through)</td><td>Dispositivos diferentes: PC-Switch, Router-Switch</td><td>T568B en ambos extremos</td></tr>
+                <tr><td>Cruzado (Crossover)</td><td>Dispositivos iguales: PC-PC, Switch-Switch, Router-Router</td><td>T568A en un extremo, T568B en el otro</td></tr>
+                <tr><td>Rollover (Console)</td><td>PC a puerto consola del router/switch</td><td>Pines invertidos</td></tr>
+            </table>
+            </div>
+
+            <h3>Estandares T568A y T568B</h3>
+            <div class="grid-2">
+                <div class="tool-box">
+                    <h4>T568A</h4>
+                    <div>
+                        <span class="wire-pin" style="background:rgba(255,255,255,0.08);">1 <span style="color:#90EE90;">Verde/Blanco</span></span>
+                        <span class="wire-pin" style="background:rgba(255,255,255,0.08);">2 <span style="color:#00cc00;">Verde</span></span>
+                        <span class="wire-pin" style="background:rgba(255,255,255,0.08);">3 <span style="color:#ffaa55;">Naranja/Blanco</span></span>
+                        <span class="wire-pin" style="background:rgba(255,255,255,0.08);">4 <span style="color:#4488ff;">Azul</span></span>
+                        <span class="wire-pin" style="background:rgba(255,255,255,0.08);">5 <span style="color:#88aaff;">Azul/Blanco</span></span>
+                        <span class="wire-pin" style="background:rgba(255,255,255,0.08);">6 <span style="color:#ff8800;">Naranja</span></span>
+                        <span class="wire-pin" style="background:rgba(255,255,255,0.08);">7 <span style="color:#cc8866;">Cafe/Blanco</span></span>
+                        <span class="wire-pin" style="background:rgba(255,255,255,0.08);">8 <span style="color:#8B4513;">Cafe</span></span>
+                    </div>
+                </div>
+                <div class="tool-box">
+                    <h4>T568B</h4>
+                    <div>
+                        <span class="wire-pin" style="background:rgba(255,255,255,0.08);">1 <span style="color:#ffaa55;">Naranja/Blanco</span></span>
+                        <span class="wire-pin" style="background:rgba(255,255,255,0.08);">2 <span style="color:#ff8800;">Naranja</span></span>
+                        <span class="wire-pin" style="background:rgba(255,255,255,0.08);">3 <span style="color:#90EE90;">Verde/Blanco</span></span>
+                        <span class="wire-pin" style="background:rgba(255,255,255,0.08);">4 <span style="color:#4488ff;">Azul</span></span>
+                        <span class="wire-pin" style="background:rgba(255,255,255,0.08);">5 <span style="color:#88aaff;">Azul/Blanco</span></span>
+                        <span class="wire-pin" style="background:rgba(255,255,255,0.08);">6 <span style="color:#00cc00;">Verde</span></span>
+                        <span class="wire-pin" style="background:rgba(255,255,255,0.08);">7 <span style="color:#cc8866;">Cafe/Blanco</span></span>
+                        <span class="wire-pin" style="background:rgba(255,255,255,0.08);">8 <span style="color:#8B4513;">Cafe</span></span>
+                    </div>
+                </div>
+            </div>
+
+            <h3>Fibra Optica</h3>
+            <div class="scroll-table-wrap">
+            <table class="data-table">
+                <tr><th></th><th>Monomodo (SMF)</th><th>Multimodo (MMF)</th></tr>
+                <tr><td>Nucleo</td><td>9 um</td><td>50 o 62.5 um</td></tr>
+                <tr><td>Distancia</td><td>Hasta 100 km</td><td>Hasta 2 km</td></tr>
+                <tr><td>Fuente de luz</td><td>Laser</td><td>LED</td></tr>
+                <tr><td>Costo</td><td>Mayor</td><td>Menor</td></tr>
+                <tr><td>Color del conector</td><td>Amarillo</td><td>Aqua / Naranja</td></tr>
+            </table>
+            </div>
+        </div>
+    </div><!-- end tab1 -->
+
+    <!-- ==================== TAB 2: CCNA2 ==================== -->
+    <div class="tab-content" id="tab2">
+
+        <!-- 2.1 VLANs -->
+        <div class="card">
+            <h2>2.1 VLANs (Virtual LANs)</h2>
+            <p style="color:var(--text-muted);margin-bottom:12px;">Una VLAN permite segmentar logicamente una red en dominios de broadcast independientes sin necesidad de hardware separado.</p>
+
+            <h3>Tipos de VLANs</h3>
+            <div class="info-grid">
+                <div class="info-item"><div class="label">VLAN de Datos</div><div class="value">Trafico de usuario (VLAN 10, 20, etc.)</div></div>
+                <div class="info-item"><div class="label">VLAN de Voz</div><div class="value">Trafico VoIP con QoS (VLAN 150)</div></div>
+                <div class="info-item"><div class="label">VLAN de Administracion</div><div class="value">Gestion del switch (VLAN 99)</div></div>
+                <div class="info-item"><div class="label">VLAN Nativa</div><div class="value">Trafico sin etiquetar en trunks (por defecto VLAN 1)</div></div>
+            </div>
+
+            <h3>Puertos Access vs Trunk</h3>
+            <div class="grid-2">
+                <div class="tool-box">
+                    <h4 style="color:var(--green);">Puerto Access</h4>
+                    <ul class="proto-list">
+                        <li>Pertenece a UNA sola VLAN</li>
+                        <li>Conecta dispositivos finales (PC, impresora)</li>
+                        <li>Trafico sin etiquetar</li>
+                    </ul>
+                </div>
+                <div class="tool-box">
+                    <h4 style="color:var(--orange);">Puerto Trunk</h4>
+                    <ul class="proto-list">
+                        <li>Transporta MULTIPLES VLANs</li>
+                        <li>Conecta switches entre si o switch-router</li>
+                        <li>Usa etiquetas 802.1Q</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>Etiquetado 802.1Q</h3>
+            <div class="encap-visual">
+                <div class="encap-box" style="border-color:var(--accent);color:var(--accent);">MAC Dest</div>
+                <div class="encap-box" style="border-color:var(--accent);color:var(--accent);">MAC Orig</div>
+                <div class="encap-box" style="border-color:var(--orange);color:var(--orange);background:rgba(255,159,67,0.08);">802.1Q Tag<br><small>4 bytes</small></div>
+                <div class="encap-box" style="border-color:var(--green);color:var(--green);">Tipo/Long</div>
+                <div class="encap-box" style="border-color:var(--text-muted);color:var(--text-muted);">Datos</div>
+                <div class="encap-box" style="border-color:var(--red);color:var(--red);">FCS</div>
+            </div>
+            <p style="color:var(--text-muted);font-size:0.85rem;text-align:center;">El tag 802.1Q contiene: TPID (0x8100) + Prioridad (3 bits) + DEI (1 bit) + VLAN ID (12 bits = 4096 VLANs)</p>
+
+            <h3>Enrutamiento Inter-VLAN</h3>
+            <div class="grid-2">
+                <div class="tool-box">
+                    <h4 style="color:var(--accent);">Router-on-a-Stick</h4>
+                    <ul class="proto-list">
+                        <li>Un enlace trunk entre switch y router</li>
+                        <li>Subinterfaces en el router (Gi0/0.10, Gi0/0.20)</li>
+                        <li>Cada subinterfaz = una VLAN con su IP</li>
+                        <li>Limitado por el ancho de banda del enlace</li>
+                    </ul>
+                </div>
+                <div class="tool-box">
+                    <h4 style="color:var(--accent2);">Switch Capa 3 (SVI)</h4>
+                    <ul class="proto-list">
+                        <li>Switch con capacidad de enrutamiento</li>
+                        <li>Interfaz VLAN (SVI) con IP para cada VLAN</li>
+                        <li>Mas rapido (enruta en hardware)</li>
+                        <li>Requiere: ip routing</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>Comandos de Configuracion VLAN</h3>
+            <div class="scroll-table-wrap">
+            <table class="data-table">
+                <tr><th>Accion</th><th>Comando</th></tr>
+                <tr><td>Crear VLAN</td><td class="mono">vlan 10 / name VENTAS</td></tr>
+                <tr><td>Asignar puerto access</td><td class="mono">int fa0/1 / switchport mode access / switchport access vlan 10</td></tr>
+                <tr><td>Configurar trunk</td><td class="mono">int gi0/1 / switchport mode trunk / switchport trunk allowed vlan 10,20,30</td></tr>
+                <tr><td>VLAN nativa trunk</td><td class="mono">switchport trunk native vlan 99</td></tr>
+                <tr><td>Ver VLANs</td><td class="mono">show vlan brief</td></tr>
+                <tr><td>Router subinterfaz</td><td class="mono">int gi0/0.10 / encapsulation dot1Q 10 / ip address 192.168.10.1 255.255.255.0</td></tr>
+                <tr><td>SVI (L3 switch)</td><td class="mono">interface vlan 10 / ip address 192.168.10.1 255.255.255.0 / no shutdown</td></tr>
+            </table>
+            </div>
+        </div>
+
+        <!-- 2.2 STP -->
+        <div class="card">
+            <h2>2.2 Spanning Tree Protocol (STP)</h2>
+            <p style="color:var(--text-muted);margin-bottom:12px;">STP previene bucles en redes con enlaces redundantes bloqueando puertos selectivamente.</p>
+
+            <h3>Problema: Tormentas de Broadcast</h3>
+            <p>Sin STP, una trama broadcast circularia indefinidamente entre switches, saturando la red. STP crea una topologia libre de bucles.</p>
+
+            <h3>Eleccion del Root Bridge</h3>
+            <ol style="color:var(--text-muted);padding-left:20px;margin:8px 0;">
+                <li>Todos los switches envian BPDUs (Bridge Protocol Data Units)</li>
+                <li>Se elige el switch con el Bridge ID mas bajo</li>
+                <li>Bridge ID = Prioridad (4 bits, default 32768) + MAC</li>
+                <li>Si la prioridad es igual, gana la MAC mas baja</li>
+            </ol>
+
+            <h3>Estados de Puerto STP</h3>
+            <div class="scroll-table-wrap">
+            <table class="data-table">
+                <tr><th>Estado</th><th>Duracion</th><th>Aprende MACs?</th><th>Envia datos?</th></tr>
+                <tr><td><span class="tag tag-red">Blocking</span></td><td>20s (max age)</td><td>No</td><td>No</td></tr>
+                <tr><td><span class="tag tag-orange">Listening</span></td><td>15s (forward delay)</td><td>No</td><td>No</td></tr>
+                <tr><td><span class="tag tag-yellow">Learning</span></td><td>15s (forward delay)</td><td>Si</td><td>No</td></tr>
+                <tr><td><span class="tag tag-green">Forwarding</span></td><td>-</td><td>Si</td><td>Si</td></tr>
+                <tr><td><span class="tag tag-purple">Disabled</span></td><td>-</td><td>No</td><td>No</td></tr>
+            </table>
+            </div>
+
+            <h3>Roles de Puerto</h3>
+            <div class="info-grid">
+                <div class="info-item"><div class="label">Root Port</div><div class="value">Mejor camino al Root Bridge</div></div>
+                <div class="info-item"><div class="label">Designated Port</div><div class="value">Mejor puerto del segmento (forwarding)</div></div>
+                <div class="info-item"><div class="label">Non-Designated</div><div class="value">Puerto bloqueado (blocking)</div></div>
+            </div>
+
+            <h3>RSTP (Rapid STP - 802.1w)</h3>
+            <p style="color:var(--text-muted);">Convergencia mucho mas rapida (~1-2 seg vs ~50 seg de STP clasico). Nuevos roles: Alternate (backup de Root Port), Backup (backup de Designated Port).</p>
+        </div>
+
+        <!-- 2.3 EtherChannel -->
+        <div class="card">
+            <h2>2.3 EtherChannel</h2>
+            <p style="color:var(--text-muted);margin-bottom:12px;">Agrupa multiples enlaces fisicos en uno logico para aumentar ancho de banda y redundancia.</p>
+
+            <div class="scroll-table-wrap">
+            <table class="data-table">
+                <tr><th>Protocolo</th><th>Estandar</th><th>Modos</th><th>Compatibilidad</th></tr>
+                <tr><td><span class="tag tag-cyan">PAgP</span></td><td>Cisco propietario</td><td class="mono">desirable / auto</td><td>Solo Cisco</td></tr>
+                <tr><td><span class="tag tag-green">LACP</span></td><td>IEEE 802.3ad</td><td class="mono">active / passive</td><td>Multi-vendor</td></tr>
+                <tr><td><span class="tag tag-orange">Static</span></td><td>Manual</td><td class="mono">on / on</td><td>Sin negociacion</td></tr>
+            </table>
+            </div>
+        </div>
+
+        <!-- 2.4 Routing Concepts -->
+        <div class="card">
+            <h2>2.4 Conceptos de Enrutamiento</h2>
+
+            <h3>Decision de Reenvio del Router</h3>
+            <ol style="color:var(--text-muted);padding-left:20px;margin:8px 0;">
+                <li>Recibe paquete, lee IP destino</li>
+                <li>Busca en la tabla de enrutamiento la coincidencia mas larga (longest prefix match)</li>
+                <li>Si encuentra ruta, reenvia por la interfaz indicada</li>
+                <li>Si no hay ruta, descarta (o envia al gateway por defecto si existe)</li>
+            </ol>
+
+            <h3>Distancia Administrativa</h3>
+            <div class="scroll-table-wrap">
+            <table class="data-table">
+                <tr><th>Fuente de Ruta</th><th>AD</th></tr>
+                <tr><td>Conectada directamente</td><td class="mono">0</td></tr>
+                <tr><td>Ruta estatica</td><td class="mono">1</td></tr>
+                <tr><td>EIGRP (resumen)</td><td class="mono">5</td></tr>
+                <tr><td>eBGP</td><td class="mono">20</td></tr>
+                <tr><td>EIGRP (interna)</td><td class="mono">90</td></tr>
+                <tr><td>OSPF</td><td class="mono">110</td></tr>
+                <tr><td>IS-IS</td><td class="mono">115</td></tr>
+                <tr><td>RIP</td><td class="mono">120</td></tr>
+                <tr><td>EIGRP (externa)</td><td class="mono">170</td></tr>
+                <tr><td>iBGP</td><td class="mono">200</td></tr>
+                <tr><td>Desconocida / No alcanzable</td><td class="mono">255</td></tr>
+            </table>
+            </div>
+
+            <h3>Ruta Estatica vs Dinamica</h3>
+            <div class="grid-2">
+                <div class="tool-box">
+                    <h4 style="color:var(--accent);">Estatica</h4>
+                    <ul class="proto-list">
+                        <li>Configurada manualmente</li>
+                        <li>No consume ancho de banda</li>
+                        <li>No se adapta a cambios</li>
+                        <li>Ideal para redes pequenas o ruta por defecto</li>
+                    </ul>
+                    <p class="mono" style="font-size:0.82rem;margin-top:8px;color:var(--text-muted);">ip route 192.168.2.0 255.255.255.0 10.0.0.2</p>
+                </div>
+                <div class="tool-box">
+                    <h4 style="color:var(--green);">Dinamica</h4>
+                    <ul class="proto-list">
+                        <li>Protocolos descubren rutas automaticamente</li>
+                        <li>Se adapta a cambios de topologia</li>
+                        <li>Consume CPU y ancho de banda</li>
+                        <li>Ideal para redes medianas/grandes</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2.5 Protocolos de Enrutamiento -->
+        <div class="card">
+            <h2>2.5 Protocolos de Enrutamiento Dinamico</h2>
+
+            <div class="scroll-table-wrap">
+            <table class="data-table">
+                <tr><th>Caracteristica</th><th>RIPv2</th><th>OSPF</th><th>EIGRP</th></tr>
+                <tr><td>Tipo</td><td>Distance Vector</td><td>Link State</td><td>Hibrido avanzado</td></tr>
+                <tr><td>Metrica</td><td>Saltos (hops)</td><td>Costo (BW)</td><td>Compuesta (BW, delay, load, reliability)</td></tr>
+                <tr><td>Limite de saltos</td><td>15 max</td><td>Sin limite</td><td>Sin limite (255 default)</td></tr>
+                <tr><td>AD</td><td class="mono">120</td><td class="mono">110</td><td class="mono">90 (interna)</td></tr>
+                <tr><td>Algoritmo</td><td>Bellman-Ford</td><td>Dijkstra (SPF)</td><td>DUAL</td></tr>
+                <tr><td>Actualizaciones</td><td>Cada 30s (toda la tabla)</td><td>Solo cambios (LSA)</td><td>Solo cambios (parcial)</td></tr>
+                <tr><td>VLSM/CIDR</td><td>Si</td><td>Si</td><td>Si</td></tr>
+                <tr><td>Estandar</td><td>Abierto</td><td>Abierto</td><td>Cisco (RFC parcial)</td></tr>
+            </table>
+            </div>
+
+            <h3>OSPF - Conceptos Clave</h3>
+            <div class="info-grid">
+                <div class="info-item"><div class="label">DR / BDR</div><div class="value">Designated Router en redes multiaccess</div></div>
+                <div class="info-item"><div class="label">Area 0</div><div class="value">Backbone, todas las areas deben conectar a ella</div></div>
+                <div class="info-item"><div class="label">Costo</div><div class="value">10^8 / BW (en bps)</div></div>
+                <div class="info-item"><div class="label">Hello / Dead</div><div class="value">10s / 40s (broadcast)</div></div>
+            </div>
+
+            <h3>EIGRP - Conceptos Clave</h3>
+            <div class="info-grid">
+                <div class="info-item"><div class="label">Successor</div><div class="value">Mejor ruta al destino</div></div>
+                <div class="info-item"><div class="label">Feasible Successor</div><div class="value">Ruta de respaldo (FD > AD del successor)</div></div>
+                <div class="info-item"><div class="label">AS Number</div><div class="value">Debe coincidir entre vecinos</div></div>
+            </div>
+        </div>
+
+        <!-- 2.6 ACLs -->
+        <div class="card">
+            <h2>2.6 ACLs (Listas de Control de Acceso)</h2>
+
+            <h3>Tipos de ACLs</h3>
+            <div class="scroll-table-wrap">
+            <table class="data-table">
+                <tr><th></th><th>ACL Estandar</th><th>ACL Extendida</th></tr>
+                <tr><td>Numero</td><td class="mono">1-99, 1300-1999</td><td class="mono">100-199, 2000-2699</td></tr>
+                <tr><td>Filtra por</td><td>Solo IP origen</td><td>IP origen, IP destino, protocolo, puerto</td></tr>
+                <tr><td>Ubicacion</td><td>Cerca del destino</td><td>Cerca del origen</td></tr>
+            </table>
+            </div>
+
+            <h3>Wildcard Masks</h3>
+            <p style="color:var(--text-muted);">La wildcard mask es el inverso de la mascara de subred: 0 = debe coincidir, 1 = ignorar.</p>
+            <div class="highlight-box">
+                <span class="mono">Mascara:  255.255.255.0   &rarr; Wildcard: 0.0.0.255</span><br>
+                <span class="mono">Mascara:  255.255.255.192 &rarr; Wildcard: 0.0.0.63</span>
+            </div>
+
+            <!-- Wildcard Calculator -->
+            <div class="tool-box">
+                <h4>Calculadora de Wildcard</h4>
+                <div class="input-group">
+                    <label>Mascara:</label>
+                    <input type="text" id="wildcardInput" placeholder="255.255.255.0" style="width:200px;">
+                    <button class="btn btn-primary btn-sm" onclick="calcWildcard()">Calcular</button>
+                </div>
+                <div id="wildcardResult" class="result-box" style="display:none;"></div>
+            </div>
+
+            <!-- ACL Builder -->
+            <div class="tool-box">
+                <h4>Constructor de ACL</h4>
+                <div class="input-group">
+                    <label>Tipo:</label>
+                    <select id="aclType" style="width:150px;" onchange="updateACLBuilder()">
+                        <option value="standard">Estandar</option>
+                        <option value="extended">Extendida</option>
+                    </select>
+                    <label>Accion:</label>
+                    <select id="aclAction" style="width:120px;">
+                        <option value="permit">permit</option>
+                        <option value="deny">deny</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>IP Origen:</label>
+                    <input type="text" id="aclSrcIP" placeholder="192.168.1.0" style="width:160px;">
+                    <label>WC Origen:</label>
+                    <input type="text" id="aclSrcWC" placeholder="0.0.0.255" style="width:160px;">
+                </div>
+                <div id="aclExtFields" style="display:none;">
+                    <div class="input-group">
+                        <label>Protocolo:</label>
+                        <select id="aclProto" style="width:120px;">
+                            <option value="ip">ip</option>
+                            <option value="tcp">tcp</option>
+                            <option value="udp">udp</option>
+                            <option value="icmp">icmp</option>
+                        </select>
+                        <label>IP Destino:</label>
+                        <input type="text" id="aclDstIP" placeholder="10.0.0.0" style="width:140px;">
+                        <label>WC Destino:</label>
+                        <input type="text" id="aclDstWC" placeholder="0.0.0.255" style="width:140px;">
+                    </div>
+                    <div class="input-group">
+                        <label>Puerto:</label>
+                        <select id="aclPortOp" style="width:80px;">
+                            <option value="">--</option>
+                            <option value="eq">eq</option>
+                            <option value="gt">gt</option>
+                            <option value="lt">lt</option>
+                            <option value="range">range</option>
+                        </select>
+                        <input type="text" id="aclPort" placeholder="80" style="width:80px;">
+                    </div>
+                </div>
+                <button class="btn btn-primary btn-sm" onclick="buildACL()" style="margin-top:8px;">Generar Comando ACL</button>
+                <div id="aclResult" class="result-box" style="display:none;"></div>
+            </div>
+        </div>
+
+        <!-- 2.7 NAT/PAT -->
+        <div class="card">
+            <h2>2.7 NAT / PAT</h2>
+
+            <h3>Tipos de NAT</h3>
+            <div class="scroll-table-wrap">
+            <table class="data-table">
+                <tr><th>Tipo</th><th>Descripcion</th><th>Relacion</th></tr>
+                <tr><td><span class="tag tag-cyan">NAT Estatico</span></td><td>Mapeo fijo 1:1 (IP privada &harr; IP publica)</td><td>1 a 1</td></tr>
+                <tr><td><span class="tag tag-green">NAT Dinamico</span></td><td>Pool de IPs publicas asignadas dinamicamente</td><td>Muchos a muchos</td></tr>
+                <tr><td><span class="tag tag-orange">PAT (Overload)</span></td><td>Multiples IPs privadas comparten 1 IP publica usando puertos</td><td>Muchos a 1</td></tr>
+            </table>
+            </div>
+
+            <h3>Terminologia NAT</h3>
+            <div class="info-grid">
+                <div class="info-item"><div class="label">Inside Local</div><div class="value">IP privada del host interno</div></div>
+                <div class="info-item"><div class="label">Inside Global</div><div class="value">IP publica asignada al host interno</div></div>
+                <div class="info-item"><div class="label">Outside Local</div><div class="value">IP del host externo vista desde dentro</div></div>
+                <div class="info-item"><div class="label">Outside Global</div><div class="value">IP publica real del host externo</div></div>
+            </div>
+        </div>
+
+        <!-- 2.8 DHCP -->
+        <div class="card">
+            <h2>2.8 DHCPv4</h2>
+
+            <h3>Proceso DORA</h3>
+            <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin:16px 0;">
+                <div style="background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2);border-radius:var(--radius-sm);padding:16px;text-align:center;min-width:140px;">
+                    <div style="font-size:1.5rem;font-weight:800;color:var(--accent);">D</div>
+                    <div style="font-weight:600;">Discover</div>
+                    <div style="font-size:0.78rem;color:var(--text-muted);">Cliente &rarr; Broadcast<br>Busca servidor DHCP</div>
+                </div>
+                <div style="font-size:2rem;color:var(--text-muted);display:flex;align-items:center;">&rarr;</div>
+                <div style="background:rgba(0,232,143,0.08);border:1px solid rgba(0,232,143,0.2);border-radius:var(--radius-sm);padding:16px;text-align:center;min-width:140px;">
+                    <div style="font-size:1.5rem;font-weight:800;color:var(--green);">O</div>
+                    <div style="font-weight:600;">Offer</div>
+                    <div style="font-size:0.78rem;color:var(--text-muted);">Servidor &rarr; Cliente<br>Ofrece IP disponible</div>
+                </div>
+                <div style="font-size:2rem;color:var(--text-muted);display:flex;align-items:center;">&rarr;</div>
+                <div style="background:rgba(255,159,67,0.08);border:1px solid rgba(255,159,67,0.2);border-radius:var(--radius-sm);padding:16px;text-align:center;min-width:140px;">
+                    <div style="font-size:1.5rem;font-weight:800;color:var(--orange);">R</div>
+                    <div style="font-weight:600;">Request</div>
+                    <div style="font-size:0.78rem;color:var(--text-muted);">Cliente &rarr; Broadcast<br>Acepta la oferta</div>
+                </div>
+                <div style="font-size:2rem;color:var(--text-muted);display:flex;align-items:center;">&rarr;</div>
+                <div style="background:rgba(124,92,252,0.08);border:1px solid rgba(124,92,252,0.2);border-radius:var(--radius-sm);padding:16px;text-align:center;min-width:140px;">
+                    <div style="font-size:1.5rem;font-weight:800;color:var(--accent2);">A</div>
+                    <div style="font-weight:600;">Acknowledge</div>
+                    <div style="font-size:0.78rem;color:var(--text-muted);">Servidor &rarr; Cliente<br>Confirma la asignacion</div>
+                </div>
+            </div>
+
+            <h3>Comandos de Configuracion DHCP</h3>
+            <div class="scroll-table-wrap">
+            <table class="data-table">
+                <tr><th>Accion</th><th>Comando</th></tr>
+                <tr><td>Crear pool</td><td class="mono">ip dhcp pool LAN1</td></tr>
+                <tr><td>Red</td><td class="mono">network 192.168.1.0 255.255.255.0</td></tr>
+                <tr><td>Gateway</td><td class="mono">default-router 192.168.1.1</td></tr>
+                <tr><td>DNS</td><td class="mono">dns-server 8.8.8.8</td></tr>
+                <tr><td>Excluir IPs</td><td class="mono">ip dhcp excluded-address 192.168.1.1 192.168.1.10</td></tr>
+                <tr><td>DHCP Relay</td><td class="mono">interface gi0/0 / ip helper-address 10.0.0.100</td></tr>
+            </table>
+            </div>
+        </div>
+    </div><!-- end tab2 -->
+
+    <!-- ==================== TAB 3: SUBNETTING ==================== -->
+    <div class="tab-content" id="tab3">
+
+        <div class="card">
+            <h2>Metodologia de Subnetting</h2>
+
+            <h3>Pasos para Subnettear</h3>
+            <div class="highlight-box">
+                <p><span class="step-number">1</span> Determinar cuantos bits de host se necesitan: 2^n - 2 >= hosts requeridos</p>
+                <p><span class="step-number">2</span> Calcular la nueva mascara de subred</p>
+                <p><span class="step-number">3</span> Determinar el tamano del bloque (block size) = 256 - valor del octeto de la mascara</p>
+                <p><span class="step-number">4</span> Listar las subredes: 0, block_size, 2*block_size, ...</p>
+                <p><span class="step-number">5</span> Para cada subred: red, primer host = red+1, ultimo host = broadcast-1, broadcast = siguiente_red - 1</p>
+            </div>
+
+            <h3>Metodo del Numero Magico</h3>
+            <p style="color:var(--text-muted);margin-bottom:8px;">El numero magico = 256 - el valor del octeto interesante de la mascara. Las subredes incrementan de ese valor.</p>
+            <div class="highlight-box">
+                <strong>Ejemplo:</strong> Mascara 255.255.255.192<br>
+                Numero magico = 256 - 192 = <strong style="color:var(--accent);">64</strong><br>
+                Subredes: .0, .64, .128, .192
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>FLSM (Fixed Length Subnet Mask)</h2>
+            <p style="color:var(--text-muted);margin-bottom:12px;">En FLSM, todas las subredes tienen el mismo tamano. Util cuando todas las subredes necesitan la misma cantidad de hosts.</p>
+
+            <div class="tool-box">
+                <h4>Calculadora FLSM</h4>
+                <div class="input-group">
+                    <label>Red:</label>
+                    <input type="text" id="flsmNetwork" placeholder="192.168.1.0" style="width:180px;">
+                    <label>CIDR:</label>
+                    <select id="flsmCidr" style="width:80px;"></select>
+                </div>
+                <div class="input-group">
+                    <label>Dividir en:</label>
+                    <input type="number" id="flsmCount" placeholder="4" min="2" max="1024" style="width:100px;">
+                    <span style="color:var(--text-muted);">subredes iguales</span>
+                    <button class="btn btn-primary btn-sm" onclick="calcFLSM()">Calcular</button>
+                </div>
+                <div id="flsmResult"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Ejercicios Interactivos de Subnetting</h2>
+
+            <div class="tool-box">
+                <h4>Dado IP y Mascara, encuentra la red</h4>
+                <div class="input-group">
+                    <label>IP:</label>
+                    <input type="text" id="exIp" placeholder="172.16.45.130" style="width:180px;">
+                    <label>Mascara:</label>
+                    <input type="text" id="exMask" placeholder="255.255.240.0" style="width:180px;">
+                    <button class="btn btn-primary btn-sm" onclick="solveSubnetting()">Resolver</button>
+                </div>
+                <div id="exResult" class="result-box" style="display:none;"></div>
+            </div>
+
+            <div class="tool-box">
+                <h4>Dado una red y hosts requeridos, encuentra la mascara</h4>
+                <div class="input-group">
+                    <label>Red:</label>
+                    <input type="text" id="exNet2" placeholder="10.0.0.0" style="width:180px;">
+                    <label>Hosts:</label>
+                    <input type="number" id="exHosts2" placeholder="500" min="1" style="width:100px;">
+                    <button class="btn btn-primary btn-sm" onclick="solveMaskForHosts()">Resolver</button>
+                </div>
+                <div id="exResult2" class="result-box" style="display:none;"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Tabla Completa de Mascaras (/8 a /30)</h2>
+            <div class="scroll-table-wrap">
+            <table class="data-table" id="fullMaskTable">
+                <tr>
+                    <th>CIDR</th>
+                    <th>Mascara Decimal</th>
+                    <th>Wildcard</th>
+                    <th>Tamano Bloque</th>
+                    <th>Direcciones Totales</th>
+                    <th>Hosts Usables</th>
+                    <th>Subredes desde /8</th>
+                    <th>Subredes desde /16</th>
+                    <th>Subredes desde /24</th>
+                </tr>
+            </table>
+            </div>
+        </div>
+    </div><!-- end tab3 -->
+
+    <!-- ==================== TAB 4: VLSM CALCULATOR ==================== -->
+    <div class="tab-content" id="tab4">
+
+        <div class="card">
+            <h2>Teoria VLSM</h2>
+
+            <h3>Que es VLSM?</h3>
+            <p>VLSM (Variable Length Subnet Mask) permite dividir una red en subredes de diferentes tamanos, asignando exactamente el espacio necesario a cada subred. Esto es mas eficiente que FLSM donde todas las subredes son iguales.</p>
+
+            <h3>Diferencia FLSM vs VLSM</h3>
+            <div class="grid-2">
+                <div class="tool-box">
+                    <h4 style="color:var(--orange);">FLSM</h4>
+                    <ul class="proto-list">
+                        <li>Todas las subredes del mismo tamano</li>
+                        <li>Desperdicia direcciones</li>
+                        <li>Mas simple de configurar</li>
+                    </ul>
+                </div>
+                <div class="tool-box">
+                    <h4 style="color:var(--green);">VLSM</h4>
+                    <ul class="proto-list">
+                        <li>Subredes de diferente tamano</li>
+                        <li>Aprovecha mejor el espacio</li>
+                        <li>Requiere planificacion ordenada</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>Reglas VLSM</h3>
+            <div class="highlight-box">
+                <p><span class="step-number">1</span> <strong>Ordenar</strong> las subredes de mayor a menor (por cantidad de hosts)</p>
+                <p><span class="step-number">2</span> <strong>Calcular</strong> para cada subred: encontrar la menor potencia de 2 que satisfaga hosts + 2 (red + broadcast)</p>
+                <p><span class="step-number">3</span> <strong>Asignar</strong> bloques contiguos: cada subred inicia donde termino la anterior</p>
+                <p><span class="step-number">4</span> <strong>Siguiente subred</strong> = broadcast de la anterior + 1</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Calculadora VLSM</h2>
+
+            <div style="margin-bottom:16px;">
+                <strong>Ejemplos predefinidos:</strong><br>
+                <button class="example-btn" onclick="loadExample(1)">Ej 1: 192.168.1.0/24 (100,50,25,2)</button>
+                <button class="example-btn" onclick="loadExample(2)">Ej 2: 10.0.0.0/16 (8000,4000,2000,1000,500,100)</button>
+                <button class="example-btn" onclick="loadExample(3)">Ej 3: 172.16.0.0/20 (1000,500,200,50,2)</button>
+                <button class="example-btn" onclick="loadExample(4)">Ej 4: 10.0.0.0/8 (100000,50000,10000,5000,1000)</button>
+            </div>
+
+            <div class="input-group">
+                <label>Red Base:</label>
+                <input type="text" id="vlsmNetwork" placeholder="192.168.1.0" style="width:200px;">
+                <label>CIDR:</label>
+                <select id="vlsmCidr" style="width:120px;"></select>
+            </div>
+
+            <div style="margin:16px 0;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                    <h3 style="margin:0;">Subredes</h3>
+                    <button class="btn btn-success btn-sm" onclick="addSubnetRow()">+ Agregar Subred</button>
+                </div>
+                <div id="subnetList"></div>
+            </div>
+
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                <button class="btn btn-primary" onclick="calculateVLSM()">Calcular VLSM</button>
+                <button class="btn btn-secondary" onclick="clearVLSM()">Limpiar Todo</button>
+            </div>
+
+            <div id="vlsmWarnings" style="margin-top:12px;"></div>
+            <div id="vlsmResults" style="margin-top:20px;"></div>
+        </div>
+    </div><!-- end tab4 -->
+
+    <!-- ==================== TAB 5: CISCO IOS ==================== -->
+    <div class="tab-content" id="tab5">
+
+        <div class="card">
+            <h2>Configuracion Cisco IOS desde VLSM</h2>
+            <p style="color:var(--text-muted);margin-bottom:12px;">Genera comandos de configuracion basados en los resultados del calculo VLSM. Primero calcula VLSM en la pestana anterior.</p>
+
+            <div class="input-group">
+                <label>Hostname:</label>
+                <input type="text" id="iosHostname" placeholder="Router1" style="width:200px;" value="Router1">
+                <label>Enable Password:</label>
+                <input type="text" id="iosEnablePass" placeholder="cisco123" style="width:200px;" value="cisco123">
+            </div>
+            <div class="input-group">
+                <label>Banner:</label>
+                <input type="text" id="iosBanner" placeholder="Acceso autorizado unicamente" style="width:400px;" value="Acceso autorizado unicamente">
+            </div>
+
+            <button class="btn btn-primary" onclick="generateIOS()" style="margin:12px 0;">Generar Configuracion IOS</button>
+
+            <div id="iosConfig" style="display:none;">
+                <div class="result-box" style="white-space:pre-wrap;color:var(--green);background:#0a0e14;border-color:#1a2a3a;" id="iosConfigText"></div>
+                <button class="btn btn-secondary btn-sm" onclick="copyIOS()" style="margin-top:8px;">Copiar al Portapapeles</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Simulador de Terminal Cisco IOS</h2>
+            <p style="color:var(--text-muted);margin-bottom:12px;">Practica comandos IOS en este simulador interactivo. Escribe <span class="mono" style="color:var(--green);">help</span> para ver los comandos disponibles.</p>
+
+            <div class="terminal" id="ciscoTerminal">
+                <div class="terminal-header">
+                    <div class="terminal-dot" style="background:#ff5f57;"></div>
+                    <div class="terminal-dot" style="background:#ffbd2e;"></div>
+                    <div class="terminal-dot" style="background:#28c840;"></div>
+                    <span style="color:var(--text-muted);font-size:0.8rem;margin-left:8px;">Cisco IOS Simulator</span>
+                </div>
+                <div class="terminal-output" id="terminalOutput">
+                    <div class="info-line">Cisco IOS Software, Simulated Version 15.1</div>
+                    <div class="info-line">Copyright (c) by Cisco Systems, Inc.</div>
+                    <div class="info-line">---</div>
+                    <div class="cmd-line">Router con 256M de memoria.</div>
+                    <div class="info-line">Escribe 'help' para ver los comandos disponibles.</div>
+                    <div>&nbsp;</div>
+                </div>
+                <div class="terminal-input-line">
+                    <span class="terminal-prompt" id="termPrompt">Router&gt;</span>
+                    <input type="text" class="terminal-input" id="termInput" autocomplete="off" spellcheck="false" autofocus>
+                </div>
+            </div>
+        </div>
+    </div><!-- end tab5 -->
+
+    <!-- ==================== TAB 6: IPv6 ==================== -->
+    <div class="tab-content" id="tab6">
+
+        <div class="card">
+            <h2>Introduccion a IPv6</h2>
+
+            <h3>Por que IPv6?</h3>
+            <p style="color:var(--text-muted);">IPv4 tiene aproximadamente 4,300 millones de direcciones (2^32). Con el crecimiento de Internet y el IoT, estas direcciones se agotaron. IPv6 usa 128 bits, proporcionando 2^128 = 340 sextillones de direcciones.</p>
+
+            <h3>Formato de Direccion IPv6</h3>
+            <p>128 bits divididos en 8 grupos de 16 bits (hextetos), separados por dos puntos (:), escritos en hexadecimal.</p>
+            <div class="binary-display">
+                <span style="color:var(--accent);">2001</span>:<span style="color:var(--accent2);">0DB8</span>:<span style="color:var(--green);">0000</span>:<span style="color:var(--orange);">0000</span>:<span style="color:var(--red);">0000</span>:<span style="color:var(--yellow);">0000</span>:<span style="color:var(--pink);">0000</span>:<span style="color:var(--cyan);">0001</span>
+            </div>
+
+            <h3>Reglas de Compresion</h3>
+            <ul class="proto-list">
+                <li>Eliminar ceros a la izquierda de cada hexteto: 0DB8 &rarr; DB8, 0000 &rarr; 0</li>
+                <li>Usar :: para reemplazar UNO O MAS grupos consecutivos de solo ceros</li>
+                <li>:: solo se puede usar UNA VEZ en una direccion</li>
+            </ul>
+            <div class="highlight-box">
+                <span class="mono">2001:0DB8:0000:0000:0000:0000:0000:0001</span><br>
+                <span class="mono">&rarr; 2001:DB8:0:0:0:0:0:1</span><br>
+                <span class="mono">&rarr; 2001:DB8::1</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Tipos de Direcciones IPv6</h2>
+            <div class="scroll-table-wrap">
+            <table class="data-table">
+                <tr><th>Tipo</th><th>Prefijo</th><th>Equivalente IPv4</th><th>Descripcion</th></tr>
+                <tr><td><span class="tag tag-cyan">Global Unicast</span></td><td class="mono">2000::/3</td><td>IP publica</td><td>Enrutables globalmente. Asignadas por ISP.</td></tr>
+                <tr><td><span class="tag tag-green">Link-Local</span></td><td class="mono">FE80::/10</td><td>APIPA</td><td>Solo valida en el enlace local. Auto-generada.</td></tr>
+                <tr><td><span class="tag tag-purple">Unique Local</span></td><td class="mono">FC00::/7</td><td>IP privada (RFC 1918)</td><td>No enrutable en Internet. Uso interno.</td></tr>
+                <tr><td><span class="tag tag-orange">Multicast</span></td><td class="mono">FF00::/8</td><td>Multicast (224.0.0.0/4)</td><td>Un origen a multiples destinos.</td></tr>
+                <tr><td><span class="tag tag-red">Loopback</span></td><td class="mono">::1</td><td>127.0.0.1</td><td>Probar stack TCP/IP local.</td></tr>
+                <tr><td><span class="tag tag-yellow">No especificada</span></td><td class="mono">::</td><td>0.0.0.0</td><td>Indica ausencia de direccion.</td></tr>
+            </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>EUI-64</h2>
+            <p style="color:var(--text-muted);margin-bottom:12px;">EUI-64 genera automaticamente los ultimos 64 bits del identificador de interfaz a partir de la direccion MAC.</p>
+
+            <div class="highlight-box">
+                <p><span class="step-number">1</span> Tomar la MAC de 48 bits (ej: AA:BB:CC:DD:EE:FF)</p>
+                <p><span class="step-number">2</span> Dividir en dos mitades: AA:BB:CC | DD:EE:FF</p>
+                <p><span class="step-number">3</span> Insertar FF:FE en el medio: AA:BB:CC:FF:FE:DD:EE:FF</p>
+                <p><span class="step-number">4</span> Invertir el 7mo bit (U/L bit) del primer byte</p>
+            </div>
+
+            <div class="tool-box">
+                <h4>Conversor EUI-64</h4>
+                <div class="input-group">
+                    <label>MAC:</label>
+                    <input type="text" id="euiMac" placeholder="AA:BB:CC:DD:EE:FF" style="width:220px;">
+                    <button class="btn btn-primary btn-sm" onclick="calcEUI64()">Convertir</button>
+                </div>
+                <div id="euiResult" class="result-box" style="display:none;"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>IPv4 vs IPv6</h2>
+            <div class="scroll-table-wrap">
+            <table class="data-table">
+                <tr><th>Caracteristica</th><th>IPv4</th><th>IPv6</th></tr>
+                <tr><td>Tamano de direccion</td><td>32 bits</td><td>128 bits</td></tr>
+                <tr><td>Notacion</td><td>Decimal con puntos</td><td>Hexadecimal con dos puntos</td></tr>
+                <tr><td>Direcciones</td><td>~4.3 mil millones</td><td>~340 sextillones</td></tr>
+                <tr><td>Configuracion</td><td>Manual o DHCP</td><td>SLAAC, DHCPv6</td></tr>
+                <tr><td>IPSec</td><td>Opcional</td><td>Integrado</td></tr>
+                <tr><td>Broadcast</td><td>Si</td><td>No (usa multicast)</td></tr>
+                <tr><td>ARP</td><td>Si</td><td>No (usa NDP - ICMPv6)</td></tr>
+                <tr><td>Header</td><td>Variable (20-60 bytes)</td><td>Fijo (40 bytes)</td></tr>
+                <tr><td>Fragmentacion</td><td>Router y host</td><td>Solo el host origen</td></tr>
+                <tr><td>NAT</td><td>Comun (necesario)</td><td>No necesario</td></tr>
+            </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Autoconfig y NDP</h2>
+
+            <h3>SLAAC (Stateless Address Autoconfiguration)</h3>
+            <p style="color:var(--text-muted);">El host genera su propia IPv6 usando el prefijo anunciado por el router (RA - Router Advertisement) y EUI-64 o un ID aleatorio. No requiere servidor DHCP.</p>
+
+            <h3>DHCPv6</h3>
+            <div class="grid-2">
+                <div class="tool-box">
+                    <h4 style="color:var(--accent);">Stateless DHCPv6</h4>
+                    <p style="font-size:0.88rem;">El host usa SLAAC para la IP pero obtiene otros parametros (DNS) del servidor DHCPv6.</p>
+                </div>
+                <div class="tool-box">
+                    <h4 style="color:var(--accent2);">Stateful DHCPv6</h4>
+                    <p style="font-size:0.88rem;">El servidor DHCPv6 asigna la IP completa y todos los parametros, similar a DHCPv4.</p>
+                </div>
+            </div>
+
+            <h3>ICMPv6 y NDP (Neighbor Discovery Protocol)</h3>
+            <p style="color:var(--text-muted);">NDP reemplaza a ARP y agrega funcionalidades adicionales:</p>
+            <div class="scroll-table-wrap">
+            <table class="data-table">
+                <tr><th>Mensaje</th><th>Tipo</th><th>Funcion</th></tr>
+                <tr><td>Router Solicitation (RS)</td><td class="mono">133</td><td>Host pregunta por routers en el enlace</td></tr>
+                <tr><td>Router Advertisement (RA)</td><td class="mono">134</td><td>Router anuncia prefijo y parametros</td></tr>
+                <tr><td>Neighbor Solicitation (NS)</td><td class="mono">135</td><td>Resolucion de direccion (como ARP request)</td></tr>
+                <tr><td>Neighbor Advertisement (NA)</td><td class="mono">136</td><td>Respuesta con MAC (como ARP reply)</td></tr>
+                <tr><td>Redirect</td><td class="mono">137</td><td>Indica mejor next-hop al host</td></tr>
+            </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Mecanismos de Transicion</h2>
+            <div class="grid-3">
+                <div class="tool-box">
+                    <h4 style="color:var(--accent);">Dual Stack</h4>
+                    <p style="font-size:0.88rem;">El dispositivo ejecuta IPv4 e IPv6 simultaneamente. Es la estrategia preferida.</p>
+                </div>
+                <div class="tool-box">
+                    <h4 style="color:var(--green);">Tunneling</h4>
+                    <p style="font-size:0.88rem;">Paquetes IPv6 se encapsulan dentro de paquetes IPv4 para cruzar redes IPv4 (6to4, ISATAP, GRE).</p>
+                </div>
+                <div class="tool-box">
+                    <h4 style="color:var(--orange);">NAT64</h4>
+                    <p style="font-size:0.88rem;">Traduce entre IPv6 e IPv4. Permite a hosts IPv6 comunicarse con hosts IPv4.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Comandos Basicos IPv6</h2>
+            <div class="scroll-table-wrap">
+            <table class="data-table">
+                <tr><th>Accion</th><th>Comando</th></tr>
+                <tr><td>Habilitar enrutamiento IPv6</td><td class="mono">ipv6 unicast-routing</td></tr>
+                <tr><td>Asignar IPv6 a interfaz</td><td class="mono">ipv6 address 2001:DB8:1::1/64</td></tr>
+                <tr><td>Link-local manual</td><td class="mono">ipv6 address FE80::1 link-local</td></tr>
+                <tr><td>EUI-64</td><td class="mono">ipv6 address 2001:DB8:1::/64 eui-64</td></tr>
+                <tr><td>Ver tabla vecinos</td><td class="mono">show ipv6 neighbors</td></tr>
+                <tr><td>Ver interfaces IPv6</td><td class="mono">show ipv6 interface brief</td></tr>
+                <tr><td>Ruta estatica IPv6</td><td class="mono">ipv6 route 2001:DB8:2::/64 2001:DB8:1::2</td></tr>
+                <tr><td>OSPFv3</td><td class="mono">ipv6 router ospf 1 / router-id 1.1.1.1</td></tr>
+            </table>
+            </div>
+        </div>
+    </div><!-- end tab6 -->
+
+</div><!-- end container -->
+
+<script>
+// ===========================
+// CORE IP MATH ENGINE (Overflow-safe)
+// ===========================
+const IPEngine = {
+    // Convert IP string to unsigned integer using multiplication (NOT bitwise)
+    ipToInt(ip) {
+        const p = ip.split('.').map(Number);
+        return p[0] * 16777216 + p[1] * 65536 + p[2] * 256 + p[3];
+    },
+
+    // Convert unsigned integer to IP string
+    intToIp(n) {
+        return [
+            Math.floor(n / 16777216) % 256,
+            Math.floor(n / 65536) % 256,
+            Math.floor(n / 256) % 256,
+            n % 256
+        ].join('.');
+    },
+
+    // Get mask as unsigned integer from CIDR
+    cidrToMaskInt(cidr) {
+        if (cidr === 0) return 0;
+        if (cidr === 32) return 4294967295;
+        // Total addresses in host portion
+        const hostAddresses = Math.pow(2, 32 - cidr);
+        return 4294967295 - (hostAddresses - 1);
+    },
+
+    // Convert mask integer to dotted decimal
+    maskIntToDotted(maskInt) {
+        return this.intToIp(maskInt);
+    },
+
+    // CIDR to dotted decimal mask
+    cidrToMask(cidr) {
+        return this.maskIntToDotted(this.cidrToMaskInt(cidr));
+    },
+
+    // Number of total addresses for given CIDR
+    totalAddresses(cidr) {
+        if (cidr > 32 || cidr < 0) return 0;
+        return Math.pow(2, 32 - cidr);
+    },
+
+    // Usable hosts for given CIDR
+    usableHosts(cidr) {
+        if (cidr >= 31) return (cidr === 31) ? 2 : 1;
+        return Math.pow(2, 32 - cidr) - 2;
+    },
+
+    // Get network address from IP and CIDR
+    getNetworkAddress(ipInt, cidr) {
+        const maskInt = this.cidrToMaskInt(cidr);
+        // AND operation using arithmetic
+        // We need to be careful with large numbers
+        const o1 = Math.floor(ipInt / 16777216) % 256;
+        const o2 = Math.floor(ipInt / 65536) % 256;
+        const o3 = Math.floor(ipInt / 256) % 256;
+        const o4 = ipInt % 256;
+
+        const m1 = Math.floor(maskInt / 16777216) % 256;
+        const m2 = Math.floor(maskInt / 65536) % 256;
+        const m3 = Math.floor(maskInt / 256) % 256;
+        const m4 = maskInt % 256;
+
+        return (o1 & m1) * 16777216 + (o2 & m2) * 65536 + (o3 & m3) * 256 + (o4 & m4);
+    },
+
+    // Get broadcast address from network address and CIDR
+    getBroadcast(networkInt, cidr) {
+        const hostBits = 32 - cidr;
+        const hostAddresses = Math.pow(2, hostBits);
+        return networkInt + hostAddresses - 1;
+    },
+
+    // Find needed CIDR for given number of hosts
+    neededCidr(hosts) {
+        let bits = 1;
+        while (Math.pow(2, bits) - 2 < hosts) {
+            bits++;
+            if (bits > 32) return 0;
+        }
+        return 32 - bits;
+    },
+
+    // Needed host bits
+    neededHostBits(hosts) {
+        let b = 1;
+        while (Math.pow(2, b) - 2 < hosts) {
+            b++;
+            if (b > 32) return 32;
+        }
+        return b;
+    },
+
+    // Validate IP format
+    isValidIP(ip) {
+        const parts = ip.split('.');
+        if (parts.length !== 4) return false;
+        return parts.every(p => {
+            const n = parseInt(p, 10);
+            return !isNaN(n) && n >= 0 && n <= 255 && String(n) === p.trim();
+        });
+    },
+
+    // IP to binary string
+    ipToBinary(ip) {
+        return ip.split('.').map(o => parseInt(o).toString(2).padStart(8, '0')).join('.');
+    },
+
+    // Wildcard from CIDR
+    wildcardFromCidr(cidr) {
+        const maskInt = this.cidrToMaskInt(cidr);
+        const wcInt = 4294967295 - maskInt;
+        return this.intToIp(wcInt);
+    },
+
+    // Format large number with commas
+    formatNum(n) {
+        return n.toLocaleString('es-ES');
+    }
+};
+
+// ===========================
+// TAB SWITCHING
+// ===========================
+function switchTab(tabId) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    const idx = ['tab1','tab2','tab3','tab4','tab5','tab6'].indexOf(tabId);
+    document.querySelectorAll('.tab-btn')[idx].classList.add('active');
+}
+
+// ===========================
+// OSI MODEL
+// ===========================
+const osiLayers = [
+    { num: 7, name: 'Aplicacion', color: '#ff5577', pdu: 'Datos', fn: 'Interfaz con el usuario y aplicaciones de red',
+      protocols: ['HTTP','HTTPS','FTP','DNS','DHCP','SMTP','POP3','IMAP','Telnet','SSH','SNMP','TFTP'],
+      devices: ['Proxy','Firewall L7','Gateway de aplicacion'] },
+    { num: 6, name: 'Presentacion', color: '#ff6b9d', pdu: 'Datos', fn: 'Formato de datos, cifrado, compresion',
+      protocols: ['SSL/TLS','JPEG','PNG','GIF','MPEG','ASCII','EBCDIC','Cifrado'],
+      devices: ['Software de cifrado'] },
+    { num: 5, name: 'Sesion', color: '#ff9f43', pdu: 'Datos', fn: 'Establecer, mantener y terminar sesiones',
+      protocols: ['NetBIOS','RPC','PPTP','SIP','H.245'],
+      devices: ['Control de sesion (software)'] },
+    { num: 4, name: 'Transporte', color: '#ffe066', pdu: 'Segmento (TCP) / Datagrama (UDP)', fn: 'Transporte extremo a extremo, control de flujo, puertos',
+      protocols: ['TCP (confiable, orientado a conexion)','UDP (no confiable, sin conexion)'],
+      devices: ['Firewall L4','Load Balancer'] },
+    { num: 3, name: 'Red', color: '#00e88f', pdu: 'Paquete', fn: 'Enrutamiento y direccionamiento logico (IP)',
+      protocols: ['IPv4','IPv6','ICMP','ARP','OSPF','EIGRP','BGP','RIP'],
+      devices: ['Router','Switch L3'] },
+    { num: 2, name: 'Enlace de Datos', color: '#00d4ff', pdu: 'Trama (Frame)', fn: 'Acceso al medio, direccionamiento fisico (MAC), deteccion de errores',
+      protocols: ['Ethernet (802.3)','Wi-Fi (802.11)','PPP','HDLC','Frame Relay'],
+      devices: ['Switch L2','Bridge','NIC'] },
+    { num: 1, name: 'Fisica', color: '#7c5cfc', pdu: 'Bits', fn: 'Transmision de bits por el medio fisico',
+      protocols: ['RS-232','Ethernet (cableado)','USB','DSL','SONET'],
+      devices: ['Hub','Repetidor','Cable','Conector'] }
+];
+
+function buildOSI() {
+    const container = document.getElementById('osiStack');
+    container.innerHTML = osiLayers.map(l => `
+        <div class="osi-layer" onclick="this.classList.toggle('open')">
+            <div class="osi-layer-header">
+                <div class="osi-layer-num" style="background:${l.color}22;color:${l.color};border:2px solid ${l.color};">${l.num}</div>
+                <div style="flex:1;">
+                    <div style="color:${l.color};font-weight:700;">Capa ${l.num}: ${l.name}</div>
+                    <div style="font-size:0.82rem;color:var(--text-muted);">${l.fn}</div>
+                </div>
+                <span class="tag" style="background:${l.color}22;color:${l.color};">${l.pdu}</span>
+                <span class="arrow">&#9660;</span>
+            </div>
+            <div class="osi-layer-detail">
+                <div class="osi-layer-detail-inner">
+                    <div class="osi-info-box">
+                        <label>Protocolos</label>
+                        <div>${l.protocols.map(p => `<span class="tag" style="background:${l.color}15;color:${l.color};">${p}</span>`).join(' ')}</div>
+                    </div>
+                    <div class="osi-info-box">
+                        <label>Dispositivos</label>
+                        <div>${l.devices.map(d => `<span class="tag tag-cyan">${d}</span>`).join(' ')}</div>
+                    </div>
+                    <div class="osi-info-box">
+                        <label>Funcion</label>
+                        <div style="font-size:0.88rem;">${l.fn}</div>
+                    </div>
+                    <div class="osi-info-box">
+                        <label>PDU</label>
+                        <div style="font-size:0.88rem;color:${l.color};font-weight:600;">${l.pdu}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// ===========================
+// IP ANALYZER
+// ===========================
+function analyzeIP() {
+    const ip = document.getElementById('ipAnalyzerInput').value.trim();
+    const res = document.getElementById('ipAnalyzerResult');
+    if (!IPEngine.isValidIP(ip)) {
+        res.style.display = 'block';
+        res.innerHTML = '<span style="color:var(--red);">Direccion IP no valida. Formato: X.X.X.X (0-255)</span>';
+        return;
+    }
+    const parts = ip.split('.').map(Number);
+    const first = parts[0];
+    let ipClass = '', defaultMask = '', cidr = 0;
+    if (first >= 1 && first <= 126) { ipClass = 'A'; defaultMask = '255.0.0.0'; cidr = 8; }
+    else if (first >= 128 && first <= 191) { ipClass = 'B'; defaultMask = '255.255.0.0'; cidr = 16; }
+    else if (first >= 192 && first <= 223) { ipClass = 'C'; defaultMask = '255.255.255.0'; cidr = 24; }
+    else if (first >= 224 && first <= 239) { ipClass = 'D (Multicast)'; defaultMask = 'N/A'; }
+    else if (first >= 240) { ipClass = 'E (Experimental)'; defaultMask = 'N/A'; }
+    else if (first === 127) { ipClass = 'Loopback'; defaultMask = '255.0.0.0'; cidr = 8; }
+    else { ipClass = 'Especial (0.x.x.x)'; defaultMask = 'N/A'; }
+
+    let tipo = 'Publica';
+    if (first === 10) tipo = 'Privada (10.0.0.0/8)';
+    else if (first === 172 && parts[1] >= 16 && parts[1] <= 31) tipo = 'Privada (172.16.0.0/12)';
+    else if (first === 192 && parts[1] === 168) tipo = 'Privada (192.168.0.0/16)';
+    else if (first === 127) tipo = 'Loopback';
+    else if (first === 169 && parts[1] === 254) tipo = 'APIPA';
+    else if (first >= 224 && first <= 239) tipo = 'Multicast';
+    else if (first >= 240) tipo = 'Experimental';
+
+    const binary = IPEngine.ipToBinary(ip);
+    let networkPart = '', hostPart = '';
+    if (cidr > 0) {
+        const maskInt = IPEngine.cidrToMaskInt(cidr);
+        const netAddr = IPEngine.getNetworkAddress(IPEngine.ipToInt(ip), cidr);
+        networkPart = IPEngine.intToIp(netAddr);
+        const bcastAddr = IPEngine.getBroadcast(netAddr, cidr);
+        hostPart = `Red: ${networkPart}/${cidr} | Broadcast: ${IPEngine.intToIp(bcastAddr)} | Hosts usables: ${IPEngine.formatNum(IPEngine.usableHosts(cidr))}`;
+    }
+
+    res.style.display = 'block';
+    res.innerHTML = `
+        <div class="info-grid">
+            <div class="info-item"><div class="label">Clase</div><div class="value">${ipClass}</div></div>
+            <div class="info-item"><div class="label">Tipo</div><div class="value">${tipo}</div></div>
+            <div class="info-item"><div class="label">Mascara por defecto</div><div class="value">${defaultMask}</div></div>
+            <div class="info-item"><div class="label">Binario</div><div class="value" style="font-size:0.78rem;">${binary}</div></div>
+        </div>
+        ${hostPart ? `<div style="margin-top:8px;color:var(--text-muted);font-size:0.85rem;">${hostPart}</div>` : ''}
+    `;
+}
+
+// ===========================
+// BINARY CONVERTER
+// ===========================
+function decToBin() {
+    const dec = parseInt(document.getElementById('decInput').value);
+    if (!isNaN(dec) && dec >= 0 && dec <= 255) {
+        document.getElementById('binInput').value = dec.toString(2).padStart(8, '0');
+    }
+}
+function binToDec() {
+    const bin = document.getElementById('binInput').value.replace(/[^01]/g, '');
+    if (bin.length > 0 && bin.length <= 8) {
+        document.getElementById('decInput').value = parseInt(bin, 2);
+    }
+}
+
+// ===========================
+// AND CALCULATOR
+// ===========================
+function calcAND() {
+    const ip = document.getElementById('andIpInput').value.trim();
+    const mask = document.getElementById('andMaskInput').value.trim();
+    const res = document.getElementById('andResult');
+
+    if (!IPEngine.isValidIP(ip) || !IPEngine.isValidIP(mask)) {
+        res.style.display = 'block';
+        res.innerHTML = '<span style="color:var(--red);">IP o mascara no valida</span>';
+        return;
+    }
+
+    const ipParts = ip.split('.').map(Number);
+    const maskParts = mask.split('.').map(Number);
+    const network = ipParts.map((o, i) => o & maskParts[i]).join('.');
+    const ipBin = IPEngine.ipToBinary(ip);
+    const maskBin = IPEngine.ipToBinary(mask);
+    const netBin = IPEngine.ipToBinary(network);
+
+    res.style.display = 'block';
+    res.innerHTML = `
+        <div class="binary-display">
+        IP:      ${ipBin}<br>
+        Mascara: ${maskBin}<br>
+        <span style="border-top:1px solid var(--border);display:block;margin:4px 0;"></span>
+        AND:     ${netBin}
+        </div>
+        <div style="margin-top:8px;">
+            <strong style="color:var(--accent);">Direccion de Red:</strong> <span class="mono">${network}</span>
+        </div>
+    `;
+}
+
+// ===========================
+// MASK TABLES
+// ===========================
+function buildMaskTables() {
+    // Quick reference table in tab1
+    const t1 = document.getElementById('maskTable');
+    for (let cidr = 8; cidr <= 30; cidr++) {
+        const mask = IPEngine.cidrToMask(cidr);
+        const wc = IPEngine.wildcardFromCidr(cidr);
+        const total = IPEngine.totalAddresses(cidr);
+        const usable = IPEngine.usableHosts(cidr);
+        const row = t1.insertRow();
+        row.innerHTML = `<td class="mono">/${cidr}</td><td class="mono">${mask}</td><td class="mono">${wc}</td><td class="mono">${IPEngine.formatNum(total)}</td><td class="mono">${IPEngine.formatNum(usable)}</td>`;
+    }
+
+    // Full table in tab3
+    const t2 = document.getElementById('fullMaskTable');
+    for (let cidr = 8; cidr <= 30; cidr++) {
+        const mask = IPEngine.cidrToMask(cidr);
+        const wc = IPEngine.wildcardFromCidr(cidr);
+        const total = IPEngine.totalAddresses(cidr);
+        const usable = IPEngine.usableHosts(cidr);
+        // Block size = number of addresses per subnet in the interesting octet
+        const maskParts = mask.split('.').map(Number);
+        let blockSize = 256;
+        for (let i = 3; i >= 0; i--) {
+            if (maskParts[i] < 255) { blockSize = 256 - maskParts[i]; break; }
+        }
+        const sFrom8 = cidr >= 8 ? Math.pow(2, cidr - 8) : '-';
+        const sFrom16 = cidr >= 16 ? Math.pow(2, cidr - 16) : '-';
+        const sFrom24 = cidr >= 24 ? Math.pow(2, cidr - 24) : '-';
+
+        const row = t2.insertRow();
+        row.innerHTML = `<td class="mono">/${cidr}</td><td class="mono">${mask}</td><td class="mono">${wc}</td><td class="mono">${IPEngine.formatNum(blockSize)}</td><td class="mono">${IPEngine.formatNum(total)}</td><td class="mono">${IPEngine.formatNum(usable)}</td><td class="mono">${typeof sFrom8 === 'number' ? IPEngine.formatNum(sFrom8) : sFrom8}</td><td class="mono">${typeof sFrom16 === 'number' ? IPEngine.formatNum(sFrom16) : sFrom16}</td><td class="mono">${typeof sFrom24 === 'number' ? IPEngine.formatNum(sFrom24) : sFrom24}</td>`;
+    }
+
+    // CIDR dropdowns
+    const selectors = ['flsmCidr', 'vlsmCidr'];
+    selectors.forEach(id => {
+        const sel = document.getElementById(id);
+        if (!sel) return;
+        for (let c = 8; c <= 30; c++) {
+            const opt = document.createElement('option');
+            opt.value = c;
+            opt.textContent = `/${c}  (${IPEngine.cidrToMask(c)}) - ${IPEngine.formatNum(IPEngine.usableHosts(c))} hosts`;
+            if (c === 24) opt.selected = true;
+            sel.appendChild(opt);
+        }
+    });
+}
+
+// ===========================
+// QUIZ
+// ===========================
+function checkQuiz(btn, result) {
+    const parent = btn.closest('.quiz-box');
+    const options = parent.querySelectorAll('.quiz-option');
+    const feedback = parent.querySelector('.quiz-feedback');
+
+    options.forEach(o => {
+        o.disabled = true;
+        o.style.pointerEvents = 'none';
+    });
+
+    if (result === 'correct') {
+        btn.classList.add('correct');
+        feedback.style.display = 'block';
+        feedback.style.background = 'rgba(0,232,143,0.1)';
+        feedback.style.color = 'var(--green)';
+        feedback.textContent = 'Correcto!';
+    } else {
+        btn.classList.add('wrong');
+        // Find and highlight correct
+        options.forEach(o => {
+            if (o.getAttribute('onclick').includes("'correct'")) o.classList.add('correct');
+        });
+        feedback.style.display = 'block';
+        feedback.style.background = 'rgba(255,85,119,0.1)';
+        feedback.style.color = 'var(--red)';
+        feedback.textContent = 'Incorrecto. La respuesta correcta esta resaltada en verde.';
+    }
+}
+
+// ===========================
+// WILDCARD CALCULATOR
+// ===========================
+function calcWildcard() {
+    const mask = document.getElementById('wildcardInput').value.trim();
+    const res = document.getElementById('wildcardResult');
+    if (!IPEngine.isValidIP(mask)) {
+        res.style.display = 'block';
+        res.innerHTML = '<span style="color:var(--red);">Mascara no valida</span>';
+        return;
+    }
+    const parts = mask.split('.').map(Number);
+    const wc = parts.map(p => 255 - p).join('.');
+    res.style.display = 'block';
+    res.innerHTML = `<strong style="color:var(--accent);">Wildcard:</strong> <span class="mono">${wc}</span>`;
+}
+
+// ===========================
+// ACL BUILDER
+// ===========================
+function updateACLBuilder() {
+    const type = document.getElementById('aclType').value;
+    document.getElementById('aclExtFields').style.display = type === 'extended' ? 'block' : 'none';
+}
+
+function buildACL() {
+    const type = document.getElementById('aclType').value;
+    const action = document.getElementById('aclAction').value;
+    const srcIP = document.getElementById('aclSrcIP').value.trim() || 'any';
+    const srcWC = document.getElementById('aclSrcWC').value.trim();
+    const res = document.getElementById('aclResult');
+
+    let cmd = '';
+    if (type === 'standard') {
+        const num = 10;
+        const src = srcWC ? `${srcIP} ${srcWC}` : (srcIP === 'any' ? 'any' : `host ${srcIP}`);
+        cmd = `access-list ${num} ${action} ${src}`;
+    } else {
+        const proto = document.getElementById('aclProto').value;
+        const dstIP = document.getElementById('aclDstIP').value.trim() || 'any';
+        const dstWC = document.getElementById('aclDstWC').value.trim();
+        const portOp = document.getElementById('aclPortOp').value;
+        const port = document.getElementById('aclPort').value.trim();
+        const num = 100;
+        const src = srcWC ? `${srcIP} ${srcWC}` : (srcIP === 'any' ? 'any' : `host ${srcIP}`);
+        const dst = dstWC ? `${dstIP} ${dstWC}` : (dstIP === 'any' ? 'any' : `host ${dstIP}`);
+        cmd = `access-list ${num} ${action} ${proto} ${src} ${dst}`;
+        if (portOp && port) cmd += ` ${portOp} ${port}`;
+    }
+
+    res.style.display = 'block';
+    res.innerHTML = `<span style="color:var(--green);">${cmd}</span><br><br>
+    <span style="color:var(--text-muted);">Aplicar a interfaz:</span><br>
+    <span style="color:var(--green);">interface GigabitEthernet0/0</span><br>
+    <span style="color:var(--green);">ip access-group ${type === 'standard' ? 10 : 100} ${type === 'standard' ? 'out' : 'in'}</span>`;
+}
+
+// ===========================
+// FLSM CALCULATOR
+// ===========================
+function calcFLSM() {
+    const net = document.getElementById('flsmNetwork').value.trim();
+    const cidr = parseInt(document.getElementById('flsmCidr').value);
+    const count = parseInt(document.getElementById('flsmCount').value);
+    const res = document.getElementById('flsmResult');
+
+    if (!IPEngine.isValidIP(net) || isNaN(count) || count < 2) {
+        res.innerHTML = '<div class="warning-box">Ingresa una red valida y al menos 2 subredes.</div>';
+        return;
+    }
+
+    // Find needed bits for N subnets
+    let subnetBits = Math.ceil(Math.log2(count));
+    const newCidr = cidr + subnetBits;
+    if (newCidr > 30) {
+        res.innerHTML = '<div class="warning-box">No es posible crear tantas subredes con esa mascara.</div>';
+        return;
+    }
+
+    const actualSubnets = Math.pow(2, subnetBits);
+    const netInt = IPEngine.getNetworkAddress(IPEngine.ipToInt(net), cidr);
+    const subnetSize = IPEngine.totalAddresses(newCidr);
+
+    let html = `<div class="highlight-box" style="margin-top:12px;">
+        <strong>Bits prestados:</strong> ${subnetBits} | <strong>Nueva mascara:</strong> /${newCidr} (${IPEngine.cidrToMask(newCidr)}) | <strong>Subredes creadas:</strong> ${actualSubnets} | <strong>Hosts/subred:</strong> ${IPEngine.formatNum(IPEngine.usableHosts(newCidr))}
+    </div>`;
+
+    html += `<div class="scroll-table-wrap"><table class="data-table"><tr><th>#</th><th>Dir. Red</th><th>Primer Host</th><th>Ultimo Host</th><th>Broadcast</th><th>Mascara</th></tr>`;
+
+    let currentNet = netInt;
+    for (let i = 0; i < Math.min(actualSubnets, 64); i++) {
+        const bcast = currentNet + subnetSize - 1;
+        html += `<tr>
+            <td>${i + 1}</td>
+            <td class="mono">${IPEngine.intToIp(currentNet)}</td>
+            <td class="mono">${IPEngine.intToIp(currentNet + 1)}</td>
+            <td class="mono">${IPEngine.intToIp(bcast - 1)}</td>
+            <td class="mono">${IPEngine.intToIp(bcast)}</td>
+            <td class="mono">/${newCidr}</td>
+        </tr>`;
+        currentNet += subnetSize;
+    }
+    if (actualSubnets > 64) html += `<tr><td colspan="6" style="text-align:center;color:var(--text-muted);">... ${actualSubnets - 64} subredes mas ...</td></tr>`;
+    html += '</table></div>';
+    res.innerHTML = html;
+}
+
+// ===========================
+// SUBNETTING EXERCISES
+// ===========================
+function solveSubnetting() {
+    const ip = document.getElementById('exIp').value.trim();
+    const mask = document.getElementById('exMask').value.trim();
+    const res = document.getElementById('exResult');
+
+    if (!IPEngine.isValidIP(ip) || !IPEngine.isValidIP(mask)) {
+        res.style.display = 'block';
+        res.innerHTML = '<span style="color:var(--red);">IP o mascara no valida</span>';
+        return;
+    }
+
+    // Figure out CIDR from mask
+    const maskInt = IPEngine.ipToInt(mask);
+    let cidr = 0;
+    let temp = maskInt;
+    for (let i = 31; i >= 0; i--) {
+        if (Math.floor(temp / Math.pow(2, i)) % 2 === 1) cidr++;
+        else break;
+    }
+    // Better CIDR calculation
+    cidr = 0;
+    const maskBin = mask.split('.').map(o => parseInt(o).toString(2).padStart(8, '0')).join('');
+    for (const bit of maskBin) { if (bit === '1') cidr++; else break; }
+
+    const ipInt = IPEngine.ipToInt(ip);
+    const netInt = IPEngine.getNetworkAddress(ipInt, cidr);
+    const bcastInt = IPEngine.getBroadcast(netInt, cidr);
+
+    res.style.display = 'block';
+    res.innerHTML = `
+        <div class="info-grid">
+            <div class="info-item"><div class="label">Direccion de Red</div><div class="value">${IPEngine.intToIp(netInt)}/${cidr}</div></div>
+            <div class="info-item"><div class="label">Primer Host</div><div class="value">${IPEngine.intToIp(netInt + 1)}</div></div>
+            <div class="info-item"><div class="label">Ultimo Host</div><div class="value">${IPEngine.intToIp(bcastInt - 1)}</div></div>
+            <div class="info-item"><div class="label">Broadcast</div><div class="value">${IPEngine.intToIp(bcastInt)}</div></div>
+            <div class="info-item"><div class="label">Mascara</div><div class="value">${mask} (/${cidr})</div></div>
+            <div class="info-item"><div class="label">Hosts Usables</div><div class="value">${IPEngine.formatNum(IPEngine.usableHosts(cidr))}</div></div>
+        </div>
+        <div class="binary-display" style="margin-top:8px;">
+        IP:      ${IPEngine.ipToBinary(ip)}<br>
+        Mascara: ${IPEngine.ipToBinary(mask)}<br>
+        Red:     ${IPEngine.ipToBinary(IPEngine.intToIp(netInt))}
+        </div>
+    `;
+}
+
+function solveMaskForHosts() {
+    const net = document.getElementById('exNet2').value.trim();
+    const hosts = parseInt(document.getElementById('exHosts2').value);
+    const res = document.getElementById('exResult2');
+
+    if (!IPEngine.isValidIP(net) || isNaN(hosts) || hosts < 1) {
+        res.style.display = 'block';
+        res.innerHTML = '<span style="color:var(--red);">Datos no validos</span>';
+        return;
+    }
+
+    const cidr = IPEngine.neededCidr(hosts);
+    const mask = IPEngine.cidrToMask(cidr);
+    const usable = IPEngine.usableHosts(cidr);
+    const hostBits = 32 - cidr;
+
+    res.style.display = 'block';
+    res.innerHTML = `
+        <div class="info-grid">
+            <div class="info-item"><div class="label">Hosts Requeridos</div><div class="value">${IPEngine.formatNum(hosts)}</div></div>
+            <div class="info-item"><div class="label">Bits de Host</div><div class="value">${hostBits}</div></div>
+            <div class="info-item"><div class="label">Mascara</div><div class="value">${mask} (/${cidr})</div></div>
+            <div class="info-item"><div class="label">Hosts Usables</div><div class="value">${IPEngine.formatNum(usable)}</div></div>
+            <div class="info-item"><div class="label">Direcciones Totales</div><div class="value">${IPEngine.formatNum(IPEngine.totalAddresses(cidr))}</div></div>
+            <div class="info-item"><div class="label">Formula</div><div class="value">2^${hostBits} - 2 = ${IPEngine.formatNum(usable)}</div></div>
+        </div>
+    `;
+}
+
+// ===========================
+// VLSM CALCULATOR
+// ===========================
+let subnetCounter = 0;
+
+function addSubnetRow(name, hosts) {
+    subnetCounter++;
+    const list = document.getElementById('subnetList');
+    const div = document.createElement('div');
+    div.className = 'subnet-row';
+    div.id = `subnet-${subnetCounter}`;
+    div.innerHTML = `
+        <span style="color:var(--text-muted);font-weight:600;min-width:30px;">${subnetCounter}.</span>
+        <input type="text" placeholder="Nombre (ej: LAN Ventas)" value="${name || ''}" class="subnet-name">
+        <input type="number" placeholder="Hosts" min="1" value="${hosts || ''}" class="subnet-hosts" style="width:120px;">
+        <button class="btn btn-danger btn-sm" onclick="removeSubnetRow(${subnetCounter})">X</button>
+    `;
+    list.appendChild(div);
+}
+
+function removeSubnetRow(id) {
+    const el = document.getElementById(`subnet-${id}`);
+    if (el) el.remove();
+}
+
+function clearVLSM() {
+    document.getElementById('subnetList').innerHTML = '';
+    document.getElementById('vlsmResults').innerHTML = '';
+    document.getElementById('vlsmWarnings').innerHTML = '';
+    document.getElementById('vlsmNetwork').value = '';
+    subnetCounter = 0;
+    addSubnetRow();
+    addSubnetRow();
+}
+
+function loadExample(n) {
+    document.getElementById('subnetList').innerHTML = '';
+    document.getElementById('vlsmResults').innerHTML = '';
+    document.getElementById('vlsmWarnings').innerHTML = '';
+    subnetCounter = 0;
+
+    const examples = {
+        1: { net: '192.168.1.0', cidr: 24, subs: [['Ventas', 100], ['Ingenieria', 50], ['Admin', 25], ['WAN Link', 2]] },
+        2: { net: '10.0.0.0', cidr: 16, subs: [['Produccion', 8000], ['Oficinas', 4000], ['Almacen', 2000], ['Contabilidad', 1000], ['TI', 500], ['Gerencia', 100]] },
+        3: { net: '172.16.0.0', cidr: 20, subs: [['Sede Principal', 1000], ['Sucursal A', 500], ['Sucursal B', 200], ['Servidores', 50], ['WAN P2P', 2]] },
+        4: { net: '10.0.0.0', cidr: 8, subs: [['DataCenter', 100000], ['Campus', 50000], ['Branch Offices', 10000], ['VoIP', 5000], ['Management', 1000]] }
+    };
+
+    const ex = examples[n];
+    document.getElementById('vlsmNetwork').value = ex.net;
+    // Set CIDR dropdown
+    const cidrSelect = document.getElementById('vlsmCidr');
+    cidrSelect.value = ex.cidr;
+
+    ex.subs.forEach(s => addSubnetRow(s[0], s[1]));
+}
+
+function calculateVLSM() {
+    const netInput = document.getElementById('vlsmNetwork').value.trim();
+    const cidr = parseInt(document.getElementById('vlsmCidr').value);
+    const warnDiv = document.getElementById('vlsmWarnings');
+    const resDiv = document.getElementById('vlsmResults');
+    warnDiv.innerHTML = '';
+    resDiv.innerHTML = '';
+
+    // Validate IP
+    if (!IPEngine.isValidIP(netInput)) {
+        warnDiv.innerHTML = '<div class="warning-box">Direccion IP no valida.</div>';
+        return;
+    }
+
+    // Collect subnets
+    const rows = document.querySelectorAll('.subnet-row');
+    const subnets = [];
+    rows.forEach(row => {
+        const name = row.querySelector('.subnet-name').value.trim() || `Subred ${subnets.length + 1}`;
+        const hosts = parseInt(row.querySelector('.subnet-hosts').value);
+        if (!isNaN(hosts) && hosts > 0) {
+            subnets.push({ name, hosts });
+        }
+    });
+
+    if (subnets.length === 0) {
+        warnDiv.innerHTML = '<div class="warning-box">Agrega al menos una subred con hosts > 0.</div>';
+        return;
+    }
+
+    // Calculate network address (auto-correct if needed)
+    const inputInt = IPEngine.ipToInt(netInput);
+    const networkInt = IPEngine.getNetworkAddress(inputInt, cidr);
+    const correctedIP = IPEngine.intToIp(networkInt);
+
+    if (correctedIP !== netInput) {
+        warnDiv.innerHTML += `<div class="warning-box">La direccion ${netInput}/${cidr} no es una direccion de red valida. Se corrigio automaticamente a <strong>${correctedIP}/${cidr}</strong>.</div>`;
+    }
+
+    const totalSpace = IPEngine.totalAddresses(cidr);
+
+    // Sort subnets largest to smallest
+    const sorted = subnets.map((s, i) => ({
+        ...s,
+        originalIndex: i + 1,
+        hostBits: IPEngine.neededHostBits(s.hosts),
+        subnetCidr: 32 - IPEngine.neededHostBits(s.hosts),
+        blockSize: Math.pow(2, IPEngine.neededHostBits(s.hosts)),
+        usable: Math.pow(2, IPEngine.neededHostBits(s.hosts)) - 2
+    })).sort((a, b) => b.blockSize - a.blockSize);
+
+    // Check if total space is sufficient
+    const totalNeeded = sorted.reduce((sum, s) => sum + s.blockSize, 0);
+    if (totalNeeded > totalSpace) {
+        warnDiv.innerHTML += `<div class="warning-box">Espacio insuficiente. Necesitas ${IPEngine.formatNum(totalNeeded)} direcciones pero solo hay ${IPEngine.formatNum(totalSpace)} disponibles en /${cidr}.</div>`;
+        return;
+    }
+
+    // Validate each subnet CIDR is valid
+    for (const s of sorted) {
+        if (s.subnetCidr < cidr) {
+            warnDiv.innerHTML += `<div class="warning-box">La subred "${s.name}" requiere ${IPEngine.formatNum(s.hosts)} hosts, lo cual necesita /${s.subnetCidr} que es mayor que la red base /${cidr}.</div>`;
+            return;
+        }
+    }
+
+    // ---- STEP 1: Network Analysis ----
+    const maskDotted = IPEngine.cidrToMask(cidr);
+    const binaryIP = IPEngine.ipToBinary(correctedIP);
+    let binaryColored = '';
+    const binNoDots = binaryIP.replace(/\./g, '');
+    for (let i = 0; i < 32; i++) {
+        if (i > 0 && i % 8 === 0) binaryColored += '.';
+        if (i < cidr) binaryColored += `<span class="net-bit">${binNoDots[i]}</span>`;
+        else binaryColored += `<span class="host-bit">${binNoDots[i]}</span>`;
+    }
+
+    let html = `<div class="vlsm-result-card">
+        <h3><span class="step-number">1</span> Analisis de la Red Base</h3>
+        <div class="info-grid">
+            <div class="info-item"><div class="label">Red Base</div><div class="value">${correctedIP}/${cidr}</div></div>
+            <div class="info-item"><div class="label">Mascara</div><div class="value">${maskDotted}</div></div>
+            <div class="info-item"><div class="label">Direcciones Totales</div><div class="value">${IPEngine.formatNum(totalSpace)}</div></div>
+            <div class="info-item"><div class="label">Hosts Usables</div><div class="value">${IPEngine.formatNum(IPEngine.usableHosts(cidr))}</div></div>
+        </div>
+        <div class="binary-display">${binaryColored}<br><small style="color:var(--text-muted);"><span style="color:var(--accent);">azul</span> = bits de red (${cidr}) | <span style="color:var(--green);">verde</span> = bits de host (${32 - cidr})</small></div>
+    </div>`;
+
+    // ---- STEP 2: Sorted subnets with full reasoning ----
+    html += `<div class="vlsm-result-card">
+        <h3><span class="step-number">2</span> Subredes Ordenadas (Mayor a Menor)</h3>
+        <p style="color:var(--text-muted);margin-bottom:12px;font-size:0.9rem;">Se ordenan de mayor a menor cantidad de hosts para asignar primero las subredes mas grandes.</p>
+        <div class="scroll-table-wrap"><table class="data-table">
+            <tr><th>#</th><th>Nombre</th><th>Hosts Pedidos</th><th>Por que n bits?</th><th>n</th><th>2<sup>n</sup></th><th>Usables (2<sup>n</sup>-2)</th><th>CIDR (32-n)</th><th>Mascara</th></tr>`;
+
+    // Collect reasoning cards data
+    const reasoningCards = [];
+
+    sorted.forEach((s, i) => {
+        const prevBits = s.hostBits - 1;
+        const prevHosts = Math.pow(2, prevBits) - 2;
+        let reasoning = '';
+        if (s.hostBits <= 1) {
+            reasoning = `Minimo 2 bits`;
+        } else {
+            reasoning = `2<sup>${prevBits}</sup>-2=${prevHosts} <span style="color:var(--red);">&#10008;</span> | 2<sup>${s.hostBits}</sup>-2=${s.usable} <span style="color:var(--green);">&#10004;</span>`;
+        }
+
+        // Mask binary octets for reasoning cards
+        const maskBinOctets = [];
+        const maskInt = IPEngine.cidrToMaskInt(s.subnetCidr);
+        for (let o = 0; o < 4; o++) {
+            const octetVal = Math.floor(maskInt / Math.pow(256, 3 - o)) % 256;
+            maskBinOctets.push(octetVal.toString(2).padStart(8, '0'));
+        }
+        reasoningCards.push({ ...s, prevBits, prevHosts, maskBinOctets, index: i });
+
+        html += `<tr>
+            <td>${i + 1}</td>
+            <td><strong>${s.name}</strong></td>
+            <td class="mono">${IPEngine.formatNum(s.hosts)}</td>
+            <td style="text-align:left;font-size:0.85rem;line-height:1.5;">${reasoning}</td>
+            <td class="mono" style="color:var(--green);font-weight:700;">${s.hostBits}</td>
+            <td class="mono">${IPEngine.formatNum(s.blockSize)}</td>
+            <td class="mono" style="color:var(--accent);font-weight:600;">${IPEngine.formatNum(s.usable)}</td>
+            <td class="mono" style="color:var(--orange);font-weight:700;">/${s.subnetCidr}</td>
+            <td class="mono" style="color:var(--yellow);">${IPEngine.cidrToMask(s.subnetCidr)}</td>
+        </tr>`;
+    });
+    html += '</table></div>';
+
+    // Reasoning detail cards below the table
+    html += `<div style="margin-top:16px;">
+        <p style="color:var(--text-muted);margin-bottom:10px;font-size:0.85rem;">&#128161; Detalle del razonamiento por cada subred (clic para expandir/colapsar):</p>`;
+
+    reasoningCards.forEach((s) => {
+        const cardId = `reason-card-${s.index}`;
+        const colors = ['#00d4ff','#7c5cfc','#00e88f','#ff9f43','#ff5577','#ffe066','#ff6b9d','#00e5ff'];
+        const color = colors[s.index % colors.length];
+
+        html += `<div style="border:1px solid ${color}33;border-left:4px solid ${color};border-radius:var(--radius-sm);margin-bottom:8px;overflow:hidden;">
+            <div onclick="document.getElementById('${cardId}').style.display = document.getElementById('${cardId}').style.display === 'none' ? 'block' : 'none'"
+                 style="padding:10px 16px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;background:var(--surface);transition:background 0.2s;"
+                 onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='var(--surface)'">
+                <span style="font-weight:600;color:${color};">${s.index + 1}. ${s.name}</span>
+                <span style="font-size:0.8rem;color:var(--text-muted);">${s.hosts} hosts &rarr; /${s.subnetCidr} (${IPEngine.cidrToMask(s.subnetCidr)}) &nbsp; &#9660;</span>
+            </div>
+            <div id="${cardId}" style="display:none;padding:16px;background:var(--bg2);">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+                    <div>
+                        <div style="color:var(--accent);font-weight:600;margin-bottom:8px;font-size:0.95rem;">&#9881; Paso a paso: Bits de host y CIDR</div>
+                        <div style="font-size:0.9rem;line-height:2;">
+                            <strong>1.</strong> Necesito alojar <strong style="color:${color};">${s.hosts}</strong> hosts<br>
+                            <strong>2.</strong> Busco <em>n</em> tal que <strong>2<sup>n</sup> - 2 &ge; ${s.hosts}</strong><br>
+                            ${s.hostBits > 1 ? `<strong>3.</strong> n=${s.prevBits}: &nbsp; 2<sup>${s.prevBits}</sup> - 2 = <strong>${s.prevHosts}</strong> &lt; ${s.hosts} <span style="color:var(--red);font-weight:700;">&#10008; No alcanza</span><br>` : ''}
+                            <strong>${s.hostBits > 1 ? '4' : '3'}.</strong> n=${s.hostBits}: &nbsp; 2<sup>${s.hostBits}</sup> - 2 = <strong>${s.usable}</strong> &ge; ${s.hosts} <span style="color:var(--green);font-weight:700;">&#10004; Si alcanza!</span><br>
+                            <strong>${s.hostBits > 1 ? '5' : '4'}.</strong> Bits de host: <strong style="color:var(--green);font-size:1.1rem;">n = ${s.hostBits}</strong><br>
+                            <strong>${s.hostBits > 1 ? '6' : '5'}.</strong> CIDR: 32 - ${s.hostBits} = <strong style="color:var(--orange);font-size:1.1rem;">/${s.subnetCidr}</strong><br>
+                            <strong>${s.hostBits > 1 ? '7' : '6'}.</strong> Tamano del bloque: 2<sup>${s.hostBits}</sup> = <strong>${IPEngine.formatNum(s.blockSize)}</strong> direcciones<br>
+                            <strong>${s.hostBits > 1 ? '8' : '7'}.</strong> Desperdicio: ${s.usable} - ${s.hosts} = <strong>${s.usable - s.hosts}</strong> hosts sin usar
+                        </div>
+                    </div>
+                    <div>
+                        <div style="color:var(--orange);font-weight:600;margin-bottom:8px;font-size:0.95rem;">&#128270; Como se obtiene la mascara</div>
+                        <div style="font-size:0.9rem;line-height:2;">
+                            <strong>/${s.subnetCidr}</strong> significa: <strong>${s.subnetCidr}</strong> bits en 1, <strong>${32 - s.subnetCidr}</strong> bits en 0<br>
+                            <span style="font-size:0.85rem;">En binario:</span><br>
+                            <span class="mono" style="font-size:0.85rem;letter-spacing:1px;">
+                                <span style="color:var(--accent);">${s.maskBinOctets[0]}</span>.<span style="color:var(--accent);">${s.maskBinOctets[1]}</span>.<span style="color:var(--accent);">${s.maskBinOctets[2]}</span>.<span style="color:var(--accent);">${s.maskBinOctets[3]}</span>
+                            </span><br>
+                            <span style="font-size:0.85rem;">Cada octeto a decimal:</span><br>
+                            ${s.maskBinOctets.map((bin) => {
+                                const dec = parseInt(bin, 2);
+                                if (dec === 255) return `<span class="mono" style="font-size:0.85rem;">${bin}</span> = <strong>255</strong> (todos 1s)`;
+                                if (dec === 0) return `<span class="mono" style="font-size:0.85rem;">${bin}</span> = <strong>0</strong> (todos 0s)`;
+                                const bits = bin.split('');
+                                const calc = bits.map((b, p) => b === '1' ? Math.pow(2, 7 - p) : null).filter(v => v !== null).join('+');
+                                return `<span class="mono" style="font-size:0.85rem;">${bin}</span> = ${calc} = <strong style="color:var(--orange);">${dec}</strong>`;
+                            }).join('<br>')}
+                            <br><span style="font-size:1.05rem;">Mascara: <strong style="color:var(--green);font-size:1.1rem;">${IPEngine.cidrToMask(s.subnetCidr)}</strong></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+    });
+
+    html += '</div></div>';
+
+    // ---- STEP 3+: Each subnet ----
+    const subnetColors = ['#00d4ff','#7c5cfc','#00e88f','#ff9f43','#ff5577','#ffe066','#ff6b9d','#00e5ff','#a78bfa','#34d399'];
+    let currentAddr = networkInt;
+    const results = [];
+
+    sorted.forEach((s, i) => {
+        const subNetAddr = currentAddr;
+        const subBcast = subNetAddr + s.blockSize - 1;
+        const firstHost = subNetAddr + 1;
+        const lastHost = subBcast - 1;
+        const wasted = s.usable - s.hosts;
+        const color = subnetColors[i % subnetColors.length];
+
+        const subBinFull = IPEngine.ipToBinary(IPEngine.intToIp(subNetAddr)).replace(/\./g, '');
+        let subBinColored = '';
+        for (let b = 0; b < 32; b++) {
+            if (b > 0 && b % 8 === 0) subBinColored += '.';
+            if (b < cidr) subBinColored += `<span class="net-bit">${subBinFull[b]}</span>`;
+            else if (b < s.subnetCidr) subBinColored += `<span class="subnet-bit">${subBinFull[b]}</span>`;
+            else subBinColored += `<span class="host-bit">${subBinFull[b]}</span>`;
+        }
+
+        results.push({
+            name: s.name,
+            network: IPEngine.intToIp(subNetAddr),
+            firstHost: IPEngine.intToIp(firstHost),
+            lastHost: IPEngine.intToIp(lastHost),
+            broadcast: IPEngine.intToIp(subBcast),
+            cidr: s.subnetCidr,
+            mask: IPEngine.cidrToMask(s.subnetCidr),
+            hosts: s.hosts,
+            usable: s.usable,
+            blockSize: s.blockSize,
+            wasted,
+            color
+        });
+
+        html += `<div class="vlsm-result-card" style="border-left:4px solid ${color};">
+            <h3 style="color:${color};"><span class="step-number" style="background:${color};">${i + 3}</span> ${s.name}</h3>
+            <div class="info-grid">
+                <div class="info-item"><div class="label">Dir. de Red</div><div class="value">${IPEngine.intToIp(subNetAddr)}/${s.subnetCidr}</div></div>
+                <div class="info-item"><div class="label">Primer Host</div><div class="value">${IPEngine.intToIp(firstHost)}</div></div>
+                <div class="info-item"><div class="label">Ultimo Host</div><div class="value">${IPEngine.intToIp(lastHost)}</div></div>
+                <div class="info-item"><div class="label">Broadcast</div><div class="value">${IPEngine.intToIp(subBcast)}</div></div>
+                <div class="info-item"><div class="label">Mascara</div><div class="value">/${s.subnetCidr} (${IPEngine.cidrToMask(s.subnetCidr)})</div></div>
+                <div class="info-item"><div class="label">Hosts Usables</div><div class="value">${IPEngine.formatNum(s.usable)}</div></div>
+                <div class="info-item"><div class="label">Hosts Requeridos</div><div class="value">${IPEngine.formatNum(s.hosts)}</div></div>
+                <div class="info-item"><div class="label">Desperdicio</div><div class="value">${IPEngine.formatNum(wasted)} hosts</div></div>
+            </div>
+            <div class="binary-display">${subBinColored}<br>
+            <small style="color:var(--text-muted);"><span style="color:var(--accent);">red original</span> (${cidr}b) | <span style="color:var(--orange);">bits subred</span> (${s.subnetCidr - cidr}b) | <span style="color:var(--green);">bits host</span> (${s.hostBits}b)</small></div>
+            <div style="font-size:0.82rem;color:var(--text-muted);margin-top:6px;">
+                Siguiente subred comienza en: <span class="mono" style="color:var(--accent);">${IPEngine.intToIp(subBcast + 1)}</span>
+            </div>
+        </div>`;
+
+        currentAddr = subBcast + 1;
+    });
+
+    // ---- SUMMARY ----
+    const usedAddresses = totalNeeded;
+    const freeAddresses = totalSpace - usedAddresses;
+    const efficiency = ((usedAddresses / totalSpace) * 100).toFixed(1);
+
+    html += `<div class="vlsm-result-card">
+        <h3><span class="step-number" style="background:var(--green);">R</span> Resumen Final</h3>
+        <div class="scroll-table-wrap"><table class="data-table">
+            <tr><th>Subred</th><th>Dir. de Red</th><th>Rango de Hosts</th><th>Broadcast</th><th>Mascara</th><th>Hosts</th></tr>`;
+
+    results.forEach(r => {
+        html += `<tr>
+            <td style="color:${r.color};font-weight:600;">${r.name}</td>
+            <td class="mono">${r.network}/${r.cidr}</td>
+            <td class="mono">${r.firstHost} - ${r.lastHost}</td>
+            <td class="mono">${r.broadcast}</td>
+            <td class="mono">${r.mask}</td>
+            <td class="mono">${IPEngine.formatNum(r.usable)}</td>
+        </tr>`;
+    });
+    html += '</table></div>';
+
+    // Address bar visualization
+    html += '<h4 style="margin-top:16px;">Uso del Espacio de Direcciones</h4><div class="addr-bar">';
+    results.forEach(r => {
+        const pct = (r.blockSize / totalSpace * 100);
+        if (pct >= 0.3) {
+            html += `<div class="addr-bar-segment" style="width:${pct}%;background:${r.color};" title="${r.name}: ${IPEngine.formatNum(r.blockSize)} dir.">${pct > 5 ? r.name : ''}</div>`;
+        }
+    });
+    if (freeAddresses > 0) {
+        const freePct = (freeAddresses / totalSpace * 100);
+        html += `<div class="addr-bar-segment" style="width:${freePct}%;background:var(--surface3);color:var(--text-muted);" title="Libre: ${IPEngine.formatNum(freeAddresses)} dir.">${freePct > 5 ? 'Libre' : ''}</div>`;
+    }
+    html += '</div>';
+
+    html += `<div class="info-grid" style="margin-top:12px;">
+        <div class="info-item"><div class="label">Espacio Total</div><div class="value">${IPEngine.formatNum(totalSpace)} dir.</div></div>
+        <div class="info-item"><div class="label">Espacio Usado</div><div class="value">${IPEngine.formatNum(usedAddresses)} dir.</div></div>
+        <div class="info-item"><div class="label">Espacio Libre</div><div class="value">${IPEngine.formatNum(freeAddresses)} dir.</div></div>
+        <div class="info-item"><div class="label">Eficiencia</div><div class="value">${efficiency}%</div></div>
+    </div></div>`;
+
+    resDiv.innerHTML = html;
+
+    // Store results globally for IOS config
+    window.vlsmResults = results;
+    window.vlsmBaseNetwork = correctedIP;
+    window.vlsmBaseCidr = cidr;
+}
+
+// ===========================
+// CISCO IOS CONFIG GENERATOR
+// ===========================
+function generateIOS() {
+    const hostname = document.getElementById('iosHostname').value || 'Router1';
+    const enablePass = document.getElementById('iosEnablePass').value || 'cisco123';
+    const banner = document.getElementById('iosBanner').value || 'Acceso autorizado unicamente';
+    const configDiv = document.getElementById('iosConfig');
+    const configText = document.getElementById('iosConfigText');
+
+    if (!window.vlsmResults || window.vlsmResults.length === 0) {
+        configDiv.style.display = 'block';
+        configText.innerHTML = '<span style="color:var(--red);">Primero calcula VLSM en la pestana "Calculadora VLSM".</span>';
+        return;
+    }
+
+    const results = window.vlsmResults;
+    let config = `!\n! Configuracion generada para: ${hostname}\n! Red base: ${window.vlsmBaseNetwork}/${window.vlsmBaseCidr}\n!\nenable\nconfigure terminal\n!\nhostname ${hostname}\n!\nenable secret ${enablePass}\nservice password-encryption\n!\nbanner motd #\n${banner}\n#\n!\nno ip domain-lookup\n!\nline console 0\n password cisco\n login\n logging synchronous\n!\nline vty 0 4\n password cisco\n login\n transport input ssh\n!\n`;
+
+    results.forEach((r, i) => {
+        const intName = i === results.length - 1 ? `Serial0/0/0` : `GigabitEthernet0/${i}`;
+        config += `!\n! === ${r.name} ===\ninterface ${intName}\n description ${r.name}\n ip address ${r.firstHost} ${r.mask}\n no shutdown\n!\n`;
+    });
+
+    // Static routes / show
+    config += `!\n! === Tabla de Enrutamiento ===\n! show ip route mostraria:\n`;
+    results.forEach(r => {
+        config += `!   C ${r.network}/${r.cidr} is directly connected\n`;
+    });
+    config += `!\nend\n!\ncopy running-config startup-config\n`;
+
+    configDiv.style.display = 'block';
+    configText.textContent = config;
+}
+
+function copyIOS() {
+    const text = document.getElementById('iosConfigText').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+        const btn = event.target;
+        btn.textContent = 'Copiado!';
+        setTimeout(() => btn.textContent = 'Copiar al Portapapeles', 2000);
+    });
+}
+
+// ===========================
+// CISCO IOS TERMINAL SIMULATOR
+// ===========================
+const CiscoSim = {
+    mode: 'user', // user, privileged, config, config-if, config-line, config-router
+    hostname: 'Router',
+    interfaces: {},
+    routes: [],
+    vlans: [
+        { id: 1, name: 'default', status: 'active', ports: 'Fa0/1-24, Gi0/1-2' }
+    ],
+    runningConfig: [],
+    history: [],
+    historyIndex: -1,
+
+    getPrompt() {
+        switch (this.mode) {
+            case 'user': return `${this.hostname}>`;
+            case 'privileged': return `${this.hostname}#`;
+            case 'config': return `${this.hostname}(config)#`;
+            case 'config-if': return `${this.hostname}(config-if)#`;
+            case 'config-line': return `${this.hostname}(config-line)#`;
+            case 'config-router': return `${this.hostname}(config-router)#`;
+            default: return `${this.hostname}>`;
+        }
+    },
+
+    processCommand(cmd) {
+        cmd = cmd.trim();
+        if (!cmd) return '';
+        this.history.push(cmd);
+        this.historyIndex = this.history.length;
+
+        const parts = cmd.toLowerCase().split(/\s+/);
+        const first = parts[0];
+
+        // TAB completion hint
+        if (cmd.endsWith('?')) {
+            return this.showHelp(cmd.replace('?', '').trim());
+        }
+
+        switch (this.mode) {
+            case 'user':
+                return this.userMode(parts, cmd);
+            case 'privileged':
+                return this.privilegedMode(parts, cmd);
+            case 'config':
+                return this.configMode(parts, cmd);
+            case 'config-if':
+                return this.configIfMode(parts, cmd);
+            case 'config-line':
+                return this.configLineMode(parts, cmd);
+            case 'config-router':
+                return this.configRouterMode(parts, cmd);
+            default:
+                return this.userMode(parts, cmd);
+        }
+    },
+
+    userMode(parts, cmd) {
+        switch (parts[0]) {
+            case 'enable': case 'en':
+                this.mode = 'privileged';
+                return '';
+            case 'help':
+                return this.getHelpText();
+            case 'ping':
+                return this.doPing(parts);
+            case 'show':
+                return '<span class="error-line">% Comando incompleto en modo usuario. Usa "enable" primero.</span>';
+            case 'exit': case 'quit':
+                return '<span class="info-line">Cerrando sesion...</span>';
+            default:
+                return `<span class="error-line">% Comando no reconocido: "${cmd}"</span>\n<span class="warn-line">Escribe "help" para ver los comandos disponibles.</span>`;
+        }
+    },
+
+    privilegedMode(parts, cmd) {
+        switch (parts[0]) {
+            case 'configure': case 'conf':
+                if (parts[1] === 'terminal' || parts[1] === 't' || !parts[1]) {
+                    this.mode = 'config';
+                    return '<span class="info-line">Enter configuration commands, one per line. End with CNTL/Z.</span>';
+                }
+                return '<span class="error-line">% Syntaxis invalida.</span>';
+            case 'show': case 'sh':
+                return this.showCommand(parts);
+            case 'ping':
+                return this.doPing(parts);
+            case 'disable':
+                this.mode = 'user';
+                return '';
+            case 'exit': case 'quit':
+                this.mode = 'user';
+                return '';
+            case 'help':
+                return this.getHelpText();
+            case 'copy':
+                if (parts.includes('running-config') || parts.includes('run')) {
+                    return '<span class="info-line">[OK] Configuracion guardada.</span>';
+                }
+                return '<span class="error-line">% Uso: copy running-config startup-config</span>';
+            default:
+                return `<span class="error-line">% Comando no reconocido: "${cmd}"</span>`;
+        }
+    },
+
+    configMode(parts, cmd) {
+        switch (parts[0]) {
+            case 'hostname':
+                if (parts[1]) {
+                    this.hostname = parts.slice(1).join(' ');
+                    this.runningConfig.push(`hostname ${this.hostname}`);
+                    return '';
+                }
+                return '<span class="error-line">% Ingresa el hostname</span>';
+            case 'interface': case 'int':
+                if (parts[1]) {
+                    this.currentInterface = parts.slice(1).join('');
+                    if (!this.interfaces[this.currentInterface]) {
+                        this.interfaces[this.currentInterface] = { ip: null, mask: null, status: 'down', desc: '' };
+                    }
+                    this.mode = 'config-if';
+                    return '';
+                }
+                return '<span class="error-line">% Especifica la interfaz</span>';
+            case 'ip':
+                if (parts[1] === 'route' && parts.length >= 5) {
+                    this.routes.push({ net: parts[2], mask: parts[3], next: parts[4] });
+                    this.runningConfig.push(cmd);
+                    return '';
+                }
+                return '<span class="error-line">% Uso: ip route [red] [mascara] [next-hop]</span>';
+            case 'no':
+                this.runningConfig.push(cmd);
+                return '';
+            case 'enable':
+                if (parts[1] === 'secret' || parts[1] === 'password') {
+                    this.runningConfig.push(cmd);
+                    return '';
+                }
+                break;
+            case 'service':
+                this.runningConfig.push(cmd);
+                return '';
+            case 'banner':
+                this.runningConfig.push(cmd);
+                return '';
+            case 'line':
+                this.mode = 'config-line';
+                return '';
+            case 'router':
+                this.mode = 'config-router';
+                return '';
+            case 'vlan':
+                if (parts[1]) {
+                    const vid = parseInt(parts[1]);
+                    if (!this.vlans.find(v => v.id === vid)) {
+                        this.vlans.push({ id: vid, name: `VLAN${vid}`, status: 'active', ports: '' });
+                    }
+                    return '';
+                }
+                break;
+            case 'exit':
+                this.mode = 'privileged';
+                return '';
+            case 'end':
+                this.mode = 'privileged';
+                return '<span class="info-line">%SYS-5-CONFIG_I: Configured from console</span>';
+            case 'do':
+                if (parts[1] === 'show' || parts[1] === 'sh') return this.showCommand(parts.slice(1));
+                return '<span class="error-line">% Comando do no soportado para eso</span>';
+            default:
+                this.runningConfig.push(cmd);
+                return '';
+        }
+        return '';
+    },
+
+    configIfMode(parts, cmd) {
+        const iface = this.interfaces[this.currentInterface];
+        switch (parts[0]) {
+            case 'ip':
+                if (parts[1] === 'address' && parts.length >= 4) {
+                    iface.ip = parts[2];
+                    iface.mask = parts[3];
+                    this.runningConfig.push(`interface ${this.currentInterface}\n ${cmd}`);
+                    return '';
+                }
+                return '<span class="error-line">% Uso: ip address [ip] [mascara]</span>';
+            case 'no':
+                if (parts[1] === 'shutdown') {
+                    iface.status = 'up';
+                    return '<span class="info-line">%LINK-3-UPDOWN: Interface ' + this.currentInterface + ', changed state to up</span>';
+                }
+                return '';
+            case 'shutdown':
+                iface.status = 'down';
+                return '';
+            case 'description': case 'desc':
+                iface.desc = parts.slice(1).join(' ');
+                return '';
+            case 'exit':
+                this.mode = 'config';
+                return '';
+            case 'end':
+                this.mode = 'privileged';
+                return '<span class="info-line">%SYS-5-CONFIG_I: Configured from console</span>';
+            default:
+                return '';
+        }
+    },
+
+    configLineMode(parts, cmd) {
+        if (parts[0] === 'exit') { this.mode = 'config'; return ''; }
+        if (parts[0] === 'end') { this.mode = 'privileged'; return ''; }
+        this.runningConfig.push(cmd);
+        return '';
+    },
+
+    configRouterMode(parts, cmd) {
+        if (parts[0] === 'exit') { this.mode = 'config'; return ''; }
+        if (parts[0] === 'end') { this.mode = 'privileged'; return ''; }
+        this.runningConfig.push(cmd);
+        return '';
+    },
+
+    showCommand(parts) {
+        const sub = parts.slice(1).join(' ');
+        if (sub.startsWith('ip route') || sub.startsWith('ip ro')) {
+            return this.showIPRoute();
+        }
+        if (sub.startsWith('ip int') || sub.startsWith('ip interface brief')) {
+            return this.showIPIntBrief();
+        }
+        if (sub.startsWith('run') || sub.startsWith('running')) {
+            return this.showRunningConfig();
+        }
+        if (sub.startsWith('vlan')) {
+            return this.showVlanBrief();
+        }
+        if (sub === 'vlsm' || sub === 'vlsm results') {
+            return this.showVLSM();
+        }
+        if (sub === 'version' || sub === 'ver') {
+            return '<span class="info-line">Cisco IOS Software, Simulated Version 15.1(4)M\nCompiled by simulation engine\nSystem returned to ROM by power-on\nSystem image file is "flash:c2900-universalk9-mz.SPA.151-4.M.bin"\nCisco 2911 (revision 1.0)\n256K bytes of RAM\n64K bytes of NVRAM</span>';
+        }
+        return '<span class="error-line">% Comando show incompleto. Opciones: ip route, ip interface brief, running-config, vlan brief, vlsm, version</span>';
+    },
+
+    showIPRoute() {
+        let out = '<span class="info-line">Codes: C - connected, S - static, R - RIP, O - OSPF</span>\n';
+        out += '<span class="info-line">Gateway of last resort is not set</span>\n\n';
+        for (const key in this.interfaces) {
+            const iface = this.interfaces[key];
+            if (iface.ip && iface.status === 'up') {
+                // Calculate network from IP and mask
+                out += `<span class="cmd-line">C    ${iface.ip} is directly connected, ${key}</span>\n`;
+            }
+        }
+        this.routes.forEach(r => {
+            out += `<span class="cmd-line">S    ${r.net} ${r.mask} [1/0] via ${r.next}</span>\n`;
+        });
+        if (window.vlsmResults) {
+            window.vlsmResults.forEach(r => {
+                out += `<span class="cmd-line">C    ${r.network}/${r.cidr} is directly connected</span>\n`;
+            });
+        }
+        return out || '<span class="warn-line">No hay rutas configuradas.</span>';
+    },
+
+    showIPIntBrief() {
+        let out = '<span class="info-line">Interface              IP-Address      OK? Method Status                Protocol</span>\n';
+        for (const key in this.interfaces) {
+            const iface = this.interfaces[key];
+            const name = key.padEnd(23);
+            const ip = (iface.ip || 'unassigned').padEnd(16);
+            const status = iface.status === 'up' ? 'up' : 'administratively down';
+            const proto = iface.status === 'up' ? 'up' : 'down';
+            out += `<span class="cmd-line">${name}${ip}YES manual ${status.padEnd(22)}${proto}</span>\n`;
+        }
+        if (Object.keys(this.interfaces).length === 0) {
+            out += '<span class="warn-line">No hay interfaces configuradas en el simulador.</span>\n';
+        }
+        return out;
+    },
+
+    showRunningConfig() {
+        let out = '<span class="info-line">Building configuration...</span>\n\n';
+        out += `<span class="cmd-line">hostname ${this.hostname}</span>\n`;
+        this.runningConfig.forEach(line => {
+            out += `<span class="cmd-line">${line}</span>\n`;
+        });
+        for (const key in this.interfaces) {
+            const iface = this.interfaces[key];
+            out += `<span class="cmd-line">!\ninterface ${key}</span>\n`;
+            if (iface.desc) out += `<span class="cmd-line"> description ${iface.desc}</span>\n`;
+            if (iface.ip) out += `<span class="cmd-line"> ip address ${iface.ip} ${iface.mask}</span>\n`;
+            if (iface.status === 'up') out += `<span class="cmd-line"> no shutdown</span>\n`;
+        }
+        out += '<span class="cmd-line">!\nend</span>';
+        return out;
+    },
+
+    showVlanBrief() {
+        let out = '<span class="info-line">VLAN Name                             Status    Ports</span>\n';
+        out += '<span class="info-line">---- -------------------------------- --------- --------------</span>\n';
+        this.vlans.forEach(v => {
+            out += `<span class="cmd-line">${String(v.id).padEnd(5)}${v.name.padEnd(33)}${v.status.padEnd(10)}${v.ports}</span>\n`;
+        });
+        return out;
+    },
+
+    showVLSM() {
+        if (!window.vlsmResults || window.vlsmResults.length === 0) {
+            return '<span class="warn-line">No hay resultados VLSM. Calcula VLSM en la pestana correspondiente.</span>';
+        }
+        let out = '<span class="info-line">VLSM Subnet Allocation:</span>\n';
+        out += '<span class="info-line">---</span>\n';
+        window.vlsmResults.forEach(r => {
+            out += `<span class="cmd-line">${r.name.padEnd(20)} ${r.network}/${r.cidr}  Hosts: ${r.usable}  Mask: ${r.mask}</span>\n`;
+        });
+        return out;
+    },
+
+    doPing(parts) {
+        if (!parts[1]) return '<span class="error-line">% Especifica la IP destino</span>';
+        const ip = parts[1];
+        let out = `<span class="info-line">Type escape sequence to abort.</span>\n`;
+        out += `<span class="info-line">Sending 5, 100-byte ICMP Echos to ${ip}, timeout is 2 seconds:</span>\n`;
+        // Simulate based on whether we have the interface
+        let found = false;
+        for (const key in this.interfaces) {
+            if (this.interfaces[key].ip === ip && this.interfaces[key].status === 'up') {
+                found = true; break;
+            }
+        }
+        if (found) {
+            out += '<span class="cmd-line">!!!!!</span>\n';
+            out += '<span class="info-line">Success rate is 100 percent (5/5), round-trip min/avg/max = 1/2/4 ms</span>';
+        } else {
+            out += '<span class="error-line">.....</span>\n';
+            out += '<span class="error-line">Success rate is 0 percent (0/5)</span>';
+        }
+        return out;
+    },
+
+    showHelp(partial) {
+        const cmds = {
+            user: ['enable', 'ping', 'help', 'exit'],
+            privileged: ['configure terminal', 'show ip route', 'show ip interface brief', 'show running-config', 'show vlan brief', 'show vlsm', 'show version', 'ping', 'disable', 'exit', 'copy running-config startup-config', 'help'],
+            config: ['hostname', 'interface', 'ip route', 'enable secret', 'no', 'vlan', 'line', 'router', 'exit', 'end', 'do show'],
+            'config-if': ['ip address', 'no shutdown', 'shutdown', 'description', 'exit', 'end'],
+            'config-line': ['password', 'login', 'exit', 'end'],
+            'config-router': ['network', 'exit', 'end']
+        };
+        const available = cmds[this.mode] || cmds.user;
+        return '<span class="info-line">Comandos disponibles:</span>\n' + available.map(c => `<span class="cmd-line">  ${c}</span>`).join('\n');
+    },
+
+    getHelpText() {
+        return `<span class="info-line">====== Simulador Cisco IOS ======</span>
+<span class="info-line">Comandos disponibles segun el modo:</span>
+<span class="cmd-line">  enable              - Entrar a modo privilegiado</span>
+<span class="cmd-line">  configure terminal  - Entrar a modo configuracion</span>
+<span class="cmd-line">  hostname [nombre]   - Cambiar hostname</span>
+<span class="cmd-line">  interface [nombre]  - Configurar interfaz</span>
+<span class="cmd-line">  ip address [ip] [mask] - Asignar IP</span>
+<span class="cmd-line">  no shutdown         - Activar interfaz</span>
+<span class="cmd-line">  show ip route       - Ver tabla de enrutamiento</span>
+<span class="cmd-line">  show ip interface brief - Ver interfaces</span>
+<span class="cmd-line">  show running-config - Ver configuracion</span>
+<span class="cmd-line">  show vlan brief     - Ver VLANs</span>
+<span class="cmd-line">  show vlsm           - Ver resultados VLSM</span>
+<span class="cmd-line">  ping [ip]           - Hacer ping</span>
+<span class="cmd-line">  exit / end          - Salir del modo actual</span>
+<span class="cmd-line">  help / ?            - Mostrar ayuda</span>`;
+    }
+};
+
+// Terminal input handler
+function initTerminal() {
+    const input = document.getElementById('termInput');
+    const output = document.getElementById('terminalOutput');
+    const promptEl = document.getElementById('termPrompt');
+
+    input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            const cmd = this.value;
+            const promptText = CiscoSim.getPrompt();
+
+            // Add command to output
+            const cmdDiv = document.createElement('div');
+            cmdDiv.innerHTML = `<span class="terminal-prompt">${promptText}</span>${cmd}`;
+            output.appendChild(cmdDiv);
+
+            // Process command
+            const result = CiscoSim.processCommand(cmd);
+            if (result) {
+                const resDiv = document.createElement('div');
+                resDiv.innerHTML = result;
+                output.appendChild(resDiv);
+            }
+
+            // Update prompt
+            promptEl.textContent = CiscoSim.getPrompt();
+            this.value = '';
+            output.scrollTop = output.scrollHeight;
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            if (CiscoSim.historyIndex > 0) {
+                CiscoSim.historyIndex--;
+                this.value = CiscoSim.history[CiscoSim.historyIndex];
+            }
+        } else if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            if (CiscoSim.historyIndex < CiscoSim.history.length - 1) {
+                CiscoSim.historyIndex++;
+                this.value = CiscoSim.history[CiscoSim.historyIndex];
+            } else {
+                CiscoSim.historyIndex = CiscoSim.history.length;
+                this.value = '';
+            }
+        } else if (e.key === 'Tab') {
+            e.preventDefault();
+            // Simple tab completion
+            const partial = this.value.toLowerCase();
+            const allCmds = ['enable','configure terminal','show ip route','show ip interface brief','show running-config','show vlan brief','show vlsm','show version','hostname','interface','ip address','ip route','no shutdown','shutdown','description','ping','disable','exit','end','help','copy running-config startup-config'];
+            const match = allCmds.find(c => c.startsWith(partial));
+            if (match) this.value = match;
+        }
+    });
+
+    // Focus terminal on click
+    document.getElementById('ciscoTerminal').addEventListener('click', () => input.focus());
+}
+
+// ===========================
+// EUI-64 CONVERTER
+// ===========================
+function calcEUI64() {
+    let mac = document.getElementById('euiMac').value.trim().toUpperCase();
+    const res = document.getElementById('euiResult');
+
+    // Normalize MAC: accept various formats
+    mac = mac.replace(/[^A-Fa-f0-9]/g, '');
+    if (mac.length !== 12) {
+        res.style.display = 'block';
+        res.innerHTML = '<span style="color:var(--red);">MAC no valida. Ingresa 12 digitos hex (ej: AABBCCDDEEFF)</span>';
+        return;
+    }
+
+    // Split into bytes
+    const bytes = [];
+    for (let i = 0; i < 12; i += 2) {
+        bytes.push(parseInt(mac.substr(i, 2), 16));
+    }
+
+    // Step 1: Split in half
+    const firstHalf = bytes.slice(0, 3);
+    const secondHalf = bytes.slice(3, 6);
+
+    // Step 2: Insert FF:FE
+    const eui64Bytes = [...firstHalf, 0xFF, 0xFE, ...secondHalf];
+
+    // Step 3: Flip 7th bit (U/L bit) of first byte
+    eui64Bytes[0] = eui64Bytes[0] ^ 0x02;
+
+    // Format as IPv6 interface ID
+    const hex = eui64Bytes.map(b => b.toString(16).padStart(2, '0'));
+    const interfaceId = `${hex[0]}${hex[1]}:${hex[2]}ff:fe${hex[3]}:${hex[4]}${hex[5]}`;
+
+    const macFormatted = mac.match(/.{2}/g).join(':');
+    const bit7 = (bytes[0] & 0x02) ? '1' : '0';
+    const newBit7 = (eui64Bytes[0] & 0x02) ? '1' : '0';
+
+    res.style.display = 'block';
+    res.innerHTML = `
+        <div class="info-grid">
+            <div class="info-item"><div class="label">MAC Original</div><div class="value">${macFormatted}</div></div>
+            <div class="info-item"><div class="label">Primer byte binario</div><div class="value">${bytes[0].toString(2).padStart(8, '0')} (bit 7: ${bit7})</div></div>
+            <div class="info-item"><div class="label">Bit 7 invertido</div><div class="value">${eui64Bytes[0].toString(2).padStart(8, '0')} (bit 7: ${newBit7})</div></div>
+            <div class="info-item"><div class="label">EUI-64 Interface ID</div><div class="value" style="color:var(--green);">${interfaceId}</div></div>
+        </div>
+        <div style="margin-top:8px;">
+            <strong style="color:var(--accent);">Direccion Link-Local completa:</strong><br>
+            <span class="mono" style="color:var(--green);font-size:1rem;">FE80::${interfaceId}</span>
+        </div>
+        <div style="margin-top:8px;">
+            <strong style="color:var(--accent);">Con prefijo Global Unicast (ejemplo):</strong><br>
+            <span class="mono" style="color:var(--green);font-size:1rem;">2001:DB8:1::${interfaceId}/64</span>
+        </div>
+    `;
+}
+
+// ===========================
+// INIT
+// ===========================
+document.addEventListener('DOMContentLoaded', function() {
+    buildOSI();
+    buildMaskTables();
+    initTerminal();
+
+    // Initial subnet rows for VLSM calculator
+    addSubnetRow();
+    addSubnetRow();
+});
+</script>
+
+</body>
+</html>

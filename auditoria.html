@@ -1,0 +1,2872 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auditoria & Seguridad Informatica - Guia Interactiva</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+        :root {
+            --bg: #050a18;
+            --bg2: #0a1628;
+            --surface: #111d35;
+            --surface2: #1a2a4a;
+            --surface3: #243556;
+            --border: #2a3f65;
+            --text: #e8edf5;
+            --text-muted: #8899b8;
+            --accent: #00d4ff;
+            --accent-glow: rgba(0, 212, 255, 0.3);
+            --accent2: #7c5cfc;
+            --accent2-glow: rgba(124, 92, 252, 0.3);
+            --green: #00e88f;
+            --green-glow: rgba(0, 232, 143, 0.2);
+            --red: #ff5577;
+            --orange: #ff9f43;
+            --yellow: #ffe066;
+            --pink: #ff6b9d;
+            --cyan: #00e5ff;
+            --critical: #ff2255;
+            --high: #ff5577;
+            --medium: #ff9f43;
+            --low: #ffe066;
+            --info: #00d4ff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(0,212,255,0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(124,92,252,0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 80%, rgba(0,232,143,0.04) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container { max-width: 1300px; margin: 0 auto; padding: 20px; position: relative; z-index: 1; }
+
+        /* HEADER */
+        header { text-align: center; padding: 40px 20px 30px; position: relative; z-index: 1; }
+
+        .logo { display: inline-flex; align-items: center; gap: 14px; margin-bottom: 12px; }
+
+        .logo-icon {
+            width: 56px; height: 56px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 28px;
+            box-shadow: 0 0 30px var(--accent-glow);
+        }
+
+        h1 {
+            font-size: 2.2rem; font-weight: 800;
+            background: linear-gradient(135deg, var(--accent), var(--accent2), var(--pink));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle { color: var(--text-muted); font-size: 1.05rem; margin-top: 6px; }
+
+        /* TABS */
+        .tabs-nav {
+            display: flex; gap: 4px; justify-content: center; flex-wrap: wrap;
+            margin: 20px 0 30px; padding: 6px;
+            background: var(--surface); border-radius: 16px; border: 1px solid var(--border);
+        }
+
+        .tab-btn {
+            padding: 12px 22px; border: none; border-radius: 12px;
+            background: transparent; color: var(--text-muted);
+            font-family: 'Inter', sans-serif; font-size: 0.9rem; font-weight: 600;
+            cursor: pointer; transition: all 0.3s;
+            display: flex; align-items: center; gap: 8px;
+        }
+
+        .tab-btn:hover { background: var(--surface2); color: var(--text); }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, rgba(0,212,255,0.15), rgba(124,92,252,0.15));
+            color: var(--accent); border: 1px solid rgba(0,212,255,0.3);
+            box-shadow: 0 0 20px rgba(0,212,255,0.1);
+        }
+
+        .tab-content { display: none; animation: fadeIn 0.4s ease; }
+        .tab-content.active { display: block; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* CARDS */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 24px;
+            transition: all 0.3s;
+        }
+
+        .card:hover { border-color: rgba(0,212,255,0.3); box-shadow: 0 4px 30px rgba(0,0,0,0.3); }
+
+        .card-title {
+            font-size: 1.3rem; font-weight: 700; margin-bottom: 16px;
+            display: flex; align-items: center; gap: 10px;
+        }
+
+        .card-title .icon {
+            width: 36px; height: 36px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
+        }
+
+        .icon-blue { background: rgba(0,212,255,0.15); }
+        .icon-purple { background: rgba(124,92,252,0.15); }
+        .icon-green { background: rgba(0,232,143,0.15); }
+        .icon-red { background: rgba(255,85,119,0.15); }
+        .icon-orange { background: rgba(255,159,67,0.15); }
+
+        /* GRID */
+        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+
+        /* MINI CARDS */
+        .mini-card {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s;
+            cursor: default;
+        }
+
+        .mini-card:hover { transform: translateY(-3px); border-color: var(--accent); box-shadow: 0 8px 25px rgba(0,0,0,0.3); }
+
+        .mini-card h4 { font-size: 1rem; margin-bottom: 8px; color: var(--accent); }
+        .mini-card p { color: var(--text-muted); font-size: 0.88rem; }
+
+        /* BADGES */
+        .badge {
+            display: inline-block; padding: 4px 12px; border-radius: 20px;
+            font-size: 0.75rem; font-weight: 600; font-family: 'JetBrains Mono', monospace;
+        }
+
+        .badge-cyan { background: rgba(0,212,255,0.15); color: var(--accent); }
+        .badge-purple { background: rgba(124,92,252,0.15); color: var(--accent2); }
+        .badge-green { background: rgba(0,232,143,0.15); color: var(--green); }
+        .badge-red { background: rgba(255,85,119,0.15); color: var(--red); }
+        .badge-orange { background: rgba(255,159,67,0.15); color: var(--orange); }
+
+        /* PROCESS STEPS */
+        .steps-container { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin: 20px 0; }
+
+        .step-item {
+            background: var(--surface2); border: 1px solid var(--border); border-radius: 12px;
+            padding: 18px 22px; min-width: 180px; text-align: center;
+            cursor: pointer; transition: all 0.3s; position: relative;
+        }
+
+        .step-item:hover, .step-item.active {
+            border-color: var(--accent);
+            background: linear-gradient(135deg, rgba(0,212,255,0.1), rgba(124,92,252,0.1));
+            box-shadow: 0 0 20px rgba(0,212,255,0.15);
+        }
+
+        .step-number {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            display: inline-flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 0.9rem; margin-bottom: 8px;
+        }
+
+        .step-item h4 { font-size: 0.9rem; margin-bottom: 4px; }
+        .step-item p { font-size: 0.78rem; color: var(--text-muted); }
+
+        .step-detail {
+            display: none; background: var(--surface2); border: 1px solid var(--border);
+            border-radius: 12px; padding: 22px; margin-top: 16px;
+            animation: fadeIn 0.3s;
+        }
+
+        .step-detail.active { display: block; }
+
+        /* CHECKLIST */
+        .checklist { list-style: none; }
+
+        .checklist li {
+            padding: 12px 16px; border-radius: 10px; margin-bottom: 8px;
+            background: var(--surface2); border: 1px solid var(--border);
+            display: flex; align-items: center; gap: 12px;
+            cursor: pointer; transition: all 0.2s; font-size: 0.92rem;
+        }
+
+        .checklist li:hover { border-color: var(--accent); }
+
+        .checklist li.checked {
+            border-color: var(--green);
+            background: rgba(0,232,143,0.08);
+        }
+
+        .checklist li.checked::before {
+            content: '\2713'; color: var(--green); font-weight: 700;
+        }
+
+        .checklist li::before {
+            content: '\25CB'; font-size: 1.2rem; color: var(--text-muted);
+            min-width: 20px; text-align: center;
+        }
+
+        .check-progress {
+            height: 6px; background: var(--surface2); border-radius: 3px;
+            margin-top: 12px; overflow: hidden;
+        }
+
+        .check-progress-bar {
+            height: 100%; background: linear-gradient(90deg, var(--green), var(--accent));
+            border-radius: 3px; transition: width 0.4s; width: 0%;
+        }
+
+        /* CIA TRIAD */
+        .cia-container {
+            display: flex; flex-direction: column; align-items: center;
+            margin: 30px 0; position: relative;
+        }
+
+        .cia-triangle { position: relative; width: 350px; height: 320px; margin-bottom: 20px; }
+
+        .cia-node {
+            position: absolute; width: 110px; height: 110px; border-radius: 50%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.4s; font-weight: 700; font-size: 0.8rem;
+            text-align: center; border: 3px solid;
+        }
+
+        .cia-node:hover { transform: scale(1.15); }
+
+        .cia-node.active { transform: scale(1.2); }
+
+        .cia-c {
+            top: 0; left: 50%; transform: translateX(-50%);
+            background: rgba(0,212,255,0.15); border-color: var(--accent);
+            box-shadow: 0 0 30px rgba(0,212,255,0.3);
+        }
+
+        .cia-i {
+            bottom: 10px; left: 10px;
+            background: rgba(124,92,252,0.15); border-color: var(--accent2);
+            box-shadow: 0 0 30px rgba(124,92,252,0.3);
+        }
+
+        .cia-a {
+            bottom: 10px; right: 10px;
+            background: rgba(0,232,143,0.15); border-color: var(--green);
+            box-shadow: 0 0 30px rgba(0,232,143,0.3);
+        }
+
+        .cia-node .node-icon { font-size: 28px; margin-bottom: 4px; }
+
+        .cia-detail {
+            background: var(--surface2); border: 1px solid var(--border);
+            border-radius: 12px; padding: 20px; max-width: 500px; text-align: center;
+            min-height: 100px;
+        }
+
+        .cia-lines {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+        }
+
+        /* RISK MATRIX */
+        .risk-matrix-wrapper { overflow-x: auto; margin: 20px 0; }
+
+        .risk-matrix {
+            display: grid; grid-template-columns: auto repeat(5, 1fr);
+            gap: 3px; min-width: 500px;
+        }
+
+        .rm-header {
+            background: var(--surface2); padding: 10px; text-align: center;
+            font-weight: 700; font-size: 0.8rem; border-radius: 6px;
+            color: var(--accent);
+        }
+
+        .rm-label {
+            background: var(--surface2); padding: 10px; text-align: center;
+            font-weight: 600; font-size: 0.78rem; border-radius: 6px;
+            display: flex; align-items: center; justify-content: center;
+            writing-mode: horizontal-tb;
+        }
+
+        .rm-cell {
+            padding: 16px 8px; text-align: center; border-radius: 8px;
+            cursor: pointer; transition: all 0.3s; font-size: 0.75rem;
+            min-height: 60px; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; gap: 4px;
+            border: 2px solid transparent;
+        }
+
+        .rm-cell:hover { transform: scale(1.05); border-color: white; }
+
+        .rm-cell.has-risk { border-color: white; }
+
+        .rm-low { background: rgba(0,232,143,0.2); }
+        .rm-medium { background: rgba(255,224,102,0.2); }
+        .rm-high { background: rgba(255,159,67,0.25); }
+        .rm-critical { background: rgba(255,34,85,0.25); }
+
+        .risk-tag {
+            background: rgba(0,0,0,0.4); padding: 2px 8px; border-radius: 10px;
+            font-size: 0.68rem; font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* NIST WHEEL */
+        .nist-wheel-container { display: flex; flex-direction: column; align-items: center; margin: 30px 0; }
+
+        .nist-wheel {
+            position: relative; width: 340px; height: 340px; margin-bottom: 20px;
+        }
+
+        .nist-segment {
+            position: absolute; width: 120px; height: 120px; border-radius: 50%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.4s; font-weight: 700; font-size: 0.78rem;
+            text-align: center; border: 3px solid;
+        }
+
+        .nist-segment:hover { transform: scale(1.12); }
+        .nist-segment.active { transform: scale(1.18); z-index: 2; }
+
+        .nist-segment .seg-icon { font-size: 26px; margin-bottom: 4px; }
+
+        .nist-identify { top: 0; left: 50%; transform: translateX(-50%); background: rgba(0,212,255,0.15); border-color: var(--accent); }
+        .nist-protect { top: 25%; right: 0; background: rgba(124,92,252,0.15); border-color: var(--accent2); }
+        .nist-detect { bottom: 5%; right: 15%; background: rgba(255,159,67,0.15); border-color: var(--orange); }
+        .nist-respond { bottom: 5%; left: 15%; background: rgba(255,85,119,0.15); border-color: var(--red); }
+        .nist-recover { top: 25%; left: 0; background: rgba(0,232,143,0.15); border-color: var(--green); }
+
+        .nist-detail {
+            background: var(--surface2); border: 1px solid var(--border);
+            border-radius: 12px; padding: 20px; max-width: 600px; width: 100%;
+        }
+
+        /* DEFENSE IN DEPTH */
+        .defense-rings {
+            display: flex; flex-direction: column; align-items: center;
+            margin: 30px 0; gap: 0;
+        }
+
+        .defense-ring {
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%; transition: all 0.4s; cursor: pointer;
+            position: relative; font-weight: 600; font-size: 0.82rem;
+            text-align: center;
+        }
+
+        .defense-ring:hover { transform: scale(1.05); }
+
+        /* QUIZ */
+        .quiz-container { max-width: 700px; margin: 0 auto; }
+
+        .quiz-question {
+            background: var(--surface2); border: 1px solid var(--border);
+            border-radius: 14px; padding: 24px; margin-bottom: 20px;
+        }
+
+        .quiz-question h4 { margin-bottom: 14px; font-size: 1rem; }
+
+        .quiz-option {
+            padding: 12px 18px; border-radius: 10px; margin-bottom: 8px;
+            background: var(--surface); border: 1px solid var(--border);
+            cursor: pointer; transition: all 0.2s; font-size: 0.9rem;
+        }
+
+        .quiz-option:hover { border-color: var(--accent); background: rgba(0,212,255,0.05); }
+        .quiz-option.correct { border-color: var(--green); background: rgba(0,232,143,0.1); color: var(--green); }
+        .quiz-option.wrong { border-color: var(--red); background: rgba(255,85,119,0.1); color: var(--red); }
+        .quiz-option.disabled { pointer-events: none; opacity: 0.7; }
+
+        .quiz-score {
+            text-align: center; font-size: 1.4rem; font-weight: 700;
+            color: var(--accent); margin-top: 20px;
+        }
+
+        /* THREAT GAME */
+        .threat-game { margin: 20px 0; }
+
+        .threat-scenario {
+            background: var(--surface2); border: 1px solid var(--border);
+            border-radius: 14px; padding: 24px; margin-bottom: 16px;
+        }
+
+        .threat-scenario h4 { color: var(--red); margin-bottom: 10px; }
+
+        .defense-options { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+
+        .defense-opt {
+            padding: 10px 18px; border-radius: 10px;
+            background: var(--surface); border: 1px solid var(--border);
+            cursor: pointer; transition: all 0.2s; font-size: 0.85rem;
+        }
+
+        .defense-opt:hover { border-color: var(--accent); }
+        .defense-opt.correct { border-color: var(--green); background: rgba(0,232,143,0.1); }
+        .defense-opt.wrong { border-color: var(--red); background: rgba(255,85,119,0.1); }
+
+        .feedback-msg {
+            margin-top: 12px; padding: 12px; border-radius: 10px;
+            font-size: 0.88rem; display: none;
+        }
+
+        .feedback-msg.show { display: block; }
+        .feedback-msg.success { background: rgba(0,232,143,0.1); border: 1px solid var(--green); color: var(--green); }
+        .feedback-msg.error { background: rgba(255,85,119,0.1); border: 1px solid var(--red); color: var(--red); }
+
+        /* FRAMEWORK CARDS */
+        .fw-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 14px; padding: 24px; transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .fw-card:hover { border-color: var(--accent); transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+
+        .fw-card h3 { font-size: 1.1rem; margin-bottom: 8px; color: var(--accent); }
+        .fw-card p { font-size: 0.85rem; color: var(--text-muted); }
+
+        .fw-detail {
+            display: none; background: var(--surface2); border: 1px solid var(--border);
+            border-radius: 14px; padding: 24px; margin-top: 16px;
+            animation: fadeIn 0.3s;
+        }
+
+        .fw-detail.active { display: block; }
+
+        /* PDCA CYCLE */
+        .pdca-container { display: flex; flex-direction: column; align-items: center; margin: 20px 0; }
+
+        .pdca-wheel {
+            position: relative; width: 280px; height: 280px; margin-bottom: 20px;
+        }
+
+        .pdca-segment {
+            position: absolute; width: 120px; height: 120px; border-radius: 50%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.4s; font-weight: 700; font-size: 0.85rem;
+            border: 3px solid;
+        }
+
+        .pdca-segment:hover { transform: scale(1.1); }
+
+        .pdca-plan { top: 0; left: 0; background: rgba(0,212,255,0.15); border-color: var(--accent); }
+        .pdca-do { top: 0; right: 0; background: rgba(0,232,143,0.15); border-color: var(--green); }
+        .pdca-check { bottom: 0; right: 0; background: rgba(255,159,67,0.15); border-color: var(--orange); }
+        .pdca-act { bottom: 0; left: 0; background: rgba(124,92,252,0.15); border-color: var(--accent2); }
+
+        /* CONTROL MATRIX */
+        .ctrl-matrix {
+            display: grid; grid-template-columns: auto repeat(3, 1fr);
+            gap: 4px; margin: 20px 0;
+        }
+
+        .ctrl-cell {
+            background: var(--surface2); padding: 14px; border-radius: 8px;
+            text-align: center; font-size: 0.82rem; transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .ctrl-cell:hover { background: var(--surface3); }
+        .ctrl-cell.header { font-weight: 700; color: var(--accent); background: var(--surface); }
+
+        /* TABLES */
+        .data-table {
+            width: 100%; border-collapse: separate; border-spacing: 0;
+            font-size: 0.88rem; margin: 16px 0;
+        }
+
+        .data-table th {
+            background: var(--surface2); padding: 12px 16px;
+            text-align: left; font-weight: 600; color: var(--accent);
+            border-bottom: 2px solid var(--border);
+        }
+
+        .data-table td {
+            padding: 12px 16px; border-bottom: 1px solid var(--border);
+        }
+
+        .data-table tr:hover td { background: rgba(0,212,255,0.03); }
+
+        .data-table th:first-child { border-radius: 10px 0 0 0; }
+        .data-table th:last-child { border-radius: 0 10px 0 0; }
+
+        /* MISC */
+        .section-title {
+            font-size: 1.5rem; font-weight: 800; margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+
+        .divider { height: 1px; background: var(--border); margin: 30px 0; }
+
+        .glow-text { color: var(--accent); text-shadow: 0 0 20px var(--accent-glow); }
+
+        code, .mono { font-family: 'JetBrains Mono', monospace; }
+
+        .tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+
+        .pulse { animation: pulse 2s infinite; }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .float-anim { animation: float 3s ease-in-out infinite; }
+
+        .btn {
+            padding: 10px 22px; border: 1px solid var(--accent); border-radius: 10px;
+            background: rgba(0,212,255,0.1); color: var(--accent);
+            cursor: pointer; font-family: 'Inter', sans-serif; font-weight: 600;
+            transition: all 0.3s; font-size: 0.88rem;
+        }
+
+        .btn:hover { background: rgba(0,212,255,0.2); box-shadow: 0 0 20px var(--accent-glow); }
+
+        .risk-input-panel {
+            background: var(--surface2); border: 1px solid var(--border);
+            border-radius: 12px; padding: 16px; margin-bottom: 16px;
+        }
+
+        .risk-input-panel input, .risk-input-panel select {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 8px; padding: 8px 12px; color: var(--text);
+            font-family: 'Inter', sans-serif; font-size: 0.88rem;
+            margin: 4px; outline: none;
+        }
+
+        .risk-input-panel input:focus, .risk-input-panel select:focus { border-color: var(--accent); }
+
+        .placed-risks { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px; }
+
+        /* COSO CUBE */
+        .coso-cube {
+            display: grid; grid-template-columns: repeat(5, 1fr);
+            gap: 4px; margin: 20px 0;
+        }
+
+        .coso-cell {
+            padding: 16px 8px; border-radius: 8px; text-align: center;
+            font-size: 0.78rem; font-weight: 600; cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .coso-cell:hover { transform: scale(1.05); }
+
+        /* INCIDENT TIMELINE */
+        .timeline { position: relative; padding-left: 40px; margin: 20px 0; }
+
+        .timeline::before {
+            content: ''; position: absolute; left: 16px; top: 0; bottom: 0;
+            width: 2px; background: linear-gradient(to bottom, var(--accent), var(--accent2), var(--green));
+        }
+
+        .timeline-item {
+            position: relative; margin-bottom: 24px; padding: 16px;
+            background: var(--surface2); border: 1px solid var(--border);
+            border-radius: 12px; transition: all 0.3s;
+        }
+
+        .timeline-item:hover { border-color: var(--accent); }
+
+        .timeline-item::before {
+            content: ''; position: absolute; left: -32px; top: 20px;
+            width: 12px; height: 12px; border-radius: 50%;
+            background: var(--accent); border: 3px solid var(--bg);
+        }
+
+        .timeline-item h4 { color: var(--accent); margin-bottom: 6px; font-size: 0.95rem; }
+        .timeline-item p { color: var(--text-muted); font-size: 0.85rem; }
+
+        /* SCROLLBAR */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 4px; }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            h1 { font-size: 1.6rem; }
+            .tabs-nav { flex-direction: column; }
+            .tab-btn { justify-content: center; }
+            .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+            .cia-triangle { width: 260px; height: 250px; }
+            .nist-wheel { width: 260px; height: 260px; }
+            .nist-segment { width: 95px; height: 95px; font-size: 0.7rem; }
+            .cia-node { width: 85px; height: 85px; font-size: 0.7rem; }
+        }
+
+        /* Back link */
+        .back-link {
+            display: inline-flex; align-items: center; gap: 6px;
+            color: var(--text-muted); text-decoration: none; font-size: 0.88rem;
+            margin-bottom: 10px; transition: color 0.3s;
+        }
+        .back-link:hover { color: var(--accent); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="index.html" class="back-link">&larr; Volver a VLSM</a>
+
+    <header>
+        <div class="logo">
+            <div class="logo-icon">&#128737;</div>
+            <div>
+                <h1>Auditoria & Seguridad Informatica</h1>
+                <p class="subtitle">Guia interactiva completa &mdash; Marcos, riesgos, controles y mas</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- TABS NAV -->
+    <nav class="tabs-nav">
+        <button class="tab-btn active" onclick="switchTab('auditoria')">&#128270; Auditoria</button>
+        <button class="tab-btn" onclick="switchTab('seguridad')">&#128274; Seguridad</button>
+        <button class="tab-btn" onclick="switchTab('marcos')">&#128218; Marcos de Referencia</button>
+        <button class="tab-btn" onclick="switchTab('riesgos')">&#9888;&#65039; Gestion de Riesgos</button>
+        <button class="tab-btn" onclick="switchTab('controles')">&#128737; Controles y Cumplimiento</button>
+        <button class="tab-btn" onclick="switchTab('agile')">&#128640; Metodologias Agiles</button>
+    </nav>
+
+    <!-- ==================== TAB 1: AUDITORIA ==================== -->
+    <div id="tab-auditoria" class="tab-content active">
+        <h2 class="section-title">Auditoria Informatica</h2>
+
+        <div class="card">
+            <div class="card-title"><span class="icon icon-blue">&#128270;</span> Que es la Auditoria Informatica?</div>
+            <p>La <strong>auditoria informatica</strong> es un proceso sistematico de evaluacion de los sistemas de informacion, infraestructura tecnologica y procesos de TI de una organizacion. Su objetivo es verificar que los controles internos sean adecuados, que la informacion sea confiable y que se cumplan las normativas aplicables.</p>
+            <div class="grid-3" style="margin-top:18px;">
+                <div class="mini-card">
+                    <h4>&#127919; Objetivos</h4>
+                    <p>Evaluar la eficacia de controles, identificar vulnerabilidades, asegurar el cumplimiento normativo y mejorar la gestion de TI.</p>
+                </div>
+                <div class="mini-card">
+                    <h4>&#128220; Importancia</h4>
+                    <p>Protege activos de informacion, reduce riesgos operativos, asegura la continuidad del negocio y genera confianza en stakeholders.</p>
+                </div>
+                <div class="mini-card">
+                    <h4>&#128101; Para quien?</h4>
+                    <p>Directivos, equipos de TI, auditores, reguladores y cualquier parte interesada en la gobernanza tecnologica.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Types of Audit -->
+        <div class="card">
+            <div class="card-title"><span class="icon icon-purple">&#128203;</span> Tipos de Auditoria</div>
+            <div class="grid-4">
+                <div class="mini-card" style="border-left: 3px solid var(--accent);">
+                    <h4>Interna</h4>
+                    <p>Realizada por personal de la organizacion. Enfoque en mejora continua y evaluacion proactiva de controles.</p>
+                    <span class="badge badge-cyan">Proactiva</span>
+                </div>
+                <div class="mini-card" style="border-left: 3px solid var(--accent2);">
+                    <h4>Externa</h4>
+                    <p>Ejecutada por auditores independientes. Proporciona una vision objetiva e imparcial del estado de TI.</p>
+                    <span class="badge badge-purple">Independiente</span>
+                </div>
+                <div class="mini-card" style="border-left: 3px solid var(--green);">
+                    <h4>De Cumplimiento</h4>
+                    <p>Verifica la adherencia a leyes, regulaciones y estandares como ISO 27001, SOX, GDPR.</p>
+                    <span class="badge badge-green">Regulatoria</span>
+                </div>
+                <div class="mini-card" style="border-left: 3px solid var(--red);">
+                    <h4>Forense</h4>
+                    <p>Investigacion de incidentes de seguridad, fraudes informaticos y recopilacion de evidencia digital.</p>
+                    <span class="badge badge-red">Investigativa</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Audit Process Steps -->
+        <div class="card">
+            <div class="card-title"><span class="icon icon-green">&#9889;</span> Proceso de Auditoria - Paso a Paso</div>
+            <p style="color:var(--text-muted); margin-bottom:16px;">Haz clic en cada paso para ver los detalles:</p>
+
+            <div class="steps-container" id="audit-steps">
+                <div class="step-item active" onclick="showStep(0)">
+                    <div class="step-number">1</div>
+                    <h4>Planificacion</h4>
+                    <p>Alcance y objetivos</p>
+                </div>
+                <div class="step-item" onclick="showStep(1)">
+                    <div class="step-number">2</div>
+                    <h4>Trabajo de Campo</h4>
+                    <p>Recopilacion de evidencia</p>
+                </div>
+                <div class="step-item" onclick="showStep(2)">
+                    <div class="step-number">3</div>
+                    <h4>Analisis</h4>
+                    <p>Evaluacion de hallazgos</p>
+                </div>
+                <div class="step-item" onclick="showStep(3)">
+                    <div class="step-number">4</div>
+                    <h4>Informe</h4>
+                    <p>Documentacion y reporte</p>
+                </div>
+                <div class="step-item" onclick="showStep(4)">
+                    <div class="step-number">5</div>
+                    <h4>Seguimiento</h4>
+                    <p>Verificacion de acciones</p>
+                </div>
+            </div>
+
+            <div id="step-details">
+                <div class="step-detail active" id="step-0">
+                    <h4 style="color:var(--accent); margin-bottom:10px;">&#128203; 1. Planificacion</h4>
+                    <p>Se define el <strong>alcance</strong>, los <strong>objetivos</strong>, el <strong>cronograma</strong> y los <strong>recursos</strong> necesarios. Se identifican las areas criticas y se establece el equipo de auditoria.</p>
+                    <div class="tag-list">
+                        <span class="badge badge-cyan">Alcance</span>
+                        <span class="badge badge-cyan">Objetivos</span>
+                        <span class="badge badge-cyan">Cronograma</span>
+                        <span class="badge badge-cyan">Recursos</span>
+                        <span class="badge badge-cyan">Equipo</span>
+                    </div>
+                </div>
+                <div class="step-detail" id="step-1">
+                    <h4 style="color:var(--accent2); margin-bottom:10px;">&#128269; 2. Trabajo de Campo</h4>
+                    <p>Fase de ejecucion donde se recopilan <strong>evidencias</strong> mediante entrevistas, revision de documentos, pruebas tecnicas y observacion directa de procesos.</p>
+                    <div class="tag-list">
+                        <span class="badge badge-purple">Entrevistas</span>
+                        <span class="badge badge-purple">Documentos</span>
+                        <span class="badge badge-purple">Pruebas tecnicas</span>
+                        <span class="badge badge-purple">Observacion</span>
+                    </div>
+                </div>
+                <div class="step-detail" id="step-2">
+                    <h4 style="color:var(--green); margin-bottom:10px;">&#128200; 3. Analisis</h4>
+                    <p>Se evaluan las evidencias recopiladas contra <strong>criterios de auditoria</strong> establecidos. Se identifican hallazgos, brechas y areas de mejora.</p>
+                    <div class="tag-list">
+                        <span class="badge badge-green">Evaluacion</span>
+                        <span class="badge badge-green">Hallazgos</span>
+                        <span class="badge badge-green">Brechas</span>
+                        <span class="badge badge-green">Criterios</span>
+                    </div>
+                </div>
+                <div class="step-detail" id="step-3">
+                    <h4 style="color:var(--orange); margin-bottom:10px;">&#128196; 4. Informe</h4>
+                    <p>Se documenta todo el proceso: hallazgos, riesgos identificados, <strong>recomendaciones</strong> y conclusiones. El informe se presenta a la alta direccion.</p>
+                    <div class="tag-list">
+                        <span class="badge badge-orange">Hallazgos</span>
+                        <span class="badge badge-orange">Riesgos</span>
+                        <span class="badge badge-orange">Recomendaciones</span>
+                        <span class="badge badge-orange">Conclusion</span>
+                    </div>
+                </div>
+                <div class="step-detail" id="step-4">
+                    <h4 style="color:var(--pink); margin-bottom:10px;">&#10004; 5. Seguimiento</h4>
+                    <p>Se verifica que las <strong>acciones correctivas</strong> recomendadas hayan sido implementadas y sean efectivas. Se monitorea el progreso.</p>
+                    <div class="tag-list">
+                        <span class="badge badge-red">Acciones correctivas</span>
+                        <span class="badge badge-red">Verificacion</span>
+                        <span class="badge badge-red">Monitoreo</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Concepts -->
+        <div class="card">
+            <div class="card-title"><span class="icon icon-orange">&#128161;</span> Conceptos Clave</div>
+            <div class="grid-3">
+                <div class="mini-card">
+                    <h4>&#9888;&#65039; Riesgo</h4>
+                    <p>Probabilidad de que una amenaza explote una vulnerabilidad y cause un impacto negativo en la organizacion.</p>
+                </div>
+                <div class="mini-card">
+                    <h4>&#128737; Control</h4>
+                    <p>Medida o mecanismo implementado para mitigar un riesgo, prevenir, detectar o corregir problemas.</p>
+                </div>
+                <div class="mini-card">
+                    <h4>&#128270; Hallazgo</h4>
+                    <p>Resultado de comparar la evidencia obtenida contra los criterios de auditoria. Puede ser una conformidad o no conformidad.</p>
+                </div>
+                <div class="mini-card">
+                    <h4>&#128196; Evidencia</h4>
+                    <p>Informacion verificable que respalda los hallazgos: documentos, registros, configuraciones, capturas, entrevistas.</p>
+                </div>
+                <div class="mini-card">
+                    <h4>&#128172; Recomendacion</h4>
+                    <p>Accion sugerida para corregir una deficiencia, mejorar un control o reducir un riesgo identificado.</p>
+                </div>
+                <div class="mini-card">
+                    <h4>&#128202; Informe</h4>
+                    <p>Documento formal que presenta los resultados de la auditoria a la direccion y partes interesadas.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Audit Report Structure -->
+        <div class="card">
+            <div class="card-title"><span class="icon icon-blue">&#128196;</span> Estructura del Informe de Auditoria</div>
+            <table class="data-table">
+                <thead>
+                    <tr><th>#</th><th>Seccion</th><th>Descripcion</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>1</td><td>Resumen ejecutivo</td><td>Vision general de hallazgos y conclusiones principales</td></tr>
+                    <tr><td>2</td><td>Alcance y objetivos</td><td>Que se audito, limitaciones y periodo evaluado</td></tr>
+                    <tr><td>3</td><td>Metodologia</td><td>Normas, marcos y procedimientos aplicados</td></tr>
+                    <tr><td>4</td><td>Hallazgos detallados</td><td>Cada hallazgo con criterio, condicion, causa y efecto</td></tr>
+                    <tr><td>5</td><td>Matriz de riesgos</td><td>Clasificacion de riesgos por probabilidad e impacto</td></tr>
+                    <tr><td>6</td><td>Recomendaciones</td><td>Acciones sugeridas con prioridad y responsables</td></tr>
+                    <tr><td>7</td><td>Plan de accion</td><td>Cronograma de implementacion de mejoras</td></tr>
+                    <tr><td>8</td><td>Anexos</td><td>Evidencias, documentos de soporte y referencias</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Common Tools -->
+        <div class="card">
+            <div class="card-title"><span class="icon icon-purple">&#128295;</span> Herramientas Comunes de Auditoria</div>
+            <div class="grid-4">
+                <div class="mini-card"><h4>Nmap</h4><p>Escaneo de red y puertos</p></div>
+                <div class="mini-card"><h4>Wireshark</h4><p>Analisis de trafico de red</p></div>
+                <div class="mini-card"><h4>Nessus</h4><p>Escaneo de vulnerabilidades</p></div>
+                <div class="mini-card"><h4>Metasploit</h4><p>Pruebas de penetracion</p></div>
+                <div class="mini-card"><h4>OWASP ZAP</h4><p>Seguridad web</p></div>
+                <div class="mini-card"><h4>Splunk</h4><p>Analisis de logs</p></div>
+                <div class="mini-card"><h4>ACL/IDEA</h4><p>Analisis de datos</p></div>
+                <div class="mini-card"><h4>GRC Tools</h4><p>Gestion de cumplimiento</p></div>
+            </div>
+        </div>
+
+        <!-- Interactive Checklist -->
+        <div class="card">
+            <div class="card-title"><span class="icon icon-green">&#9745;</span> Checklist de Auditoria Basica</div>
+            <p style="color:var(--text-muted); margin-bottom:14px;">Haz clic en cada item para marcarlo como completado:</p>
+            <ul class="checklist" id="audit-checklist">
+                <li onclick="toggleCheck(this)">Definir alcance y objetivos de la auditoria</li>
+                <li onclick="toggleCheck(this)">Identificar las normativas y marcos aplicables</li>
+                <li onclick="toggleCheck(this)">Revisar politicas de seguridad existentes</li>
+                <li onclick="toggleCheck(this)">Evaluar la arquitectura de red y sistemas</li>
+                <li onclick="toggleCheck(this)">Verificar controles de acceso logico</li>
+                <li onclick="toggleCheck(this)">Revisar gestion de parches y actualizaciones</li>
+                <li onclick="toggleCheck(this)">Evaluar planes de respaldo y recuperacion</li>
+                <li onclick="toggleCheck(this)">Comprobar registros de auditoria (logs)</li>
+                <li onclick="toggleCheck(this)">Revisar gestion de incidentes de seguridad</li>
+                <li onclick="toggleCheck(this)">Evaluar seguridad fisica del centro de datos</li>
+                <li onclick="toggleCheck(this)">Verificar cumplimiento de licencias de software</li>
+                <li onclick="toggleCheck(this)">Documentar hallazgos y generar recomendaciones</li>
+            </ul>
+            <div class="check-progress"><div class="check-progress-bar" id="checklist-progress"></div></div>
+            <p style="margin-top:10px; color:var(--text-muted); font-size:0.85rem;" id="checklist-count">0 de 12 completados</p>
+        </div>
+    </div>
+
+    <!-- ==================== TAB 2: SEGURIDAD ==================== -->
+    <div id="tab-seguridad" class="tab-content">
+        <h2 class="section-title">Seguridad Informatica</h2>
+
+        <!-- CIA Triad -->
+        <div class="card">
+            <div class="card-title"><span class="icon icon-blue">&#128272;</span> Triada CIA (Confidencialidad, Integridad, Disponibilidad)</div>
+            <p style="color:var(--text-muted); margin-bottom:10px;">Haz clic en cada elemento del triangulo para ver detalles:</p>
+
+            <div class="cia-container">
+                <div class="cia-triangle">
+                    <svg class="cia-lines" viewBox="0 0 350 320">
+                        <line x1="175" y1="55" x2="65" y2="255" stroke="rgba(0,212,255,0.2)" stroke-width="2" stroke-dasharray="6,4"/>
+                        <line x1="175" y1="55" x2="285" y2="255" stroke="rgba(124,92,252,0.2)" stroke-width="2" stroke-dasharray="6,4"/>
+                        <line x1="65" y1="255" x2="285" y2="255" stroke="rgba(0,232,143,0.2)" stroke-width="2" stroke-dasharray="6,4"/>
+                    </svg>
+                    <div class="cia-node cia-c active" onclick="showCIA('c')">
+                        <span class="node-icon">&#128274;</span>
+                        Confidencialidad
+                    </div>
+                    <div class="cia-node cia-i" onclick="showCIA('i')">
+                        <span class="node-icon">&#128737;</span>
+                        Integridad
+                    </div>
+                    <div class="cia-node cia-a" onclick="showCIA('a')">
+                        <span class="node-icon">&#9989;</span>
+                        Disponibilidad
+                    </div>
+                </div>
+                <div class="cia-detail" id="cia-detail">
+                    <h4 style="color:var(--accent); margin-bottom:8px;">&#128274; Confidencialidad</h4>
+                    <p>Garantiza que la informacion solo sea accesible por personas autorizadas. Se implementa mediante cifrado, control de acceso, clasificacion de datos y acuerdos de confidencialidad (NDA).</p>
+                    <div class="tag-list" style="margin-top:10px; justify-content:center;">
+                        <span class="badge badge-cyan">Cifrado</span>
+                        <span class="badge badge-cyan">Control de acceso</span>
+                        <span class="badge badge-cyan">Clasificacion</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Threats -->
+        <div class="card">
+            <div class="card-title"><span class="icon icon-red">&#9888;</span> Tipos de Amenazas</div>
+            <div class="grid-2">
+                <div class="mini-card" style="border-top: 3px solid var(--red);">
+                    <h4>&#128128; Malware</h4>
+                    <p>Software malicioso disenado para danar o infiltrarse en sistemas.</p>
+                    <div class="tag-list">
+                        <span class="badge badge-red">Virus</span>
+                        <span class="badge badge-red">Gusanos</span>
+                        <span class="badge badge-red">Troyanos</span>
+                        <span class="badge badge-red">Ransomware</span>
+                        <span class="badge badge-red">Spyware</span>
+                    </div>
+                </div>
+                <div class="mini-card" style="border-top: 3px solid var(--orange);">
+                    <h4>&#127907; Ingenieria Social</h4>
+                    <p>Manipulacion psicologica para engañar a usuarios y obtener informacion confidencial.</p>
+                    <div class="tag-list">
+                        <span class="badge badge-orange">Phishing</span>
+                        <span class="badge badge-orange">Vishing</span>
+                        <span class="badge badge-orange">Smishing</span>
+                        <span class="badge badge-orange">Pretexting</span>
+                    </div>
+                </div>
+                <div class="mini-card" style="border-top: 3px solid var(--accent2);">
+                    <h4>&#127760; Ataques de Red</h4>
+                    <p>Ataques dirigidos a la infraestructura de red y aplicaciones web.</p>
+                    <div class="tag-list">
+                        <span class="badge badge-purple">DDoS</span>
+                        <span class="badge badge-purple">MITM</span>
+                        <span class="badge badge-purple">SQL Injection</span>
+                        <span class="badge badge-purple">XSS</span>
+                    </div>
+                </div>
+                <div class="mini-card" style="border-top: 3px solid var(--yellow);">
+                    <h4>&#128100; Amenazas Internas</h4>
+                    <p>Riesgos originados por empleados, contratistas o socios con acceso legitimo a los sistemas.</p>
+                    <div class="tag-list">
+                        <span class="badge badge-cyan">Negligencia</span>
+                        <span class="badge badge-cyan">Sabotaje</span>
+                        <span class="badge badge-cyan">Robo de datos</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Defense in Depth -->
+        <div class="card">
+            <div class="card-title"><span class="icon icon-green">&#128737;</span> Defensa en Profundidad</div>
+            <p style="color:var(--text-muted); margin-bottom:16px;">Modelo de capas concentricas de seguridad. Haz clic en cada capa:</p>
+            <div style="display:flex; flex-direction:column; align-items:center; gap:8px; margin:20px 0;" id="defense-layers">
+                <div class="defense-ring" onclick="showDefenseLayer(0)" style="width:340px;height:70px;background:rgba(255,34,85,0.1);border:2px solid rgba(255,34,85,0.4);border-radius:35px; color:var(--red);">&#127760; Perimetro (Firewalls, IDS/IPS)</div>
+                <div class="defense-ring" onclick="showDefenseLayer(1)" style="width:300px;height:70px;background:rgba(255,159,67,0.1);border:2px solid rgba(255,159,67,0.4);border-radius:35px; color:var(--orange);">&#128423; Red (Segmentacion, VPN, NAC)</div>
+                <div class="defense-ring" onclick="showDefenseLayer(2)" style="width:260px;height:70px;background:rgba(255,224,102,0.1);border:2px solid rgba(255,224,102,0.4);border-radius:35px; color:var(--yellow);">&#128187; Host (Antivirus, Hardening)</div>
+                <div class="defense-ring" onclick="showDefenseLayer(3)" style="width:220px;height:70px;background:rgba(0,212,255,0.1);border:2px solid rgba(0,212,255,0.4);border-radius:35px; color:var(--accent);">&#128268; Aplicacion (WAF, Code Review)</div>
+                <div class="defense-ring" onclick="showDefenseLayer(4)" style="width:180px;height:70px;background:rgba(124,92,252,0.1);border:2px solid rgba(124,92,252,0.4);border-radius:35px; color:var(--accent2);">&#128451; Datos (Cifrado, DLP)</div>
+            </div>
+            <div id="defense-detail" class="step-detail active" style="text-align:center;">
+                <h4 style="color:var(--red);">&#127760; Capa de Perimetro</h4>
+                <p>Primera linea de defensa. Incluye firewalls, sistemas de deteccion/prevencion de intrusos (IDS/IPS), DMZ y filtrado de paquetes. Controla el trafico entre la red interna y externa.</p>
+            </div>
+        </div>
+
+        <!-- Cryptography -->
+        <div class="card">
+            <div class="card-title"><span class="icon icon-purple">&#128272;</span> Fundamentos de Criptografia</div>
+            <div class="grid-3">
+                <div class="mini-card" style="border-left:3px solid var(--accent);">
+                    <h4>&#128273; Simetrica</h4>
+                    <p>Misma clave para cifrar y descifrar. Rapida pero requiere intercambio seguro de la clave.</p>
+                    <div class="tag-list"><span class="badge badge-cyan">AES</span><span class="badge badge-cyan">DES</span><span class="badge badge-cyan">3DES</span></div>
+                </div>
+                <div class="mini-card" style="border-left:3px solid var(--accent2);">
+                    <h4>&#128272; Asimetrica</h4>
+                    <p>Par de claves: publica (cifrar) y privada (descifrar). Mas lenta pero mas segura para intercambio.</p>
+                    <div class="tag-list"><span class="badge badge-purple">RSA</span><span class="badge badge-purple">ECC</span><span class="badge badge-purple">DSA</span></div>
+                </div>
+                <div class="mini-card" style="border-left:3px solid var(--green);">
+                    <h4>#&#65039;&#8419; Hash</h4>
+                    <p>Funcion unidireccional que genera un resumen unico de longitud fija. No se puede revertir.</p>
+                    <div class="tag-list"><span class="badge badge-green">SHA-256</span><span class="badge badge-green">MD5</span><span class="badge badge-green">SHA-3</span></div>
+                </div>
+            </div>
+            <div class="mini-card" style="margin-top:16px; border-left:3px solid var(--orange);">
+                <h4>&#9997;&#65039; Firma Digital</h4>
+                <p>Usa criptografia asimetrica para garantizar autenticidad, integridad y no repudio. El emisor firma con su clave privada y el receptor verifica con la clave publica.</p>
+                <div style="display:flex; gap:12px; margin-top:12px; flex-wrap:wrap; justify-content:center;">
+                    <span class="badge badge-cyan">1. Crear hash del mensaje</span>
+                    <span class="badge badge-purple">2. Cifrar hash con clave privada</span>
+                    <span class="badge badge-green">3. Enviar mensaje + firma</span>
+                    <span class="badge badge-orange">4. Receptor verifica con clave publica</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Access Control -->
+        <div class="card">
+            <div class="card-title"><span class="icon icon-blue">&#128101;</span> Modelos de Control de Acceso</div>
+            <div class="grid-3">
+                <div class="mini-card">
+                    <h4>DAC</h4>
+                    <p><strong>Control Discrecional.</strong> El propietario del recurso decide quien tiene acceso. Flexible pero menos seguro.</p>
+                    <span class="badge badge-cyan">Ejemplo: Permisos de archivo en Windows</span>
+                </div>
+                <div class="mini-card">
+                    <h4>MAC</h4>
+                    <p><strong>Control Obligatorio.</strong> El sistema impone las politicas de acceso basadas en etiquetas de seguridad. Muy rigido.</p>
+                    <span class="badge badge-purple">Ejemplo: Clasificacion militar</span>
+                </div>
+                <div class="mini-card">
+                    <h4>RBAC</h4>
+                    <p><strong>Control basado en Roles.</strong> El acceso se otorga segun el rol del usuario en la organizacion. Mas comun en empresas.</p>
+                    <span class="badge badge-green">Ejemplo: Roles en Active Directory</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Threat Simulator -->
+        <div class="card">
+            <div class="card-title"><span class="icon icon-red">&#127918;</span> Simulador de Amenazas</div>
+            <p style="color:var(--text-muted); margin-bottom:16px;">Selecciona la defensa correcta para cada escenario de ataque:</p>
+
+            <div class="threat-game" id="threat-game">
+                <div class="threat-scenario" data-correct="2">
+                    <h4>&#9888;&#65039; Escenario 1: Ataque de Phishing</h4>
+                    <p>Un empleado recibe un correo aparentemente del CEO pidiendo transferir fondos urgentemente a una cuenta desconocida.</p>
+                    <div class="defense-options">
+                        <div class="defense-opt" onclick="checkDefense(this, 0, false)">Instalar mas firewalls</div>
+                        <div class="defense-opt" onclick="checkDefense(this, 0, false)">Cambiar contrasenas de red</div>
+                        <div class="defense-opt" onclick="checkDefense(this, 0, true)">Capacitacion en seguridad + verificacion multicanal</div>
+                        <div class="defense-opt" onclick="checkDefense(this, 0, false)">Reiniciar el servidor de correo</div>
+                    </div>
+                    <div class="feedback-msg" id="feedback-0"></div>
+                </div>
+
+                <div class="threat-scenario" data-correct="1">
+                    <h4>&#9888;&#65039; Escenario 2: Ransomware</h4>
+                    <p>El servidor de archivos de la empresa ha sido cifrado por ransomware. Los atacantes exigen pago en criptomonedas.</p>
+                    <div class="defense-options">
+                        <div class="defense-opt" onclick="checkDefense(this, 1, false)">Pagar el rescate inmediatamente</div>
+                        <div class="defense-opt" onclick="checkDefense(this, 1, true)">Restaurar desde backups + aislar + investigar vector</div>
+                        <div class="defense-opt" onclick="checkDefense(this, 1, false)">Apagar todos los servidores permanentemente</div>
+                        <div class="defense-opt" onclick="checkDefense(this, 1, false)">Ignorar y esperar que se resuelva</div>
+                    </div>
+                    <div class="feedback-msg" id="feedback-1"></div>
+                </div>
+
+                <div class="threat-scenario">
+                    <h4>&#9888;&#65039; Escenario 3: SQL Injection</h4>
+                    <p>Un atacante esta inyectando codigo SQL malicioso a traves de un formulario web de login para extraer datos de la base de datos.</p>
+                    <div class="defense-options">
+                        <div class="defense-opt" onclick="checkDefense(this, 2, false)">Bloquear la IP del atacante</div>
+                        <div class="defense-opt" onclick="checkDefense(this, 2, false)">Cambiar la contrasena del admin</div>
+                        <div class="defense-opt" onclick="checkDefense(this, 2, false)">Desconectar la base de datos</div>
+                        <div class="defense-opt" onclick="checkDefense(this, 2, true)">Implementar consultas parametrizadas + WAF + validacion de inputs</div>
+                    </div>
+                    <div class="feedback-msg" id="feedback-2"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Incident Response Timeline -->
+        <div class="card">
+            <div class="card-title"><span class="icon icon-orange">&#128337;</span> Proceso de Respuesta a Incidentes</div>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <h4>1. Preparacion</h4>
+                    <p>Establecer el equipo CSIRT, definir procedimientos, preparar herramientas y capacitar al personal. Crear planes de comunicacion.</p>
+                </div>
+                <div class="timeline-item">
+                    <h4>2. Identificacion</h4>
+                    <p>Detectar y confirmar el incidente. Analizar alertas de IDS/IPS, SIEM, logs y reportes de usuarios. Clasificar la severidad.</p>
+                </div>
+                <div class="timeline-item">
+                    <h4>3. Contencion</h4>
+                    <p>Limitar el alcance del incidente. Aislar sistemas afectados, preservar evidencia forense y aplicar medidas temporales.</p>
+                </div>
+                <div class="timeline-item">
+                    <h4>4. Erradicacion</h4>
+                    <p>Eliminar la causa raiz del incidente. Remover malware, cerrar vulnerabilidades y limpiar sistemas comprometidos.</p>
+                </div>
+                <div class="timeline-item">
+                    <h4>5. Recuperacion</h4>
+                    <p>Restaurar sistemas y servicios a la operacion normal. Verificar la integridad de los datos y monitorear actividad sospechosa.</p>
+                </div>
+                <div class="timeline-item">
+                    <h4>6. Lecciones Aprendidas</h4>
+                    <p>Documentar el incidente, analizar que funciono y que no, actualizar procedimientos y compartir conocimiento.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Security Best Practices -->
+        <div class="card">
+            <div class="card-title"><span class="icon icon-green">&#128077;</span> Politicas y Buenas Practicas</div>
+            <div class="grid-2">
+                <div class="mini-card"><h4>&#128273; Contrasenas</h4><p>Minimo 12 caracteres, complejidad, MFA obligatorio, rotacion periodica, no reutilizar.</p></div>
+                <div class="mini-card"><h4>&#128187; Actualizaciones</h4><p>Parches de seguridad en un maximo de 72h para criticos. Gestion centralizada de parches.</p></div>
+                <div class="mini-card"><h4>&#128451; Respaldos</h4><p>Regla 3-2-1: 3 copias, 2 medios diferentes, 1 fuera del sitio. Pruebas de restauracion periodicas.</p></div>
+                <div class="mini-card"><h4>&#128101; Principio del menor privilegio</h4><p>Otorgar solo los permisos minimos necesarios para cada funcion. Revisar periodicamente.</p></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== TAB 3: MARCOS ==================== -->
+    <div id="tab-marcos" class="tab-content">
+        <h2 class="section-title">Marcos de Referencia (Frameworks)</h2>
+
+        <div class="grid-3" id="frameworks-grid">
+            <!-- COBIT -->
+            <div class="fw-card" onclick="toggleFramework('cobit')">
+                <span class="badge badge-cyan">Gobernanza</span>
+                <h3>COBIT 2019</h3>
+                <p>Marco de gobernanza y gestion de TI empresarial. Define 40 objetivos de gobernanza y gestion.</p>
+            </div>
+            <!-- ISO 27001 -->
+            <div class="fw-card" onclick="toggleFramework('iso27')">
+                <span class="badge badge-purple">Seguridad</span>
+                <h3>ISO 27001/27002</h3>
+                <p>Estandar internacional para Sistemas de Gestion de Seguridad de la Informacion (SGSI).</p>
+            </div>
+            <!-- ITIL -->
+            <div class="fw-card" onclick="toggleFramework('itil')">
+                <span class="badge badge-green">Servicios</span>
+                <h3>ITIL 4</h3>
+                <p>Marco de mejores practicas para la gestion de servicios de TI.</p>
+            </div>
+            <!-- NIST -->
+            <div class="fw-card" onclick="toggleFramework('nist')">
+                <span class="badge badge-orange">Ciberseguridad</span>
+                <h3>NIST CSF</h3>
+                <p>Marco de ciberseguridad del NIST. 5 funciones: Identificar, Proteger, Detectar, Responder, Recuperar.</p>
+            </div>
+            <!-- ISO 31000 -->
+            <div class="fw-card" onclick="toggleFramework('iso31')">
+                <span class="badge badge-red">Riesgos</span>
+                <h3>ISO 31000</h3>
+                <p>Estandar para la gestion de riesgos. Proporciona principios y directrices genericas.</p>
+            </div>
+            <!-- COSO -->
+            <div class="fw-card" onclick="toggleFramework('coso')">
+                <span class="badge badge-cyan">Control Interno</span>
+                <h3>COSO</h3>
+                <p>Marco de control interno. 5 componentes integrados para la gestion efectiva.</p>
+            </div>
+        </div>
+
+        <!-- COBIT Detail -->
+        <div class="fw-detail" id="fw-cobit">
+            <h3 style="color:var(--accent); margin-bottom:16px;">COBIT 2019 - Control Objectives for Information and Related Technologies</h3>
+            <div class="grid-2">
+                <div>
+                    <h4 style="margin-bottom:12px;">5 Principios de Gobernanza</h4>
+                    <div style="display:flex; flex-direction:column; gap:8px;">
+                        <div class="mini-card"><h4>1. Proveer valor a los stakeholders</h4></div>
+                        <div class="mini-card"><h4>2. Enfoque holistico</h4></div>
+                        <div class="mini-card"><h4>3. Sistema de gobernanza dinamico</h4></div>
+                        <div class="mini-card"><h4>4. Separar gobernanza de gestion</h4></div>
+                        <div class="mini-card"><h4>5. Adaptado a las necesidades de la empresa</h4></div>
+                    </div>
+                </div>
+                <div>
+                    <h4 style="margin-bottom:12px;">Cascada de Metas</h4>
+                    <div style="display:flex; flex-direction:column; gap:6px; align-items:center;">
+                        <div class="badge badge-cyan" style="padding:10px 20px; font-size:0.85rem;">Necesidades de los Stakeholders</div>
+                        <span style="color:var(--text-muted);">&#8595;</span>
+                        <div class="badge badge-purple" style="padding:10px 20px; font-size:0.85rem;">Metas Empresariales</div>
+                        <span style="color:var(--text-muted);">&#8595;</span>
+                        <div class="badge badge-green" style="padding:10px 20px; font-size:0.85rem;">Metas de Alineamiento</div>
+                        <span style="color:var(--text-muted);">&#8595;</span>
+                        <div class="badge badge-orange" style="padding:10px 20px; font-size:0.85rem;">Objetivos de Gobernanza/Gestion</div>
+                    </div>
+                </div>
+            </div>
+            <h4 style="margin:20px 0 12px;">Dominios (40 Objetivos)</h4>
+            <div class="grid-2">
+                <div class="mini-card" style="border-left:3px solid var(--accent);">
+                    <h4>EDM - Evaluar, Dirigir, Monitorear</h4>
+                    <p>5 procesos de gobernanza. Asegurar la entrega de valor, gestion de riesgos y recursos.</p>
+                </div>
+                <div class="mini-card" style="border-left:3px solid var(--accent2);">
+                    <h4>APO - Alinear, Planificar, Organizar</h4>
+                    <p>14 procesos. Estrategia, arquitectura, innovacion, presupuesto, calidad, riesgos, seguridad.</p>
+                </div>
+                <div class="mini-card" style="border-left:3px solid var(--green);">
+                    <h4>BAI - Construir, Adquirir, Implementar</h4>
+                    <p>11 procesos. Programas, requerimientos, soluciones, cambios, conocimiento, activos, configuracion.</p>
+                </div>
+                <div class="mini-card" style="border-left:3px solid var(--orange);">
+                    <h4>DSS - Entregar, Servir, Soportar</h4>
+                    <p>6 procesos. Operaciones, peticiones, problemas, continuidad, servicios de seguridad, controles.</p>
+                </div>
+                <div class="mini-card" style="border-left:3px solid var(--red);">
+                    <h4>MEA - Monitorear, Evaluar, Valorar</h4>
+                    <p>4 procesos. Desempeno, control interno, cumplimiento, aseguramiento.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ISO 27001 Detail -->
+        <div class="fw-detail" id="fw-iso27">
+            <h3 style="color:var(--accent2); margin-bottom:16px;">ISO 27001/27002 - Sistema de Gestion de Seguridad de la Informacion</h3>
+
+            <h4 style="margin-bottom:12px;">Ciclo PDCA (Plan-Do-Check-Act)</h4>
+            <div class="pdca-container">
+                <div class="pdca-wheel">
+                    <div class="pdca-segment pdca-plan" onclick="showPDCA('plan')">
+                        <span>&#128203;</span>
+                        PLAN
+                    </div>
+                    <div class="pdca-segment pdca-do" onclick="showPDCA('do')">
+                        <span>&#9881;</span>
+                        DO
+                    </div>
+                    <div class="pdca-segment pdca-check" onclick="showPDCA('check')">
+                        <span>&#128270;</span>
+                        CHECK
+                    </div>
+                    <div class="pdca-segment pdca-act" onclick="showPDCA('act')">
+                        <span>&#128296;</span>
+                        ACT
+                    </div>
+                </div>
+                <div id="pdca-detail" style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:18px;max-width:500px;text-align:center;">
+                    <p style="color:var(--text-muted);">Haz clic en cada fase del ciclo PDCA para ver detalles.</p>
+                </div>
+            </div>
+
+            <h4 style="margin:20px 0 12px;">Dominios de Control (Anexo A - ISO 27002:2022)</h4>
+            <div class="grid-4">
+                <div class="mini-card"><h4>Organizacionales</h4><p>37 controles: Politicas, roles, clasificacion, gestion de activos.</p></div>
+                <div class="mini-card"><h4>Personas</h4><p>8 controles: Seleccion, terminos, concientizacion, disciplina.</p></div>
+                <div class="mini-card"><h4>Fisicos</h4><p>14 controles: Perimetros, entrada, oficinas, monitoreo, proteccion.</p></div>
+                <div class="mini-card"><h4>Tecnologicos</h4><p>34 controles: Endpoints, acceso, criptografia, redes, desarrollo.</p></div>
+            </div>
+
+            <h4 style="margin:20px 0 12px;">Proceso de Certificacion</h4>
+            <div class="steps-container">
+                <div class="step-item"><div class="step-number">1</div><h4>Gap Analysis</h4><p>Evaluar estado actual</p></div>
+                <div class="step-item"><div class="step-number">2</div><h4>Implementar SGSI</h4><p>Politicas y controles</p></div>
+                <div class="step-item"><div class="step-number">3</div><h4>Auditoria Interna</h4><p>Verificar implementacion</p></div>
+                <div class="step-item"><div class="step-number">4</div><h4>Auditoria Fase 1</h4><p>Revision documental</p></div>
+                <div class="step-item"><div class="step-number">5</div><h4>Auditoria Fase 2</h4><p>Auditoria in situ</p></div>
+                <div class="step-item"><div class="step-number">6</div><h4>Certificacion</h4><p>Emision del certificado</p></div>
+            </div>
+        </div>
+
+        <!-- ITIL Detail -->
+        <div class="fw-detail" id="fw-itil">
+            <h3 style="color:var(--green); margin-bottom:16px;">ITIL 4 - Information Technology Infrastructure Library</h3>
+
+            <h4 style="margin-bottom:12px;">4 Dimensiones de la Gestion de Servicios</h4>
+            <div class="grid-4">
+                <div class="mini-card" style="border-top:3px solid var(--accent);"><h4>Organizaciones y Personas</h4><p>Cultura, roles, competencias y comunicacion.</p></div>
+                <div class="mini-card" style="border-top:3px solid var(--accent2);"><h4>Informacion y Tecnologia</h4><p>Datos, conocimiento y herramientas tecnologicas.</p></div>
+                <div class="mini-card" style="border-top:3px solid var(--green);"><h4>Socios y Proveedores</h4><p>Relaciones externas y contratos de servicio.</p></div>
+                <div class="mini-card" style="border-top:3px solid var(--orange);"><h4>Flujos de Valor y Procesos</h4><p>Actividades y workflows que crean valor.</p></div>
+            </div>
+
+            <h4 style="margin:20px 0 12px;">Cadena de Valor del Servicio (SVC)</h4>
+            <div class="steps-container">
+                <div class="step-item" style="background:rgba(0,212,255,0.08);"><div class="step-number">&#128203;</div><h4>Planear</h4></div>
+                <div class="step-item" style="background:rgba(124,92,252,0.08);"><div class="step-number">&#128161;</div><h4>Mejorar</h4></div>
+                <div class="step-item" style="background:rgba(0,232,143,0.08);"><div class="step-number">&#128172;</div><h4>Involucrar</h4></div>
+                <div class="step-item" style="background:rgba(255,159,67,0.08);"><div class="step-number">&#128300;</div><h4>Disenar y Transicionar</h4></div>
+                <div class="step-item" style="background:rgba(255,85,119,0.08);"><div class="step-number">&#128296;</div><h4>Obtener/Construir</h4></div>
+                <div class="step-item" style="background:rgba(255,224,102,0.08);"><div class="step-number">&#128640;</div><h4>Entregar y Soportar</h4></div>
+            </div>
+
+            <h4 style="margin:20px 0 12px;">34 Practicas ITIL 4</h4>
+            <div class="grid-3">
+                <div class="mini-card"><h4>Practicas Generales (14)</h4><p>Mejora continua, gestion de la seguridad de la informacion, gestion de relaciones, gestion de proveedores, gestion de riesgos, etc.</p></div>
+                <div class="mini-card"><h4>Practicas de Servicio (17)</h4><p>Gestion de incidentes, problemas, cambios, niveles de servicio, catalogo, mesa de servicio, disponibilidad, capacidad, etc.</p></div>
+                <div class="mini-card"><h4>Practicas Tecnicas (3)</h4><p>Gestion de despliegue, gestion de infraestructura y plataformas, desarrollo y gestion de software.</p></div>
+            </div>
+        </div>
+
+        <!-- NIST Detail -->
+        <div class="fw-detail" id="fw-nist">
+            <h3 style="color:var(--orange); margin-bottom:16px;">NIST Cybersecurity Framework (CSF)</h3>
+            <p style="color:var(--text-muted); margin-bottom:16px;">Haz clic en cada funcion del framework:</p>
+
+            <div class="nist-wheel-container">
+                <div class="nist-wheel">
+                    <div class="nist-segment nist-identify active" onclick="showNIST('identify')">
+                        <span class="seg-icon">&#128270;</span>
+                        Identificar
+                    </div>
+                    <div class="nist-segment nist-protect" onclick="showNIST('protect')">
+                        <span class="seg-icon">&#128737;</span>
+                        Proteger
+                    </div>
+                    <div class="nist-segment nist-detect" onclick="showNIST('detect')">
+                        <span class="seg-icon">&#128680;</span>
+                        Detectar
+                    </div>
+                    <div class="nist-segment nist-respond" onclick="showNIST('respond')">
+                        <span class="seg-icon">&#9889;</span>
+                        Responder
+                    </div>
+                    <div class="nist-segment nist-recover" onclick="showNIST('recover')">
+                        <span class="seg-icon">&#128260;</span>
+                        Recuperar
+                    </div>
+                </div>
+                <div class="nist-detail" id="nist-detail">
+                    <h4 style="color:var(--accent); margin-bottom:8px;">&#128270; Identificar (Identify)</h4>
+                    <p>Desarrollar la comprension organizacional para gestionar el riesgo de ciberseguridad de sistemas, personas, activos, datos y capacidades.</p>
+                    <div class="tag-list" style="margin-top:12px;">
+                        <span class="badge badge-cyan">Gestion de activos</span>
+                        <span class="badge badge-cyan">Entorno de negocio</span>
+                        <span class="badge badge-cyan">Gobernanza</span>
+                        <span class="badge badge-cyan">Evaluacion de riesgos</span>
+                        <span class="badge badge-cyan">Estrategia de riesgos</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ISO 31000 Detail -->
+        <div class="fw-detail" id="fw-iso31">
+            <h3 style="color:var(--red); margin-bottom:16px;">ISO 31000 - Gestion de Riesgos</h3>
+
+            <h4 style="margin-bottom:12px;">Proceso de Gestion de Riesgos</h4>
+            <div class="steps-container">
+                <div class="step-item"><div class="step-number">1</div><h4>Establecer contexto</h4><p>Interno y externo</p></div>
+                <div class="step-item"><div class="step-number">2</div><h4>Identificar riesgos</h4><p>Fuentes y eventos</p></div>
+                <div class="step-item"><div class="step-number">3</div><h4>Analizar riesgos</h4><p>Probabilidad e impacto</p></div>
+                <div class="step-item"><div class="step-number">4</div><h4>Evaluar riesgos</h4><p>Priorizar y clasificar</p></div>
+                <div class="step-item"><div class="step-number">5</div><h4>Tratar riesgos</h4><p>Mitigar, transferir, aceptar</p></div>
+            </div>
+
+            <h4 style="margin:20px 0 12px;">Principios de ISO 31000</h4>
+            <div class="grid-4">
+                <div class="mini-card"><h4>Integrada</h4><p>Parte de todas las actividades de la organizacion.</p></div>
+                <div class="mini-card"><h4>Estructurada</h4><p>Enfoque sistematico produce resultados consistentes.</p></div>
+                <div class="mini-card"><h4>Personalizada</h4><p>Adaptada al contexto de la organizacion.</p></div>
+                <div class="mini-card"><h4>Dinamica</h4><p>Anticipar y responder a cambios de manera oportuna.</p></div>
+            </div>
+        </div>
+
+        <!-- COSO Detail -->
+        <div class="fw-detail" id="fw-coso">
+            <h3 style="color:var(--accent); margin-bottom:16px;">COSO - Committee of Sponsoring Organizations</h3>
+
+            <h4 style="margin-bottom:12px;">5 Componentes del Control Interno (Cubo COSO)</h4>
+            <div class="coso-cube">
+                <div class="coso-cell" style="background:rgba(0,212,255,0.2); color:var(--accent);" onclick="showCOSO(0)">Entorno de Control</div>
+                <div class="coso-cell" style="background:rgba(124,92,252,0.2); color:var(--accent2);" onclick="showCOSO(1)">Evaluacion de Riesgos</div>
+                <div class="coso-cell" style="background:rgba(0,232,143,0.2); color:var(--green);" onclick="showCOSO(2)">Actividades de Control</div>
+                <div class="coso-cell" style="background:rgba(255,159,67,0.2); color:var(--orange);" onclick="showCOSO(3)">Informacion y Comunicacion</div>
+                <div class="coso-cell" style="background:rgba(255,85,119,0.2); color:var(--red);" onclick="showCOSO(4)">Monitoreo</div>
+            </div>
+            <div id="coso-detail" style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:18px;margin-top:12px;">
+                <p style="color:var(--text-muted);">Haz clic en un componente del cubo COSO para ver detalles.</p>
+            </div>
+
+            <h4 style="margin:20px 0 12px;">17 Principios COSO</h4>
+            <p style="color:var(--text-muted); font-size:0.88rem;">Los 17 principios se distribuyen en los 5 componentes, cubriendo desde el compromiso con la integridad y valores eticos, pasando por la identificacion y evaluacion de riesgos, hasta el monitoreo continuo de la efectividad del control interno.</p>
+        </div>
+
+        <!-- Framework Comparison -->
+        <div class="card" style="margin-top:24px;">
+            <div class="card-title"><span class="icon icon-blue">&#128200;</span> Comparacion de Marcos</div>
+            <div class="risk-matrix-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Marco</th>
+                            <th>Enfoque Principal</th>
+                            <th>Origen</th>
+                            <th>Certificable</th>
+                            <th>Mejor Para</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td style="color:var(--accent); font-weight:600;">COBIT 2019</td><td>Gobernanza de TI</td><td>ISACA</td><td>No (pero tiene certificaciones profesionales)</td><td>Gobernanza y alineamiento TI-negocio</td></tr>
+                        <tr><td style="color:var(--accent2); font-weight:600;">ISO 27001</td><td>Seguridad de la Informacion</td><td>ISO/IEC</td><td>Si</td><td>SGSI y cumplimiento normativo</td></tr>
+                        <tr><td style="color:var(--green); font-weight:600;">ITIL 4</td><td>Gestion de Servicios</td><td>Axelos</td><td>No (certificaciones individuales)</td><td>Operacion y soporte de servicios TI</td></tr>
+                        <tr><td style="color:var(--orange); font-weight:600;">NIST CSF</td><td>Ciberseguridad</td><td>NIST (EE.UU.)</td><td>No</td><td>Programa de ciberseguridad</td></tr>
+                        <tr><td style="color:var(--red); font-weight:600;">ISO 31000</td><td>Gestion de Riesgos</td><td>ISO</td><td>No</td><td>Gestion integral de riesgos</td></tr>
+                        <tr><td style="color:var(--cyan); font-weight:600;">COSO</td><td>Control Interno</td><td>COSO</td><td>No</td><td>Control interno y reporte financiero</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Decision Tree -->
+        <div class="card">
+            <div class="card-title"><span class="icon icon-green">&#127795;</span> Cuando usar cada Marco? - Arbol de Decision</div>
+            <div class="grid-2">
+                <div class="mini-card" style="border-left:3px solid var(--accent);">
+                    <h4>&#128073; Necesitas gobernar la TI empresarial?</h4>
+                    <p style="font-size:0.95rem; color:var(--accent); font-weight:600;">&#8594; COBIT 2019</p>
+                </div>
+                <div class="mini-card" style="border-left:3px solid var(--accent2);">
+                    <h4>&#128073; Necesitas certificar la seguridad de la informacion?</h4>
+                    <p style="font-size:0.95rem; color:var(--accent2); font-weight:600;">&#8594; ISO 27001</p>
+                </div>
+                <div class="mini-card" style="border-left:3px solid var(--green);">
+                    <h4>&#128073; Necesitas mejorar la gestion de servicios TI?</h4>
+                    <p style="font-size:0.95rem; color:var(--green); font-weight:600;">&#8594; ITIL 4</p>
+                </div>
+                <div class="mini-card" style="border-left:3px solid var(--orange);">
+                    <h4>&#128073; Necesitas un programa de ciberseguridad robusto?</h4>
+                    <p style="font-size:0.95rem; color:var(--orange); font-weight:600;">&#8594; NIST CSF</p>
+                </div>
+                <div class="mini-card" style="border-left:3px solid var(--red);">
+                    <h4>&#128073; Necesitas gestionar riesgos de forma integral?</h4>
+                    <p style="font-size:0.95rem; color:var(--red); font-weight:600;">&#8594; ISO 31000</p>
+                </div>
+                <div class="mini-card" style="border-left:3px solid var(--cyan);">
+                    <h4>&#128073; Necesitas fortalecer el control interno y reporte?</h4>
+                    <p style="font-size:0.95rem; color:var(--cyan); font-weight:600;">&#8594; COSO</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== TAB 4: RIESGOS ==================== -->
+    <div id="tab-riesgos" class="tab-content">
+        <h2 class="section-title">Gestion de Riesgos de TI</h2>
+
+        <div class="card">
+            <div class="card-title"><span class="icon icon-red">&#9888;</span> Que es la Gestion de Riesgos de TI?</div>
+            <p>Proceso sistematico para <strong>identificar</strong>, <strong>analizar</strong>, <strong>evaluar</strong> y <strong>tratar</strong> los riesgos que pueden afectar los sistemas de informacion, la infraestructura tecnologica y los procesos de negocio dependientes de TI.</p>
+            <div class="grid-4" style="margin-top:16px;">
+                <div class="mini-card"><h4>&#128270; Identificar</h4><p>Catalogar activos, amenazas y vulnerabilidades.</p></div>
+                <div class="mini-card"><h4>&#128202; Analizar</h4><p>Evaluar probabilidad e impacto de cada riesgo.</p></div>
+                <div class="mini-card"><h4>&#128200; Evaluar</h4><p>Priorizar riesgos y determinar tolerancia.</p></div>
+                <div class="mini-card"><h4>&#128296; Tratar</h4><p>Seleccionar estrategia de tratamiento adecuada.</p></div>
+            </div>
+        </div>
+
+        <!-- Interactive Risk Matrix -->
+        <div class="card">
+            <div class="card-title"><span class="icon icon-orange">&#128200;</span> Matriz de Riesgos Interactiva (5x5)</div>
+            <p style="color:var(--text-muted); margin-bottom:10px;">Escribe un nombre de riesgo y haz clic en la celda de la matriz para colocarlo:</p>
+
+            <div class="risk-input-panel">
+                <input type="text" id="risk-name" placeholder="Nombre del riesgo..." style="width:250px;">
+                <button class="btn" onclick="clearRiskMatrix()" style="margin-left:8px;">Limpiar matriz</button>
+                <div class="placed-risks" id="placed-risks-list"></div>
+            </div>
+
+            <div class="risk-matrix-wrapper">
+                <div class="risk-matrix" id="risk-matrix">
+                    <!-- Header row -->
+                    <div class="rm-header"></div>
+                    <div class="rm-header">Insignificante</div>
+                    <div class="rm-header">Menor</div>
+                    <div class="rm-header">Moderado</div>
+                    <div class="rm-header">Mayor</div>
+                    <div class="rm-header">Catastrofico</div>
+
+                    <!-- Row 5 - Casi Seguro -->
+                    <div class="rm-label">Casi Seguro</div>
+                    <div class="rm-cell rm-medium" onclick="placeRisk(this,4,0)"></div>
+                    <div class="rm-cell rm-high" onclick="placeRisk(this,4,1)"></div>
+                    <div class="rm-cell rm-high" onclick="placeRisk(this,4,2)"></div>
+                    <div class="rm-cell rm-critical" onclick="placeRisk(this,4,3)"></div>
+                    <div class="rm-cell rm-critical" onclick="placeRisk(this,4,4)"></div>
+
+                    <!-- Row 4 - Probable -->
+                    <div class="rm-label">Probable</div>
+                    <div class="rm-cell rm-medium" onclick="placeRisk(this,3,0)"></div>
+                    <div class="rm-cell rm-medium" onclick="placeRisk(this,3,1)"></div>
+                    <div class="rm-cell rm-high" onclick="placeRisk(this,3,2)"></div>
+                    <div class="rm-cell rm-high" onclick="placeRisk(this,3,3)"></div>
+                    <div class="rm-cell rm-critical" onclick="placeRisk(this,3,4)"></div>
+
+                    <!-- Row 3 - Posible -->
+                    <div class="rm-label">Posible</div>
+                    <div class="rm-cell rm-low" onclick="placeRisk(this,2,0)"></div>
+                    <div class="rm-cell rm-medium" onclick="placeRisk(this,2,1)"></div>
+                    <div class="rm-cell rm-medium" onclick="placeRisk(this,2,2)"></div>
+                    <div class="rm-cell rm-high" onclick="placeRisk(this,2,3)"></div>
+                    <div class="rm-cell rm-high" onclick="placeRisk(this,2,4)"></div>
+
+                    <!-- Row 2 - Improbable -->
+                    <div class="rm-label">Improbable</div>
+                    <div class="rm-cell rm-low" onclick="placeRisk(this,1,0)"></div>
+                    <div class="rm-cell rm-low" onclick="placeRisk(this,1,1)"></div>
+                    <div class="rm-cell rm-medium" onclick="placeRisk(this,1,2)"></div>
+                    <div class="rm-cell rm-medium" onclick="placeRisk(this,1,3)"></div>
+                    <div class="rm-cell rm-high" onclick="placeRisk(this,1,4)"></div>
+
+                    <!-- Row 1 - Raro -->
+                    <div class="rm-label">Raro</div>
+                    <div class="rm-cell rm-low" onclick="placeRisk(this,0,0)"></div>
+                    <div class="rm-cell rm-low" onclick="placeRisk(this,0,1)"></div>
+                    <div class="rm-cell rm-low" onclick="placeRisk(this,0,2)"></div>
+                    <div class="rm-cell rm-medium" onclick="placeRisk(this,0,3)"></div>
+                    <div class="rm-cell rm-medium" onclick="placeRisk(this,0,4)"></div>
+                </div>
+            </div>
+
+            <div class="grid-4" style="margin-top:16px;">
+                <div style="display:flex;align-items:center;gap:8px;"><div style="width:20px;height:20px;border-radius:4px;background:rgba(0,232,143,0.3);"></div><span style="font-size:0.82rem;">Bajo</span></div>
+                <div style="display:flex;align-items:center;gap:8px;"><div style="width:20px;height:20px;border-radius:4px;background:rgba(255,224,102,0.3);"></div><span style="font-size:0.82rem;">Medio</span></div>
+                <div style="display:flex;align-items:center;gap:8px;"><div style="width:20px;height:20px;border-radius:4px;background:rgba(255,159,67,0.35);"></div><span style="font-size:0.82rem;">Alto</span></div>
+                <div style="display:flex;align-items:center;gap:8px;"><div style="width:20px;height:20px;border-radius:4px;background:rgba(255,34,85,0.35);"></div><span style="font-size:0.82rem;">Critico</span></div>
+            </div>
+        </div>
+
+        <!-- Risk Treatment -->
+        <div class="card">
+            <div class="card-title"><span class="icon icon-green">&#128296;</span> Opciones de Tratamiento de Riesgos</div>
+            <div class="grid-4">
+                <div class="mini-card" style="border-top:3px solid var(--green);">
+                    <h4>&#128737; Mitigar</h4>
+                    <p>Implementar controles para reducir la probabilidad o el impacto del riesgo a un nivel aceptable.</p>
+                    <span class="badge badge-green">Mas comun</span>
+                </div>
+                <div class="mini-card" style="border-top:3px solid var(--accent);">
+                    <h4>&#128257; Transferir</h4>
+                    <p>Trasladar el riesgo a un tercero mediante seguros, outsourcing o contratos de servicio.</p>
+                    <span class="badge badge-cyan">Seguros / SLA</span>
+                </div>
+                <div class="mini-card" style="border-top:3px solid var(--yellow);">
+                    <h4>&#9989; Aceptar</h4>
+                    <p>Asumir el riesgo conscientemente cuando el costo de mitigacion supera el impacto potencial.</p>
+                    <span class="badge badge-orange">Riesgo residual</span>
+                </div>
+                <div class="mini-card" style="border-top:3px solid var(--red);">
+                    <h4>&#10060; Evitar</h4>
+                    <p>Eliminar la actividad que genera el riesgo. Se modifica el plan o se abandona el proyecto.</p>
+                    <span class="badge badge-red">Cambiar plan</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- BIA -->
+        <div class="card">
+            <div class="card-title"><span class="icon icon-purple">&#128202;</span> BIA - Analisis de Impacto en el Negocio</div>
+            <p>El BIA identifica los <strong>procesos criticos</strong> del negocio y determina el impacto de su interrupcion.</p>
+            <div class="grid-3" style="margin-top:16px;">
+                <div class="mini-card">
+                    <h4>RTO</h4>
+                    <p><strong>Recovery Time Objective.</strong> Tiempo maximo tolerable para restaurar un proceso/sistema despues de una interrupcion.</p>
+                </div>
+                <div class="mini-card">
+                    <h4>RPO</h4>
+                    <p><strong>Recovery Point Objective.</strong> Cantidad maxima de datos que se puede perder medida en tiempo (ultimo backup valido).</p>
+                </div>
+                <div class="mini-card">
+                    <h4>MTPD</h4>
+                    <p><strong>Maximum Tolerable Period of Disruption.</strong> Periodo maximo que un proceso puede estar inactivo antes de daño irreversible.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Common IT Risks -->
+        <div class="card">
+            <div class="card-title"><span class="icon icon-red">&#128203;</span> Catalogo de Riesgos Comunes de TI</div>
+            <table class="data-table">
+                <thead>
+                    <tr><th>Categoria</th><th>Riesgo</th><th>Impacto</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><span class="badge badge-red">Ciberseguridad</span></td><td>Brecha de datos / Data breach</td><td>Perdida financiera, reputacional, legal</td></tr>
+                    <tr><td><span class="badge badge-red">Ciberseguridad</span></td><td>Ataque de ransomware</td><td>Interrupcion operativa, extorsion</td></tr>
+                    <tr><td><span class="badge badge-orange">Operacional</span></td><td>Fallo de hardware / servidores</td><td>Interrupcion de servicios</td></tr>
+                    <tr><td><span class="badge badge-orange">Operacional</span></td><td>Perdida de datos por falta de backup</td><td>Perdida irreversible de informacion</td></tr>
+                    <tr><td><span class="badge badge-purple">Cumplimiento</span></td><td>Incumplimiento de regulaciones (GDPR)</td><td>Multas, sanciones legales</td></tr>
+                    <tr><td><span class="badge badge-cyan">Personas</span></td><td>Errores humanos / Negligencia</td><td>Exposicion de datos, caidas de sistemas</td></tr>
+                    <tr><td><span class="badge badge-cyan">Personas</span></td><td>Fuga de talento clave</td><td>Perdida de conocimiento critico</td></tr>
+                    <tr><td><span class="badge badge-green">Estrategico</span></td><td>Obsolescencia tecnologica</td><td>Reduccion de competitividad</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Risk Register -->
+        <div class="card">
+            <div class="card-title"><span class="icon icon-blue">&#128196;</span> Registro de Riesgos (Plantilla)</div>
+            <div class="risk-matrix-wrapper">
+                <table class="data-table" id="risk-register">
+                    <thead>
+                        <tr>
+                            <th>ID</th><th>Riesgo</th><th>Categoria</th><th>Probabilidad</th><th>Impacto</th><th>Nivel</th><th>Tratamiento</th><th>Responsable</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="mono">R-001</td><td>Ataque de ransomware</td><td>Ciberseguridad</td>
+                            <td><span class="badge badge-orange">Alta</span></td>
+                            <td><span class="badge badge-red">Critico</span></td>
+                            <td><span class="badge badge-red">Critico</span></td>
+                            <td>Mitigar</td><td>CISO</td>
+                        </tr>
+                        <tr>
+                            <td class="mono">R-002</td><td>Fallo de servidor principal</td><td>Operacional</td>
+                            <td><span class="badge badge-cyan">Media</span></td>
+                            <td><span class="badge badge-orange">Alto</span></td>
+                            <td><span class="badge badge-orange">Alto</span></td>
+                            <td>Mitigar + Transferir</td><td>Infra TI</td>
+                        </tr>
+                        <tr>
+                            <td class="mono">R-003</td><td>Phishing a empleados</td><td>Personas</td>
+                            <td><span class="badge badge-red">Alta</span></td>
+                            <td><span class="badge badge-cyan">Medio</span></td>
+                            <td><span class="badge badge-orange">Alto</span></td>
+                            <td>Mitigar</td><td>Seguridad TI</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== TAB 5: CONTROLES ==================== -->
+    <div id="tab-controles" class="tab-content">
+        <h2 class="section-title">Controles y Cumplimiento</h2>
+
+        <!-- Types of Controls -->
+        <div class="card">
+            <div class="card-title"><span class="icon icon-blue">&#128737;</span> Tipos de Controles</div>
+            <div class="grid-3">
+                <div class="mini-card" style="border-top:3px solid var(--green);">
+                    <h4>&#128737; Preventivos</h4>
+                    <p>Evitan que las amenazas se materialicen. Actuan <strong>antes</strong> del incidente.</p>
+                    <div class="tag-list">
+                        <span class="badge badge-green">Firewall</span>
+                        <span class="badge badge-green">Cifrado</span>
+                        <span class="badge badge-green">Capacitacion</span>
+                        <span class="badge badge-green">Politicas</span>
+                    </div>
+                </div>
+                <div class="mini-card" style="border-top:3px solid var(--orange);">
+                    <h4>&#128270; Detectivos</h4>
+                    <p>Identifican cuando una amenaza se ha materializado o esta en curso. Actuan <strong>durante</strong> el incidente.</p>
+                    <div class="tag-list">
+                        <span class="badge badge-orange">IDS/IPS</span>
+                        <span class="badge badge-orange">SIEM</span>
+                        <span class="badge badge-orange">Logs</span>
+                        <span class="badge badge-orange">Auditorias</span>
+                    </div>
+                </div>
+                <div class="mini-card" style="border-top:3px solid var(--red);">
+                    <h4>&#128296; Correctivos</h4>
+                    <p>Corrigen o minimizan el impacto despues de que un incidente ha ocurrido. Actuan <strong>despues</strong>.</p>
+                    <div class="tag-list">
+                        <span class="badge badge-red">Backups</span>
+                        <span class="badge badge-red">DRP</span>
+                        <span class="badge badge-red">Parches</span>
+                        <span class="badge badge-red">Forense</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Control Matrix -->
+        <div class="card">
+            <div class="card-title"><span class="icon icon-purple">&#128200;</span> Matriz de Controles: Categoria vs. Tipo</div>
+            <p style="color:var(--text-muted); margin-bottom:14px;">Haz clic en cualquier celda para ver ejemplos:</p>
+            <div class="ctrl-matrix" id="ctrl-matrix">
+                <div class="ctrl-cell header"></div>
+                <div class="ctrl-cell header">Preventivo</div>
+                <div class="ctrl-cell header">Detectivo</div>
+                <div class="ctrl-cell header">Correctivo</div>
+
+                <div class="ctrl-cell header">Administrativo</div>
+                <div class="ctrl-cell" onclick="showCtrl(this,'Politicas de seguridad, NDAs, capacitacion, procedimientos de seleccion de personal')">&#128203;</div>
+                <div class="ctrl-cell" onclick="showCtrl(this,'Revisiones gerenciales, auditorias internas, evaluaciones de desempeno')">&#128202;</div>
+                <div class="ctrl-cell" onclick="showCtrl(this,'Planes de accion correctiva, actualizacion de politicas, sanciones disciplinarias')">&#128296;</div>
+
+                <div class="ctrl-cell header">Tecnico</div>
+                <div class="ctrl-cell" onclick="showCtrl(this,'Firewalls, cifrado, MFA, antivirus, WAF, segmentacion de red, hardening')">&#128274;</div>
+                <div class="ctrl-cell" onclick="showCtrl(this,'IDS/IPS, SIEM, DLP, monitoreo de red, analisis de logs, honeypots')">&#128270;</div>
+                <div class="ctrl-cell" onclick="showCtrl(this,'Backups, restauracion, parches de seguridad, reimagen de sistemas')">&#128187;</div>
+
+                <div class="ctrl-cell header">Fisico</div>
+                <div class="ctrl-cell" onclick="showCtrl(this,'Cerraduras, biometria, guardias, vallas, tarjetas de acceso')">&#128273;</div>
+                <div class="ctrl-cell" onclick="showCtrl(this,'Camaras CCTV, sensores de movimiento, alarmas, registros de acceso')">&#128247;</div>
+                <div class="ctrl-cell" onclick="showCtrl(this,'Extintores, UPS, generadores, sitio alterno, reconstruccion fisica')">&#9889;</div>
+            </div>
+            <div id="ctrl-detail" style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px;margin-top:12px;display:none;">
+                <p id="ctrl-detail-text" style="color:var(--text);font-size:0.9rem;"></p>
+            </div>
+        </div>
+
+        <!-- Compliance -->
+        <div class="card">
+            <div class="card-title"><span class="icon icon-green">&#9989;</span> Requisitos de Cumplimiento</div>
+            <div class="grid-3">
+                <div class="mini-card" style="border-left:3px solid var(--accent);">
+                    <h4>GDPR</h4>
+                    <p><strong>General Data Protection Regulation.</strong> Proteccion de datos personales en la Union Europea. Multas hasta 4% de ingresos globales.</p>
+                    <div class="tag-list">
+                        <span class="badge badge-cyan">Consentimiento</span>
+                        <span class="badge badge-cyan">Derecho al olvido</span>
+                        <span class="badge badge-cyan">DPO</span>
+                    </div>
+                </div>
+                <div class="mini-card" style="border-left:3px solid var(--accent2);">
+                    <h4>SOX</h4>
+                    <p><strong>Sarbanes-Oxley Act.</strong> Controles sobre informacion financiera en empresas publicas de EE.UU. Seccion 404: control interno.</p>
+                    <div class="tag-list">
+                        <span class="badge badge-purple">Control interno</span>
+                        <span class="badge badge-purple">Reporte financiero</span>
+                    </div>
+                </div>
+                <div class="mini-card" style="border-left:3px solid var(--green);">
+                    <h4>HIPAA</h4>
+                    <p><strong>Health Insurance Portability and Accountability Act.</strong> Proteccion de datos de salud en EE.UU. Salvaguardas tecnicas, fisicas y administrativas.</p>
+                    <div class="tag-list">
+                        <span class="badge badge-green">PHI</span>
+                        <span class="badge badge-green">ePHI</span>
+                        <span class="badge badge-green">BAA</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Evidence Types -->
+        <div class="card">
+            <div class="card-title"><span class="icon icon-orange">&#128196;</span> Tipos de Evidencia de Auditoria</div>
+            <div class="grid-4">
+                <div class="mini-card"><h4>&#128196; Documental</h4><p>Politicas, procedimientos, manuales, registros, contratos.</p></div>
+                <div class="mini-card"><h4>&#128187; Tecnica</h4><p>Capturas de pantalla, logs, configuraciones, escaneos.</p></div>
+                <div class="mini-card"><h4>&#128172; Testimonial</h4><p>Entrevistas, declaraciones del personal auditado.</p></div>
+                <div class="mini-card"><h4>&#128065; Observacional</h4><p>Observacion directa de procesos, instalaciones y controles.</p></div>
+            </div>
+        </div>
+
+        <!-- Testing Procedures -->
+        <div class="card">
+            <div class="card-title"><span class="icon icon-blue">&#128300;</span> Procedimientos de Prueba</div>
+            <div class="grid-2">
+                <div class="mini-card">
+                    <h4>Pruebas de Diseno</h4>
+                    <p>Verifican que el control esta correctamente <strong>disenado</strong> para mitigar el riesgo. Se evalua la documentacion y la logica del control.</p>
+                </div>
+                <div class="mini-card">
+                    <h4>Pruebas de Eficacia Operativa</h4>
+                    <p>Verifican que el control funciona <strong>efectivamente en la practica</strong> durante un periodo. Se realizan muestreos y re-ejecucion.</p>
+                </div>
+            </div>
+            <div class="grid-3" style="margin-top:16px;">
+                <div class="mini-card"><h4>Indagacion</h4><p>Preguntas al personal responsable sobre la operacion del control.</p></div>
+                <div class="mini-card"><h4>Inspeccion</h4><p>Revision de documentos, configuraciones y registros.</p></div>
+                <div class="mini-card"><h4>Re-ejecucion</h4><p>Ejecutar independientemente el control para verificar resultados.</p></div>
+            </div>
+        </div>
+
+        <!-- Control Environment Designer -->
+        <div class="card">
+            <div class="card-title"><span class="icon icon-purple">&#127912;</span> Disenador de Ambiente de Control</div>
+            <p style="color:var(--text-muted); margin-bottom:14px;">Selecciona controles para construir tu ambiente de control. Haz clic para agregar/quitar:</p>
+
+            <div class="grid-3" style="margin-bottom:20px;">
+                <div>
+                    <h4 style="color:var(--green); margin-bottom:10px;">Preventivos</h4>
+                    <div style="display:flex; flex-direction:column; gap:6px;" id="ctrl-preventive">
+                        <div class="defense-opt" onclick="toggleControl(this)">&#128274; Firewall perimetral</div>
+                        <div class="defense-opt" onclick="toggleControl(this)">&#128273; MFA (Autenticacion multifactor)</div>
+                        <div class="defense-opt" onclick="toggleControl(this)">&#128272; Cifrado de datos</div>
+                        <div class="defense-opt" onclick="toggleControl(this)">&#128218; Capacitacion de seguridad</div>
+                        <div class="defense-opt" onclick="toggleControl(this)">&#128203; Politicas de seguridad</div>
+                        <div class="defense-opt" onclick="toggleControl(this)">&#128423; Segmentacion de red</div>
+                    </div>
+                </div>
+                <div>
+                    <h4 style="color:var(--orange); margin-bottom:10px;">Detectivos</h4>
+                    <div style="display:flex; flex-direction:column; gap:6px;" id="ctrl-detective">
+                        <div class="defense-opt" onclick="toggleControl(this)">&#128270; IDS/IPS</div>
+                        <div class="defense-opt" onclick="toggleControl(this)">&#128202; SIEM</div>
+                        <div class="defense-opt" onclick="toggleControl(this)">&#128187; Monitoreo de endpoints</div>
+                        <div class="defense-opt" onclick="toggleControl(this)">&#128247; Videovigilancia</div>
+                        <div class="defense-opt" onclick="toggleControl(this)">&#128196; Analisis de logs</div>
+                    </div>
+                </div>
+                <div>
+                    <h4 style="color:var(--red); margin-bottom:10px;">Correctivos</h4>
+                    <div style="display:flex; flex-direction:column; gap:6px;" id="ctrl-corrective">
+                        <div class="defense-opt" onclick="toggleControl(this)">&#128451; Backups automatizados</div>
+                        <div class="defense-opt" onclick="toggleControl(this)">&#128259; Plan de recuperacion (DRP)</div>
+                        <div class="defense-opt" onclick="toggleControl(this)">&#128296; Gestion de parches</div>
+                        <div class="defense-opt" onclick="toggleControl(this)">&#128101; Equipo de respuesta (CSIRT)</div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:18px;">
+                <h4 style="margin-bottom:10px;">Tu Ambiente de Control</h4>
+                <div id="selected-controls" style="min-height:40px;">
+                    <p style="color:var(--text-muted); font-size:0.85rem;">Selecciona controles arriba para construir tu ambiente de control.</p>
+                </div>
+                <div style="margin-top:12px; display:flex; gap:16px; flex-wrap:wrap;">
+                    <div><span style="color:var(--green); font-weight:600;" id="prev-count">0</span> <span style="color:var(--text-muted); font-size:0.85rem;">Preventivos</span></div>
+                    <div><span style="color:var(--orange); font-weight:600;" id="det-count">0</span> <span style="color:var(--text-muted); font-size:0.85rem;">Detectivos</span></div>
+                    <div><span style="color:var(--red); font-weight:600;" id="cor-count">0</span> <span style="color:var(--text-muted); font-size:0.85rem;">Correctivos</span></div>
+                </div>
+                <div class="check-progress" style="margin-top:10px;"><div class="check-progress-bar" id="ctrl-progress" style="width:0%"></div></div>
+            </div>
+        </div>
+
+        <!-- Quiz -->
+        <div class="card">
+            <div class="card-title"><span class="icon icon-green">&#127891;</span> Quiz de Conocimiento</div>
+            <div class="quiz-container" id="quiz-container">
+                <div class="quiz-question">
+                    <h4>1. Cual es el principio de la triada CIA que garantiza que la informacion no ha sido alterada de forma no autorizada?</h4>
+                    <div class="quiz-option" onclick="checkQuiz(this, false)">Confidencialidad</div>
+                    <div class="quiz-option" onclick="checkQuiz(this, true)">Integridad</div>
+                    <div class="quiz-option" onclick="checkQuiz(this, false)">Disponibilidad</div>
+                    <div class="quiz-option" onclick="checkQuiz(this, false)">Autenticidad</div>
+                </div>
+
+                <div class="quiz-question">
+                    <h4>2. Que marco de referencia se enfoca especificamente en la gobernanza y gestion de TI empresarial con 40 objetivos?</h4>
+                    <div class="quiz-option" onclick="checkQuiz(this, false)">ITIL 4</div>
+                    <div class="quiz-option" onclick="checkQuiz(this, true)">COBIT 2019</div>
+                    <div class="quiz-option" onclick="checkQuiz(this, false)">NIST CSF</div>
+                    <div class="quiz-option" onclick="checkQuiz(this, false)">ISO 31000</div>
+                </div>
+
+                <div class="quiz-question">
+                    <h4>3. Que tipo de control actua DESPUES de que un incidente ha ocurrido para minimizar el impacto?</h4>
+                    <div class="quiz-option" onclick="checkQuiz(this, false)">Preventivo</div>
+                    <div class="quiz-option" onclick="checkQuiz(this, false)">Detectivo</div>
+                    <div class="quiz-option" onclick="checkQuiz(this, true)">Correctivo</div>
+                    <div class="quiz-option" onclick="checkQuiz(this, false)">Disuasivo</div>
+                </div>
+
+                <div class="quiz-question">
+                    <h4>4. El RTO (Recovery Time Objective) se refiere a:</h4>
+                    <div class="quiz-option" onclick="checkQuiz(this, false)">La cantidad maxima de datos que se puede perder</div>
+                    <div class="quiz-option" onclick="checkQuiz(this, true)">El tiempo maximo para restaurar un sistema</div>
+                    <div class="quiz-option" onclick="checkQuiz(this, false)">El costo total de un incidente</div>
+                    <div class="quiz-option" onclick="checkQuiz(this, false)">La frecuencia de los backups</div>
+                </div>
+
+                <div class="quiz-question">
+                    <h4>5. Las 5 funciones del NIST Cybersecurity Framework son:</h4>
+                    <div class="quiz-option" onclick="checkQuiz(this, true)">Identificar, Proteger, Detectar, Responder, Recuperar</div>
+                    <div class="quiz-option" onclick="checkQuiz(this, false)">Planificar, Hacer, Verificar, Actuar, Mejorar</div>
+                    <div class="quiz-option" onclick="checkQuiz(this, false)">Evaluar, Dirigir, Monitorear, Controlar, Mejorar</div>
+                    <div class="quiz-option" onclick="checkQuiz(this, false)">Prevenir, Detectar, Corregir, Auditar, Reportar</div>
+                </div>
+
+                <div class="quiz-question">
+                    <h4>6. Que modelo de control de acceso otorga permisos basado en la funcion del usuario en la organizacion?</h4>
+                    <div class="quiz-option" onclick="checkQuiz(this, false)">DAC (Control Discrecional)</div>
+                    <div class="quiz-option" onclick="checkQuiz(this, false)">MAC (Control Obligatorio)</div>
+                    <div class="quiz-option" onclick="checkQuiz(this, true)">RBAC (Control basado en Roles)</div>
+                    <div class="quiz-option" onclick="checkQuiz(this, false)">ABAC (Control basado en Atributos)</div>
+                </div>
+
+                <div class="quiz-question">
+                    <h4>7. ISO 27001 utiliza el ciclo _____ para la mejora continua del SGSI:</h4>
+                    <div class="quiz-option" onclick="checkQuiz(this, false)">OODA (Observe, Orient, Decide, Act)</div>
+                    <div class="quiz-option" onclick="checkQuiz(this, true)">PDCA (Plan, Do, Check, Act)</div>
+                    <div class="quiz-option" onclick="checkQuiz(this, false)">DMAIC (Define, Measure, Analyze, Improve, Control)</div>
+                    <div class="quiz-option" onclick="checkQuiz(this, false)">SIPOC (Supplier, Input, Process, Output, Customer)</div>
+                </div>
+
+                <div class="quiz-question">
+                    <h4>8. La criptografia asimetrica utiliza:</h4>
+                    <div class="quiz-option" onclick="checkQuiz(this, false)">Una sola clave compartida entre emisor y receptor</div>
+                    <div class="quiz-option" onclick="checkQuiz(this, true)">Un par de claves: publica y privada</div>
+                    <div class="quiz-option" onclick="checkQuiz(this, false)">Una funcion hash unidireccional</div>
+                    <div class="quiz-option" onclick="checkQuiz(this, false)">Tres claves: publica, privada y de sesion</div>
+                </div>
+            </div>
+            <div class="quiz-score" id="quiz-score"></div>
+            <div style="text-align:center; margin-top:16px;">
+                <button class="btn" onclick="resetQuiz()">Reiniciar Quiz</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== TAB 6: METODOLOGIAS AGILES ==================== -->
+    <div id="tab-agile" class="tab-content">
+        <h2 class="section-title">Metodologias Agiles en Auditoria y TI</h2>
+
+        <!-- Intro -->
+        <div class="card">
+            <div class="card-title"><span class="icon icon-blue">&#128640;</span> Que son las Metodologias Agiles?</div>
+            <p>Las <strong>metodologias agiles</strong> son un conjunto de marcos de trabajo y practicas que priorizan la <strong>entrega incremental de valor</strong>, la <strong>colaboracion continua</strong> con el cliente y la <strong>adaptacion al cambio</strong> sobre la planificacion rigida. Nacieron del desarrollo de software y hoy se aplican en gestion de proyectos, auditoria, operaciones y mas.</p>
+            <div class="tag-list" style="margin-top:14px;">
+                <span class="badge badge-cyan">Iterativo</span>
+                <span class="badge badge-purple">Incremental</span>
+                <span class="badge badge-green">Colaborativo</span>
+                <span class="badge badge-orange">Adaptativo</span>
+            </div>
+        </div>
+
+        <!-- Manifiesto Agil -->
+        <div class="card">
+            <div class="card-title"><span class="icon icon-purple">&#128220;</span> Manifiesto Agil (2001) — Los 4 Valores</div>
+            <p style="margin-bottom:18px;">El Manifiesto Agil establece 4 valores fundamentales que guian todas las metodologias agiles. No se rechaza lo de la derecha, pero se valora <strong>mas</strong> lo de la izquierda.</p>
+            <div class="grid-2">
+                <div class="mini-card" style="border-left:4px solid var(--accent);">
+                    <h4 style="display:flex;align-items:center;gap:8px;">&#128101; Individuos e interacciones <span style="color:var(--green);font-size:0.8rem;">se valora mas</span></h4>
+                    <p>sobre procesos y herramientas. Las personas y la comunicacion efectiva son mas importantes que las herramientas perfectas.</p>
+                </div>
+                <div class="mini-card" style="border-left:4px solid var(--accent2);">
+                    <h4 style="display:flex;align-items:center;gap:8px;">&#128187; Software funcionando <span style="color:var(--green);font-size:0.8rem;">se valora mas</span></h4>
+                    <p>sobre documentacion extensiva. El producto que funciona es la medida principal del progreso.</p>
+                </div>
+                <div class="mini-card" style="border-left:4px solid var(--green);">
+                    <h4 style="display:flex;align-items:center;gap:8px;">&#129309; Colaboracion con el cliente <span style="color:var(--green);font-size:0.8rem;">se valora mas</span></h4>
+                    <p>sobre negociacion contractual. Trabajar junto al cliente para entender y satisfacer sus necesidades reales.</p>
+                </div>
+                <div class="mini-card" style="border-left:4px solid var(--orange);">
+                    <h4 style="display:flex;align-items:center;gap:8px;">&#128260; Respuesta ante el cambio <span style="color:var(--green);font-size:0.8rem;">se valora mas</span></h4>
+                    <p>sobre seguir un plan. Abrazar el cambio como ventaja competitiva, incluso en etapas avanzadas del proyecto.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 12 Principios -->
+        <div class="card">
+            <div class="card-title"><span class="icon icon-green">&#128218;</span> Los 12 Principios del Manifiesto Agil</div>
+            <div class="grid-3">
+                <div class="mini-card">
+                    <h4>1. Satisfaccion del cliente</h4>
+                    <p>Prioridad maxima: satisfacer al cliente mediante entrega temprana y continua de software valioso.</p>
+                </div>
+                <div class="mini-card">
+                    <h4>2. Bienvenir el cambio</h4>
+                    <p>Aceptar cambios de requisitos, incluso en etapas tardias. Los procesos agiles aprovechan el cambio.</p>
+                </div>
+                <div class="mini-card">
+                    <h4>3. Entregas frecuentes</h4>
+                    <p>Entregar software funcional con frecuencia (semanas, no meses), prefiriendo intervalos cortos.</p>
+                </div>
+                <div class="mini-card">
+                    <h4>4. Trabajo conjunto</h4>
+                    <p>Negocio y desarrolladores deben trabajar juntos diariamente durante todo el proyecto.</p>
+                </div>
+                <div class="mini-card">
+                    <h4>5. Personas motivadas</h4>
+                    <p>Construir proyectos alrededor de individuos motivados. Darles el entorno y confianza que necesitan.</p>
+                </div>
+                <div class="mini-card">
+                    <h4>6. Comunicacion cara a cara</h4>
+                    <p>El metodo mas eficiente de transmitir informacion es la conversacion directa.</p>
+                </div>
+                <div class="mini-card">
+                    <h4>7. Software funcionando</h4>
+                    <p>El software que funciona es la medida principal y real del progreso del proyecto.</p>
+                </div>
+                <div class="mini-card">
+                    <h4>8. Desarrollo sostenible</h4>
+                    <p>Los procesos agiles promueven un ritmo constante y sostenible indefinidamente.</p>
+                </div>
+                <div class="mini-card">
+                    <h4>9. Excelencia tecnica</h4>
+                    <p>La atencion continua a la excelencia tecnica y el buen diseno mejora la agilidad.</p>
+                </div>
+                <div class="mini-card">
+                    <h4>10. Simplicidad</h4>
+                    <p>El arte de maximizar la cantidad de trabajo NO realizado es esencial. Hacer solo lo necesario.</p>
+                </div>
+                <div class="mini-card">
+                    <h4>11. Equipos autoorganizados</h4>
+                    <p>Las mejores arquitecturas, requisitos y disenos emergen de equipos que se organizan a si mismos.</p>
+                </div>
+                <div class="mini-card">
+                    <h4>12. Reflexion y ajuste</h4>
+                    <p>El equipo reflexiona regularmente sobre como ser mas efectivo y ajusta su comportamiento.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCRUM -->
+        <div class="card">
+            <div class="card-title"><span class="icon icon-blue">&#128736;</span> Scrum — El Framework Mas Popular</div>
+            <p style="margin-bottom:18px;">Scrum es un marco de trabajo agil que organiza el desarrollo en ciclos cortos llamados <strong>Sprints</strong> (1-4 semanas). Tiene roles, eventos y artefactos bien definidos.</p>
+
+            <h4 style="color:var(--accent); margin-bottom:12px;">&#128101; Roles de Scrum</h4>
+            <div class="grid-3" style="margin-bottom:24px;">
+                <div class="mini-card" style="border-top:3px solid var(--accent);">
+                    <h4>Product Owner</h4>
+                    <p>Responsable de maximizar el valor del producto. Gestiona y prioriza el <strong>Product Backlog</strong>. Es la voz del cliente.</p>
+                    <div class="tag-list"><span class="badge badge-cyan">Vision</span><span class="badge badge-cyan">Prioridades</span><span class="badge badge-cyan">ROI</span></div>
+                </div>
+                <div class="mini-card" style="border-top:3px solid var(--accent2);">
+                    <h4>Scrum Master</h4>
+                    <p>Facilitador y lider servil. Elimina impedimentos, protege al equipo y asegura que se siga el marco Scrum.</p>
+                    <div class="tag-list"><span class="badge badge-purple">Facilitador</span><span class="badge badge-purple">Coach</span><span class="badge badge-purple">Protector</span></div>
+                </div>
+                <div class="mini-card" style="border-top:3px solid var(--green);">
+                    <h4>Development Team</h4>
+                    <p>Equipo multifuncional y autoorganizado (3-9 personas) que entrega incrementos de producto funcionales.</p>
+                    <div class="tag-list"><span class="badge badge-green">Autonomo</span><span class="badge badge-green">Cross-functional</span></div>
+                </div>
+            </div>
+
+            <h4 style="color:var(--accent); margin-bottom:12px;">&#128197; Eventos de Scrum</h4>
+            <div class="steps-container" id="scrum-events">
+                <div class="step-item" onclick="showScrumEvent(0)">
+                    <div class="step-number">1</div>
+                    <h4>Sprint Planning</h4>
+                    <p>Planificacion</p>
+                </div>
+                <div class="step-item" onclick="showScrumEvent(1)">
+                    <div class="step-number">2</div>
+                    <h4>Daily Scrum</h4>
+                    <p>Reunion diaria</p>
+                </div>
+                <div class="step-item" onclick="showScrumEvent(2)">
+                    <div class="step-number">3</div>
+                    <h4>Sprint Review</h4>
+                    <p>Revision</p>
+                </div>
+                <div class="step-item" onclick="showScrumEvent(3)">
+                    <div class="step-number">4</div>
+                    <h4>Sprint Retro</h4>
+                    <p>Retrospectiva</p>
+                </div>
+            </div>
+            <div id="scrum-event-details">
+                <div class="step-detail" id="scrum-ev-0">
+                    <h4 style="color:var(--accent);">&#128197; Sprint Planning</h4>
+                    <p><strong>Duracion:</strong> Maximo 8 horas para Sprint de 1 mes. <strong>Participan:</strong> Todo el equipo Scrum.</p>
+                    <p style="margin-top:8px;">Se responden dos preguntas: <strong>Que</strong> se puede entregar en el Sprint? y <strong>Como</strong> se realizara el trabajo? El equipo selecciona items del Product Backlog y crea el Sprint Backlog con un objetivo (Sprint Goal).</p>
+                </div>
+                <div class="step-detail" id="scrum-ev-1">
+                    <h4 style="color:var(--accent);">&#9200; Daily Scrum (Stand-up)</h4>
+                    <p><strong>Duracion:</strong> 15 minutos. <strong>Frecuencia:</strong> Diaria, misma hora y lugar.</p>
+                    <p style="margin-top:8px;">Cada miembro responde: Que hice ayer? Que hare hoy? Hay algun impedimento? No es un reporte de estado, es una sincronizacion del equipo para optimizar la colaboracion.</p>
+                </div>
+                <div class="step-detail" id="scrum-ev-2">
+                    <h4 style="color:var(--accent);">&#128269; Sprint Review</h4>
+                    <p><strong>Duracion:</strong> Maximo 4 horas. <strong>Participan:</strong> Equipo Scrum + stakeholders.</p>
+                    <p style="margin-top:8px;">Se inspecciona el incremento del producto y se adapta el Product Backlog si es necesario. El equipo demuestra el trabajo completado y se discute que hacer despues. Es una reunion de <strong>inspeccion</strong>, no de aprobacion.</p>
+                </div>
+                <div class="step-detail" id="scrum-ev-3">
+                    <h4 style="color:var(--accent);">&#128161; Sprint Retrospective</h4>
+                    <p><strong>Duracion:</strong> Maximo 3 horas. <strong>Participan:</strong> Solo el equipo Scrum.</p>
+                    <p style="margin-top:8px;">El equipo reflexiona sobre: Que salio bien? Que se puede mejorar? Que acciones concretas implementar? Se identifican mejoras accionables para el siguiente Sprint. Es el motor de la <strong>mejora continua</strong>.</p>
+                </div>
+            </div>
+
+            <h4 style="color:var(--accent); margin:20px 0 12px;">&#128230; Artefactos de Scrum</h4>
+            <div class="grid-3">
+                <div class="mini-card" style="border-left:4px solid var(--accent);">
+                    <h4>Product Backlog</h4>
+                    <p>Lista ordenada por prioridad de todo lo que podria necesitar el producto. Es dinamica, nunca esta completa y es responsabilidad del Product Owner.</p>
+                </div>
+                <div class="mini-card" style="border-left:4px solid var(--accent2);">
+                    <h4>Sprint Backlog</h4>
+                    <p>Subconjunto del Product Backlog seleccionado para el Sprint actual + el plan para entregar el incremento. Es propiedad del equipo de desarrollo.</p>
+                </div>
+                <div class="mini-card" style="border-left:4px solid var(--green);">
+                    <h4>Incremento</h4>
+                    <p>Suma de todos los items del Product Backlog completados durante el Sprint + incrementos anteriores. Debe cumplir la <strong>Definition of Done</strong>.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- KANBAN -->
+        <div class="card">
+            <div class="card-title"><span class="icon icon-green">&#128203;</span> Kanban — Flujo Continuo Visual</div>
+            <p style="margin-bottom:18px;">Kanban se basa en <strong>visualizar el flujo de trabajo</strong>, limitar el trabajo en progreso (WIP) y optimizar el tiempo de entrega. No tiene iteraciones fijas como Scrum.</p>
+
+            <h4 style="color:var(--green); margin-bottom:12px;">&#128200; Tablero Kanban Interactivo</h4>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:12px; margin-bottom:20px;">
+                <div style="background:var(--surface2); border:1px solid var(--border); border-radius:12px; padding:16px; border-top:3px solid var(--text-muted);">
+                    <h4 style="text-align:center; color:var(--text-muted); font-size:0.85rem; margin-bottom:12px;">&#128203; BACKLOG</h4>
+                    <div style="background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:10px; margin-bottom:8px; font-size:0.82rem;">
+                        <span class="badge badge-orange" style="margin-bottom:6px;display:inline-block;">Media</span><br>Documentar API REST
+                    </div>
+                    <div style="background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:10px; margin-bottom:8px; font-size:0.82rem;">
+                        <span class="badge badge-red" style="margin-bottom:6px;display:inline-block;">Alta</span><br>Migrar base de datos
+                    </div>
+                    <div style="background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:10px; font-size:0.82rem;">
+                        <span class="badge badge-cyan" style="margin-bottom:6px;display:inline-block;">Baja</span><br>Refactorizar modulo X
+                    </div>
+                </div>
+                <div style="background:var(--surface2); border:1px solid var(--border); border-radius:12px; padding:16px; border-top:3px solid var(--accent);">
+                    <h4 style="text-align:center; color:var(--accent); font-size:0.85rem; margin-bottom:12px;">&#128295; EN PROGRESO <span style="background:rgba(0,212,255,0.2);padding:2px 8px;border-radius:10px;font-size:0.7rem;">WIP: 3</span></h4>
+                    <div style="background:var(--surface); border:1px solid rgba(0,212,255,0.3); border-radius:8px; padding:10px; margin-bottom:8px; font-size:0.82rem;">
+                        <span class="badge badge-red" style="margin-bottom:6px;display:inline-block;">Alta</span><br>Implementar login OAuth
+                    </div>
+                    <div style="background:var(--surface); border:1px solid rgba(0,212,255,0.3); border-radius:8px; padding:10px; font-size:0.82rem;">
+                        <span class="badge badge-orange" style="margin-bottom:6px;display:inline-block;">Media</span><br>Disenar dashboard
+                    </div>
+                </div>
+                <div style="background:var(--surface2); border:1px solid var(--border); border-radius:12px; padding:16px; border-top:3px solid var(--orange);">
+                    <h4 style="text-align:center; color:var(--orange); font-size:0.85rem; margin-bottom:12px;">&#128269; EN REVISION</h4>
+                    <div style="background:var(--surface); border:1px solid rgba(255,159,67,0.3); border-radius:8px; padding:10px; font-size:0.82rem;">
+                        <span class="badge badge-red" style="margin-bottom:6px;display:inline-block;">Alta</span><br>Fix bug autenticacion
+                    </div>
+                </div>
+                <div style="background:var(--surface2); border:1px solid var(--border); border-radius:12px; padding:16px; border-top:3px solid var(--green);">
+                    <h4 style="text-align:center; color:var(--green); font-size:0.85rem; margin-bottom:12px;">&#9989; COMPLETADO</h4>
+                    <div style="background:var(--surface); border:1px solid rgba(0,232,143,0.3); border-radius:8px; padding:10px; margin-bottom:8px; font-size:0.82rem; opacity:0.7;">
+                        <span class="badge badge-green" style="margin-bottom:6px;display:inline-block;">Done</span><br>Setup CI/CD pipeline
+                    </div>
+                    <div style="background:var(--surface); border:1px solid rgba(0,232,143,0.3); border-radius:8px; padding:10px; font-size:0.82rem; opacity:0.7;">
+                        <span class="badge badge-green" style="margin-bottom:6px;display:inline-block;">Done</span><br>Configurar entorno dev
+                    </div>
+                </div>
+            </div>
+
+            <h4 style="color:var(--green); margin-bottom:12px;">&#128273; Principios Kanban</h4>
+            <div class="grid-3">
+                <div class="mini-card">
+                    <h4>&#128065; Visualizar el trabajo</h4>
+                    <p>Hacer visible todo el trabajo mediante un tablero. Cada tarjeta representa una tarea con su estado actual.</p>
+                </div>
+                <div class="mini-card">
+                    <h4>&#128683; Limitar el WIP</h4>
+                    <p>Establecer limites de trabajo en progreso por columna. Evita la sobrecarga y mejora el foco del equipo.</p>
+                </div>
+                <div class="mini-card">
+                    <h4>&#128200; Gestionar el flujo</h4>
+                    <p>Monitorear y optimizar el flujo de trabajo. Medir lead time, cycle time y throughput para mejora continua.</p>
+                </div>
+                <div class="mini-card">
+                    <h4>&#128220; Politicas explicitas</h4>
+                    <p>Definir claramente las reglas: criterios para mover tarjetas, Definition of Done, limites WIP por columna.</p>
+                </div>
+                <div class="mini-card">
+                    <h4>&#128161; Feedback loops</h4>
+                    <p>Implementar ciclos de retroalimentacion regulares: standups, revisiones de entrega, retrospectivas.</p>
+                </div>
+                <div class="mini-card">
+                    <h4>&#128640; Mejorar colaborativamente</h4>
+                    <p>Evolucionar experimentalmente usando modelos y el metodo cientifico. Cambios incrementales, no radicales.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- XP -->
+        <div class="card">
+            <div class="card-title"><span class="icon icon-orange">&#9889;</span> Extreme Programming (XP)</div>
+            <p style="margin-bottom:18px;">XP es una metodologia agil que enfatiza las <strong>practicas tecnicas de ingenieria</strong> y la excelencia del codigo. Ideal para equipos pequenos con requisitos cambiantes.</p>
+            <div class="grid-4">
+                <div class="mini-card" style="text-align:center;">
+                    <h4>&#128101; Pair Programming</h4>
+                    <p>Dos desarrolladores trabajando juntos en la misma estacion: uno codifica, otro revisa en tiempo real.</p>
+                </div>
+                <div class="mini-card" style="text-align:center;">
+                    <h4>&#128260; TDD</h4>
+                    <p>Test-Driven Development: escribir la prueba ANTES del codigo. Red-Green-Refactor.</p>
+                </div>
+                <div class="mini-card" style="text-align:center;">
+                    <h4>&#128640; Integracion Continua</h4>
+                    <p>Integrar codigo al repositorio compartido varias veces al dia con pruebas automaticas.</p>
+                </div>
+                <div class="mini-card" style="text-align:center;">
+                    <h4>&#128221; Refactoring</h4>
+                    <p>Mejorar continuamente el diseno del codigo sin cambiar su comportamiento externo.</p>
+                </div>
+                <div class="mini-card" style="text-align:center;">
+                    <h4>&#128230; Releases pequenos</h4>
+                    <p>Entregas frecuentes y pequenas que aportan valor inmediato al cliente.</p>
+                </div>
+                <div class="mini-card" style="text-align:center;">
+                    <h4>&#128200; Codigo colectivo</h4>
+                    <p>Todo el equipo es responsable de todo el codigo. Cualquiera puede modificar cualquier parte.</p>
+                </div>
+                <div class="mini-card" style="text-align:center;">
+                    <h4>&#127919; Diseno simple</h4>
+                    <p>La solucion mas simple que funcione. No disenar para el futuro hipotetico (YAGNI).</p>
+                </div>
+                <div class="mini-card" style="text-align:center;">
+                    <h4>&#128170; Ritmo sostenible</h4>
+                    <p>Maximo 40 horas semanales. La fatiga reduce la calidad y la productividad.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Comparativa -->
+        <div class="card">
+            <div class="card-title"><span class="icon icon-purple">&#128202;</span> Comparativa: Scrum vs Kanban vs XP vs Waterfall</div>
+            <div style="overflow-x:auto;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Aspecto</th>
+                            <th>Scrum</th>
+                            <th>Kanban</th>
+                            <th>XP</th>
+                            <th>Waterfall</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Iteraciones</td>
+                            <td>Sprints fijos (1-4 sem)</td>
+                            <td>Flujo continuo</td>
+                            <td>Iteraciones cortas (1-2 sem)</td>
+                            <td>Fases secuenciales</td>
+                        </tr>
+                        <tr>
+                            <td>Roles</td>
+                            <td>PO, SM, Dev Team</td>
+                            <td>No prescribe roles</td>
+                            <td>Coach, Customer, Dev</td>
+                            <td>PM, Analista, Dev, QA</td>
+                        </tr>
+                        <tr>
+                            <td>Cambios</td>
+                            <td>Entre sprints</td>
+                            <td>En cualquier momento</td>
+                            <td>En cualquier momento</td>
+                            <td>Dificiles y costosos</td>
+                        </tr>
+                        <tr>
+                            <td>Metricas clave</td>
+                            <td>Velocity, Burndown</td>
+                            <td>Lead time, Cycle time</td>
+                            <td>Cobertura tests, Defectos</td>
+                            <td>Gantt, % completado</td>
+                        </tr>
+                        <tr>
+                            <td>Enfoque</td>
+                            <td>Gestion del equipo</td>
+                            <td>Optimizar flujo</td>
+                            <td>Practicas tecnicas</td>
+                            <td>Planificacion completa</td>
+                        </tr>
+                        <tr>
+                            <td>Mejor para</td>
+                            <td>Proyectos complejos</td>
+                            <td>Soporte, mantenimiento</td>
+                            <td>Equipos pequenos, calidad</td>
+                            <td>Requisitos fijos y claros</td>
+                        </tr>
+                        <tr>
+                            <td>Flexibilidad</td>
+                            <td><span class="badge badge-green">Alta</span></td>
+                            <td><span class="badge badge-green">Muy alta</span></td>
+                            <td><span class="badge badge-green">Alta</span></td>
+                            <td><span class="badge badge-red">Baja</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Agile en Auditoria -->
+        <div class="card">
+            <div class="card-title"><span class="icon icon-red">&#128270;</span> Metodologias Agiles Aplicadas a la Auditoria de TI</div>
+            <p style="margin-bottom:18px;">La auditoria agil adapta los principios agiles para hacer las auditorias mas <strong>eficientes, adaptables y orientadas al valor</strong>. Se abandona el enfoque lineal y rigido a favor de ciclos iterativos.</p>
+            <div class="grid-2">
+                <div class="mini-card" style="border-top:3px solid var(--accent);">
+                    <h4>&#128270; Auditoria Tradicional</h4>
+                    <p><strong style="color:var(--red);">Limitaciones:</strong></p>
+                    <ul style="color:var(--text-muted); font-size:0.85rem; padding-left:18px; margin-top:6px;">
+                        <li>Planificacion rigida al inicio</li>
+                        <li>Informe final extenso al final</li>
+                        <li>Poca comunicacion intermedia</li>
+                        <li>Hallazgos reportados tarde</li>
+                        <li>Dificil adaptarse a cambios</li>
+                        <li>El auditado se entera al final</li>
+                    </ul>
+                </div>
+                <div class="mini-card" style="border-top:3px solid var(--green);">
+                    <h4>&#128640; Auditoria Agil</h4>
+                    <p><strong style="color:var(--green);">Ventajas:</strong></p>
+                    <ul style="color:var(--text-muted); font-size:0.85rem; padding-left:18px; margin-top:6px;">
+                        <li>Planificacion adaptativa en sprints</li>
+                        <li>Hallazgos comunicados incrementalmente</li>
+                        <li>Comunicacion continua con stakeholders</li>
+                        <li>Riesgos criticos reportados de inmediato</li>
+                        <li>Alcance ajustable segun descubrimientos</li>
+                        <li>Retroalimentacion constante del auditado</li>
+                    </ul>
+                </div>
+            </div>
+            <div style="margin-top:20px; background:var(--surface2); border:1px solid var(--border); border-radius:12px; padding:20px;">
+                <h4 style="color:var(--accent); margin-bottom:10px;">&#128197; Sprint de Auditoria Tipico (2 semanas)</h4>
+                <div class="steps-container" style="gap:8px;">
+                    <div class="step-item" style="min-width:140px; cursor:default;">
+                        <div class="step-number">1</div>
+                        <h4>Planificacion</h4>
+                        <p>Definir alcance del sprint</p>
+                    </div>
+                    <div class="step-item" style="min-width:140px; cursor:default;">
+                        <div class="step-number">2</div>
+                        <h4>Fieldwork</h4>
+                        <p>Ejecutar pruebas y recopilar evidencia</p>
+                    </div>
+                    <div class="step-item" style="min-width:140px; cursor:default;">
+                        <div class="step-number">3</div>
+                        <h4>Analisis</h4>
+                        <p>Evaluar hallazgos y riesgos</p>
+                    </div>
+                    <div class="step-item" style="min-width:140px; cursor:default;">
+                        <div class="step-number">4</div>
+                        <h4>Review</h4>
+                        <p>Presentar al auditado</p>
+                    </div>
+                    <div class="step-item" style="min-width:140px; cursor:default;">
+                        <div class="step-number">5</div>
+                        <h4>Retro</h4>
+                        <p>Mejorar proceso</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Otras metodologías -->
+        <div class="card">
+            <div class="card-title"><span class="icon icon-blue">&#128218;</span> Otras Metodologias y Frameworks Complementarios</div>
+            <div class="grid-2">
+                <div class="mini-card" style="border-left:4px solid var(--accent);">
+                    <h4>&#128200; Lean</h4>
+                    <p>Originado en manufactura (Toyota). Enfocado en <strong>eliminar desperdicios</strong> (actividades sin valor), optimizar el flujo y la mejora continua (Kaizen). Los 7 desperdicios de software: funcionalidades extra, trabajo parcialmente hecho, tareas extra, cambio de contexto, esperas, movimiento y defectos.</p>
+                </div>
+                <div class="mini-card" style="border-left:4px solid var(--accent2);">
+                    <h4>&#128736; SAFe (Scaled Agile Framework)</h4>
+                    <p>Framework para escalar agil a nivel empresarial. Organiza equipos en <strong>Agile Release Trains (ART)</strong>. Define 4 niveles: Team, Program, Large Solution y Portfolio. Ideal para empresas grandes con multiples equipos coordinados.</p>
+                </div>
+                <div class="mini-card" style="border-left:4px solid var(--green);">
+                    <h4>&#128161; Design Thinking</h4>
+                    <p>Metodologia centrada en el usuario para resolver problemas complejos. 5 fases: <strong>Empatizar, Definir, Idear, Prototipar y Testear</strong>. Se complementa con Agile: DT para descubrir QUE construir, Agile para COMO construirlo.</p>
+                </div>
+                <div class="mini-card" style="border-left:4px solid var(--orange);">
+                    <h4>&#128202; DevOps</h4>
+                    <p>Cultura y conjunto de practicas que unifican <strong>Desarrollo (Dev) y Operaciones (Ops)</strong>. Automatiza el ciclo de vida: CI/CD, IaC, monitoreo. Complementa Agile extendiendo la agilidad desde el codigo hasta produccion.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Stories -->
+        <div class="card">
+            <div class="card-title"><span class="icon icon-green">&#128221;</span> Historias de Usuario — Como Escribirlas</div>
+            <p style="margin-bottom:18px;">Las <strong>historias de usuario</strong> son la unidad fundamental de trabajo en metodologias agiles. Describen funcionalidad desde la perspectiva del usuario final.</p>
+            <div style="background:var(--surface2); border:1px solid var(--border); border-radius:12px; padding:24px; margin-bottom:16px; font-family:'JetBrains Mono', monospace;">
+                <p style="color:var(--accent); font-weight:700; font-size:1.1rem; margin-bottom:12px;">Formato Estandar:</p>
+                <p style="font-size:1rem; line-height:2;">
+                    <span style="color:var(--green);">Como</span> <span style="color:var(--text-muted);">[tipo de usuario]</span><br>
+                    <span style="color:var(--orange);">Quiero</span> <span style="color:var(--text-muted);">[realizar una accion]</span><br>
+                    <span style="color:var(--accent2);">Para</span> <span style="color:var(--text-muted);">[obtener un beneficio]</span>
+                </p>
+            </div>
+            <div class="grid-2">
+                <div class="mini-card" style="border-left:4px solid var(--green);">
+                    <h4 style="color:var(--green);">&#9989; Buen ejemplo</h4>
+                    <p><em>"Como auditor de TI, quiero generar reportes automaticos de cumplimiento de controles, para reducir el tiempo de documentacion de hallazgos en un 50%."</em></p>
+                    <div class="tag-list" style="margin-top:8px;">
+                        <span class="badge badge-green">Especifica</span>
+                        <span class="badge badge-green">Medible</span>
+                        <span class="badge badge-green">Con valor</span>
+                    </div>
+                </div>
+                <div class="mini-card" style="border-left:4px solid var(--red);">
+                    <h4 style="color:var(--red);">&#10060; Mal ejemplo</h4>
+                    <p><em>"Como usuario, quiero que el sistema sea rapido."</em></p>
+                    <div class="tag-list" style="margin-top:8px;">
+                        <span class="badge badge-red">Vaga</span>
+                        <span class="badge badge-red">No medible</span>
+                        <span class="badge badge-red">Sin contexto</span>
+                    </div>
+                </div>
+            </div>
+            <div style="margin-top:16px; background:var(--surface2); border:1px solid var(--border); border-radius:12px; padding:20px;">
+                <h4 style="color:var(--accent); margin-bottom:10px;">&#128220; Criterios de Aceptacion (Ejemplo)</h4>
+                <ul style="color:var(--text-muted); font-size:0.88rem; padding-left:18px;">
+                    <li><strong>DADO</strong> que el auditor ha completado la evaluacion de un area</li>
+                    <li><strong>CUANDO</strong> selecciona "Generar Reporte" en el dashboard</li>
+                    <li><strong>ENTONCES</strong> el sistema genera un PDF con todos los hallazgos clasificados por severidad, incluyendo evidencia y recomendaciones</li>
+                    <li><strong>Y</strong> el tiempo de generacion no excede los 10 segundos</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Estimacion -->
+        <div class="card">
+            <div class="card-title"><span class="icon icon-orange">&#127922;</span> Tecnicas de Estimacion Agil</div>
+            <div class="grid-3">
+                <div class="mini-card" style="border-top:3px solid var(--accent);">
+                    <h4>&#127183; Planning Poker</h4>
+                    <p>El equipo estima usando cartas con la secuencia Fibonacci (1, 2, 3, 5, 8, 13, 21). Cada miembro elige una carta simultaneamente. Si hay discrepancia, se discute y se vuelve a votar. Fomenta el consenso.</p>
+                    <div class="tag-list"><span class="badge badge-cyan">Story Points</span><span class="badge badge-cyan">Consenso</span></div>
+                </div>
+                <div class="mini-card" style="border-top:3px solid var(--accent2);">
+                    <h4>&#128085; T-Shirt Sizing</h4>
+                    <p>Estimacion rapida usando tallas: <strong>XS, S, M, L, XL</strong>. Ideal para estimaciones de alto nivel (epicas o features). Menos preciso pero mucho mas rapido que Planning Poker.</p>
+                    <div class="tag-list"><span class="badge badge-purple">Rapido</span><span class="badge badge-purple">Alto nivel</span></div>
+                </div>
+                <div class="mini-card" style="border-top:3px solid var(--green);">
+                    <h4>&#128202; Dot Voting</h4>
+                    <p>Cada miembro tiene un numero limitado de puntos (dots) para distribuir entre las opciones. Las opciones con mas puntos tienen mayor prioridad. Util para priorizar el backlog.</p>
+                    <div class="tag-list"><span class="badge badge-green">Priorizacion</span><span class="badge badge-green">Democratico</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Metricas Agiles -->
+        <div class="card">
+            <div class="card-title"><span class="icon icon-blue">&#128200;</span> Metricas Agiles Clave</div>
+            <div class="grid-2">
+                <div class="mini-card">
+                    <h4>&#128200; Velocity (Velocidad)</h4>
+                    <p>Cantidad de story points completados por sprint. Permite predecir cuanto trabajo puede abordar el equipo. Se estabiliza despues de 3-5 sprints.</p>
+                </div>
+                <div class="mini-card">
+                    <h4>&#128201; Burndown Chart</h4>
+                    <p>Grafico que muestra el trabajo pendiente vs el tiempo. La linea ideal es recta; desviaciones revelan riesgos de no cumplir el sprint goal.</p>
+                </div>
+                <div class="mini-card">
+                    <h4>&#9201; Lead Time</h4>
+                    <p>Tiempo total desde que se solicita un trabajo hasta que se entrega. Incluye tiempo de espera. Metrica clave en Kanban.</p>
+                </div>
+                <div class="mini-card">
+                    <h4>&#128338; Cycle Time</h4>
+                    <p>Tiempo desde que se empieza a trabajar en un item hasta que se completa. Excluye el tiempo de espera en backlog.</p>
+                </div>
+                <div class="mini-card">
+                    <h4>&#128202; Throughput</h4>
+                    <p>Numero de items completados por unidad de tiempo. Indica la capacidad real de entrega del equipo.</p>
+                </div>
+                <div class="mini-card">
+                    <h4>&#128515; Team Happiness</h4>
+                    <p>Indice de satisfaccion del equipo medido en retrospectivas. Equipos felices son mas productivos y generan mejor calidad.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<footer style="text-align:center; padding:40px 20px; color:var(--text-muted); font-size:0.82rem; border-top:1px solid var(--border); margin-top:40px;">
+    <p>Auditoria & Seguridad Informatica &mdash; Guia Interactiva Educativa</p>
+    <p style="margin-top:4px;">Contenido con fines educativos &bull; 2026</p>
+</footer>
+
+<script>
+    // ==================== TAB SWITCHING ====================
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('tab-' + tabId).classList.add('active');
+        event.currentTarget.classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ==================== AUDIT STEPS ====================
+    function showStep(index) {
+        document.querySelectorAll('#audit-steps .step-item').forEach((s, i) => {
+            s.classList.toggle('active', i === index);
+        });
+        document.querySelectorAll('#step-details .step-detail').forEach((d, i) => {
+            d.classList.toggle('active', i === index);
+        });
+    }
+
+    // ==================== CHECKLIST ====================
+    function toggleCheck(el) {
+        el.classList.toggle('checked');
+        updateChecklistProgress();
+    }
+
+    function updateChecklistProgress() {
+        const items = document.querySelectorAll('#audit-checklist li');
+        const checked = document.querySelectorAll('#audit-checklist li.checked');
+        const pct = (checked.length / items.length) * 100;
+        document.getElementById('checklist-progress').style.width = pct + '%';
+        document.getElementById('checklist-count').textContent = checked.length + ' de ' + items.length + ' completados';
+    }
+
+    // ==================== CIA TRIAD ====================
+    const ciaData = {
+        c: {
+            title: '&#128274; Confidencialidad',
+            color: 'var(--accent)',
+            text: 'Garantiza que la informacion solo sea accesible por personas autorizadas. Se implementa mediante cifrado, control de acceso, clasificacion de datos y acuerdos de confidencialidad (NDA).',
+            tags: ['Cifrado', 'Control de acceso', 'Clasificacion', 'NDA']
+        },
+        i: {
+            title: '&#128737; Integridad',
+            color: 'var(--accent2)',
+            text: 'Asegura que la informacion no ha sido alterada de manera no autorizada. Se verifica con hash, firmas digitales, checksums, control de versiones y logs de auditoria.',
+            tags: ['Hash', 'Firmas digitales', 'Checksums', 'Logs']
+        },
+        a: {
+            title: '&#9989; Disponibilidad',
+            color: 'var(--green)',
+            text: 'Garantiza que los sistemas y datos esten disponibles cuando se necesiten. Se logra con redundancia, balanceo de carga, backups, planes de continuidad (BCP) y DRP.',
+            tags: ['Redundancia', 'Backups', 'BCP', 'Balanceo de carga']
+        }
+    };
+
+    function showCIA(key) {
+        const data = ciaData[key];
+        document.querySelectorAll('.cia-node').forEach(n => n.classList.remove('active'));
+        document.querySelector('.cia-' + key).classList.add('active');
+        const detail = document.getElementById('cia-detail');
+        detail.innerHTML = `
+            <h4 style="color:${data.color}; margin-bottom:8px;">${data.title}</h4>
+            <p>${data.text}</p>
+            <div class="tag-list" style="margin-top:10px; justify-content:center;">
+                ${data.tags.map(t => `<span class="badge badge-cyan">${t}</span>`).join('')}
+            </div>
+        `;
+    }
+
+    // ==================== DEFENSE IN DEPTH ====================
+    const defenseData = [
+        { title: '&#127760; Capa de Perimetro', color: 'var(--red)', text: 'Primera linea de defensa. Incluye firewalls, sistemas de deteccion/prevencion de intrusos (IDS/IPS), DMZ y filtrado de paquetes. Controla el trafico entre la red interna y externa.' },
+        { title: '&#128423; Capa de Red', color: 'var(--orange)', text: 'Segmentacion de red (VLANs), VPNs para acceso remoto seguro, NAC (Network Access Control) para autenticar dispositivos antes de conectarlos.' },
+        { title: '&#128187; Capa de Host', color: 'var(--yellow)', text: 'Proteccion a nivel de servidor y estacion de trabajo: antivirus/EDR, hardening del sistema operativo, gestion de parches, bastionado de configuraciones.' },
+        { title: '&#128268; Capa de Aplicacion', color: 'var(--accent)', text: 'WAF (Web Application Firewall), revision de codigo seguro (SAST/DAST), validacion de entradas, autenticacion robusta y gestion de sesiones.' },
+        { title: '&#128451; Capa de Datos', color: 'var(--accent2)', text: 'Cifrado de datos en reposo y en transito, DLP (Data Loss Prevention), clasificacion de informacion, backups cifrados y gestion de claves.' }
+    ];
+
+    function showDefenseLayer(index) {
+        const data = defenseData[index];
+        document.getElementById('defense-detail').innerHTML = `
+            <h4 style="color:${data.color};">${data.title}</h4>
+            <p>${data.text}</p>
+        `;
+        document.getElementById('defense-detail').classList.add('active');
+    }
+
+    // ==================== THREAT SIMULATOR ====================
+    const defenseExplanations = [
+        { correct: 'La capacitacion del personal y la verificacion por un segundo canal (llamada, mensaje) son la defensa mas efectiva contra phishing. Los firewalls no bloquean correos socialmente manipulados.', wrong: 'Esa medida no aborda la raiz del problema. El phishing explota la psicologia humana, no vulnerabilidades tecnicas de red.' },
+        { correct: 'Restaurar desde backups limpios, aislar los sistemas afectados e investigar como entro el ransomware es la respuesta correcta. Nunca se debe pagar el rescate.', wrong: 'Esa opcion no resuelve el problema y podria empeorar la situacion. Los backups y la investigacion del vector son clave.' },
+        { correct: 'Las consultas parametrizadas (prepared statements) eliminan la posibilidad de inyeccion SQL. Un WAF agrega una capa adicional y la validacion de inputs previene datos maliciosos.', wrong: 'Esa medida sola no es suficiente. La solucion raiz es sanitizar y parametrizar las consultas en el codigo fuente.' }
+    ];
+
+    function checkDefense(el, scenarioIndex, isCorrect) {
+        const feedback = document.getElementById('feedback-' + scenarioIndex);
+        const siblings = el.parentElement.querySelectorAll('.defense-opt');
+
+        siblings.forEach(s => {
+            s.style.pointerEvents = 'none';
+            s.style.opacity = '0.6';
+        });
+
+        if (isCorrect) {
+            el.classList.add('correct');
+            el.style.opacity = '1';
+            feedback.className = 'feedback-msg show success';
+            feedback.textContent = '✓ Correcto! ' + defenseExplanations[scenarioIndex].correct;
+        } else {
+            el.classList.add('wrong');
+            el.style.opacity = '1';
+            feedback.className = 'feedback-msg show error';
+            feedback.textContent = '✗ Incorrecto. ' + defenseExplanations[scenarioIndex].wrong;
+        }
+    }
+
+    // ==================== FRAMEWORKS ====================
+    function toggleFramework(id) {
+        const detail = document.getElementById('fw-' + id);
+        const isActive = detail.classList.contains('active');
+        document.querySelectorAll('.fw-detail').forEach(d => d.classList.remove('active'));
+        if (!isActive) {
+            detail.classList.add('active');
+            detail.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    }
+
+    // ==================== NIST WHEEL ====================
+    const nistData = {
+        identify: {
+            title: '&#128270; Identificar (Identify)', color: 'var(--accent)',
+            text: 'Desarrollar la comprension organizacional para gestionar el riesgo de ciberseguridad de sistemas, personas, activos, datos y capacidades.',
+            categories: ['Gestion de activos', 'Entorno de negocio', 'Gobernanza', 'Evaluacion de riesgos', 'Estrategia de riesgos', 'Gestion de la cadena de suministro']
+        },
+        protect: {
+            title: '&#128737; Proteger (Protect)', color: 'var(--accent2)',
+            text: 'Desarrollar e implementar las salvaguardas apropiadas para asegurar la entrega de servicios de infraestructura critica.',
+            categories: ['Gestion de identidad y acceso', 'Concientizacion y capacitacion', 'Seguridad de datos', 'Procesos y procedimientos', 'Mantenimiento', 'Tecnologia de proteccion']
+        },
+        detect: {
+            title: '&#128680; Detectar (Detect)', color: 'var(--orange)',
+            text: 'Desarrollar e implementar las actividades apropiadas para identificar la ocurrencia de un evento de ciberseguridad.',
+            categories: ['Anomalias y eventos', 'Monitoreo continuo de seguridad', 'Procesos de deteccion']
+        },
+        respond: {
+            title: '&#9889; Responder (Respond)', color: 'var(--red)',
+            text: 'Desarrollar e implementar las actividades apropiadas para tomar accion ante un incidente de ciberseguridad detectado.',
+            categories: ['Planificacion de respuesta', 'Comunicaciones', 'Analisis', 'Mitigacion', 'Mejoras']
+        },
+        recover: {
+            title: '&#128260; Recuperar (Recover)', color: 'var(--green)',
+            text: 'Desarrollar e implementar actividades para mantener planes de resiliencia y restaurar capacidades afectadas por un incidente.',
+            categories: ['Planificacion de recuperacion', 'Mejoras', 'Comunicaciones']
+        }
+    };
+
+    function showNIST(key) {
+        const data = nistData[key];
+        document.querySelectorAll('.nist-segment').forEach(s => s.classList.remove('active'));
+        document.querySelector('.nist-' + key).classList.add('active');
+        document.getElementById('nist-detail').innerHTML = `
+            <h4 style="color:${data.color}; margin-bottom:8px;">${data.title}</h4>
+            <p>${data.text}</p>
+            <div class="tag-list" style="margin-top:12px;">
+                ${data.categories.map(c => `<span class="badge badge-cyan">${c}</span>`).join('')}
+            </div>
+        `;
+    }
+
+    // ==================== PDCA ====================
+    const pdcaData = {
+        plan: { title: 'PLAN - Planificar', color: 'var(--accent)', text: 'Establecer los objetivos y procesos del SGSI. Definir la politica de seguridad, alcance, evaluacion de riesgos, seleccion de controles y la Declaracion de Aplicabilidad (SoA).' },
+        do: { title: 'DO - Hacer', color: 'var(--green)', text: 'Implementar y operar la politica del SGSI, los controles, procesos y procedimientos definidos en la fase de planificacion.' },
+        check: { title: 'CHECK - Verificar', color: 'var(--orange)', text: 'Evaluar y medir el desempeno de los procesos contra la politica, objetivos y la experiencia practica. Realizar auditorias internas y revisiones de la direccion.' },
+        act: { title: 'ACT - Actuar', color: 'var(--accent2)', text: 'Tomar acciones correctivas y preventivas basadas en los resultados de la auditoria y revision. Implementar mejoras continuas al SGSI.' }
+    };
+
+    function showPDCA(phase) {
+        const data = pdcaData[phase];
+        document.getElementById('pdca-detail').innerHTML = `
+            <h4 style="color:${data.color}; margin-bottom:8px;">${data.title}</h4>
+            <p>${data.text}</p>
+        `;
+    }
+
+    // ==================== COSO ====================
+    const cosoData = [
+        { title: 'Entorno de Control', color: 'var(--accent)', text: 'Es la base del sistema de control interno. Establece el tono de la organizacion, incluyendo la integridad, valores eticos, competencia del personal, filosofia de la direccion y estilo de liderazgo. Define la estructura organizacional y las politicas de RRHH.' },
+        { title: 'Evaluacion de Riesgos', color: 'var(--accent2)', text: 'Proceso para identificar y analizar los riesgos relevantes que pueden impedir el logro de los objetivos. Considera cambios en el entorno externo e interno, fraude potencial y cambios significativos.' },
+        { title: 'Actividades de Control', color: 'var(--green)', text: 'Politicas y procedimientos que aseguran que las directivas de la gerencia se cumplan. Incluyen aprobaciones, autorizaciones, verificaciones, conciliaciones, revision de desempeno y controles de TI.' },
+        { title: 'Informacion y Comunicacion', color: 'var(--orange)', text: 'La informacion relevante debe ser identificada, capturada y comunicada de forma oportuna. Los sistemas de informacion deben producir reportes con datos financieros, operativos y de cumplimiento.' },
+        { title: 'Monitoreo', color: 'var(--red)', text: 'Evaluaciones continuas y separadas del desempeno del control interno a lo largo del tiempo. Incluye supervisiones regulares, auditorias internas y evaluacion de deficiencias.' }
+    ];
+
+    function showCOSO(index) {
+        const data = cosoData[index];
+        document.getElementById('coso-detail').innerHTML = `
+            <h4 style="color:${data.color}; margin-bottom:8px;">${data.title}</h4>
+            <p>${data.text}</p>
+        `;
+    }
+
+    // ==================== RISK MATRIX ====================
+    let placedRisks = [];
+
+    function placeRisk(cell, row, col) {
+        const nameInput = document.getElementById('risk-name');
+        const name = nameInput.value.trim();
+        if (!name) {
+            nameInput.style.borderColor = 'var(--red)';
+            nameInput.focus();
+            setTimeout(() => nameInput.style.borderColor = 'var(--border)', 1500);
+            return;
+        }
+
+        const levelNames = { 'rm-low': 'Bajo', 'rm-medium': 'Medio', 'rm-high': 'Alto', 'rm-critical': 'Critico' };
+        const levelColors = { 'rm-low': 'badge-green', 'rm-medium': 'badge-orange', 'rm-high': 'badge-orange', 'rm-critical': 'badge-red' };
+        let level = '';
+        cell.classList.forEach(c => { if (levelNames[c]) level = c; });
+
+        const tag = document.createElement('span');
+        tag.className = 'risk-tag';
+        tag.textContent = name;
+        cell.appendChild(tag);
+        cell.classList.add('has-risk');
+
+        placedRisks.push({ name, level: levelNames[level], row, col });
+
+        const listEl = document.getElementById('placed-risks-list');
+        const badge = document.createElement('span');
+        badge.className = 'badge ' + (levelColors[level] || 'badge-cyan');
+        badge.textContent = name + ' (' + levelNames[level] + ')';
+        listEl.appendChild(badge);
+
+        nameInput.value = '';
+        nameInput.focus();
+    }
+
+    function clearRiskMatrix() {
+        document.querySelectorAll('.rm-cell').forEach(cell => {
+            cell.querySelectorAll('.risk-tag').forEach(t => t.remove());
+            cell.classList.remove('has-risk');
+        });
+        document.getElementById('placed-risks-list').innerHTML = '';
+        placedRisks = [];
+    }
+
+    // ==================== CONTROL MATRIX ====================
+    function showCtrl(el, text) {
+        document.querySelectorAll('.ctrl-matrix .ctrl-cell:not(.header)').forEach(c => c.style.background = 'var(--surface2)');
+        el.style.background = 'var(--surface3)';
+        const detail = document.getElementById('ctrl-detail');
+        document.getElementById('ctrl-detail-text').textContent = text;
+        detail.style.display = 'block';
+    }
+
+    // ==================== CONTROL ENVIRONMENT DESIGNER ====================
+    function toggleControl(el) {
+        el.classList.toggle('correct');
+        updateControlCounts();
+    }
+
+    function updateControlCounts() {
+        const prevCount = document.querySelectorAll('#ctrl-preventive .correct').length;
+        const detCount = document.querySelectorAll('#ctrl-detective .correct').length;
+        const corCount = document.querySelectorAll('#ctrl-corrective .correct').length;
+        const total = prevCount + detCount + corCount;
+        const maxControls = 15;
+
+        document.getElementById('prev-count').textContent = prevCount;
+        document.getElementById('det-count').textContent = detCount;
+        document.getElementById('cor-count').textContent = corCount;
+        document.getElementById('ctrl-progress').style.width = ((total / maxControls) * 100) + '%';
+
+        const container = document.getElementById('selected-controls');
+        if (total === 0) {
+            container.innerHTML = '<p style="color:var(--text-muted); font-size:0.85rem;">Selecciona controles arriba para construir tu ambiente de control.</p>';
+            return;
+        }
+
+        let html = '<div style="display:flex; flex-wrap:wrap; gap:6px;">';
+        document.querySelectorAll('#ctrl-preventive .correct, #ctrl-detective .correct, #ctrl-corrective .correct').forEach(c => {
+            html += `<span class="badge badge-green">${c.textContent}</span>`;
+        });
+        html += '</div>';
+
+        let evaluation = '';
+        if (prevCount === 0) evaluation += '<span style="color:var(--red);">&#9888; Falta: Controles preventivos.</span> ';
+        if (detCount === 0) evaluation += '<span style="color:var(--red);">&#9888; Falta: Controles detectivos.</span> ';
+        if (corCount === 0) evaluation += '<span style="color:var(--red);">&#9888; Falta: Controles correctivos.</span> ';
+        if (prevCount > 0 && detCount > 0 && corCount > 0) {
+            evaluation = '<span style="color:var(--green);">&#10004; Buen balance de controles preventivos, detectivos y correctivos.</span>';
+        }
+
+        html += `<p style="margin-top:10px; font-size:0.85rem;">${evaluation}</p>`;
+        container.innerHTML = html;
+    }
+
+    // ==================== QUIZ ====================
+    let quizCorrect = 0;
+    let quizAnswered = 0;
+    const totalQuestions = 8;
+
+    function checkQuiz(el, isCorrect) {
+        const question = el.parentElement;
+        if (question.classList.contains('answered')) return;
+        question.classList.add('answered');
+
+        const options = question.querySelectorAll('.quiz-option');
+        options.forEach(o => o.classList.add('disabled'));
+
+        if (isCorrect) {
+            el.classList.add('correct');
+            quizCorrect++;
+        } else {
+            el.classList.add('wrong');
+            options.forEach(o => {
+                if (o.onclick && o.getAttribute('onclick').includes('true')) {
+                    o.classList.add('correct');
+                }
+            });
+        }
+
+        quizAnswered++;
+        if (quizAnswered === totalQuestions) {
+            const pct = Math.round((quizCorrect / totalQuestions) * 100);
+            let msg = '';
+            if (pct === 100) msg = 'Excelente! Dominas el tema!';
+            else if (pct >= 75) msg = 'Muy bien! Buen nivel de conocimiento.';
+            else if (pct >= 50) msg = 'Bien, pero hay areas para mejorar.';
+            else msg = 'Necesitas repasar los conceptos.';
+            document.getElementById('quiz-score').innerHTML = `Resultado: ${quizCorrect}/${totalQuestions} (${pct}%)<br><span style="font-size:1rem; color:var(--text-muted);">${msg}</span>`;
+        }
+    }
+
+    function resetQuiz() {
+        quizCorrect = 0;
+        quizAnswered = 0;
+        document.getElementById('quiz-score').innerHTML = '';
+        document.querySelectorAll('.quiz-question').forEach(q => {
+            q.classList.remove('answered');
+            q.querySelectorAll('.quiz-option').forEach(o => {
+                o.classList.remove('correct', 'wrong', 'disabled');
+            });
+        });
+    }
+
+    // ==================== SCRUM EVENTS ====================
+    function showScrumEvent(index) {
+        document.querySelectorAll('#scrum-events .step-item').forEach((s, i) => {
+            s.classList.toggle('active', i === index);
+        });
+        document.querySelectorAll('#scrum-event-details .step-detail').forEach((d, i) => {
+            d.classList.toggle('active', i === index);
+        });
+    }
+
+    // ==================== PARTICLE BACKGROUND ====================
+    (function() {
+        const canvas = document.createElement('canvas');
+        canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:0.4;';
+        document.body.prepend(canvas);
+        const ctx = canvas.getContext('2d');
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resize();
+        window.addEventListener('resize', resize);
+
+        const particles = [];
+        for (let i = 0; i < 40; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                vx: (Math.random() - 0.5) * 0.3,
+                vy: (Math.random() - 0.5) * 0.3,
+                r: Math.random() * 2 + 0.5,
+                color: ['rgba(0,212,255,', 'rgba(124,92,252,', 'rgba(0,232,143,'][Math.floor(Math.random() * 3)]
+            });
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+                if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.fillStyle = p.color + '0.6)';
+                ctx.fill();
+            });
+
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 150) {
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.strokeStyle = 'rgba(0,212,255,' + (1 - dist / 150) * 0.15 + ')';
+                        ctx.lineWidth = 0.5;
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+        animate();
+    })();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ingeniería de Software — De Inicio a Fin</title>
+<style>
+:root{
+  --bg:#0b1020; --bg-soft:#121a30; --card:#11192b; --border:rgba(148,163,184,.22);
+  --text:#e5e7eb; --muted:#94a3b8;
+  --blue:#60a5fa; --cyan:#22d3ee; --green:#34d399; --orange:#fb923c; --purple:#a78bfa; --red:#f87171;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; font-family:Inter,Segoe UI,Roboto,Arial,sans-serif; color:var(--text);
+  background:radial-gradient(circle at 20% 0%, #12203f 0%, var(--bg) 45%, #060a16 100%);
+}
+.wrapper{max-width:1180px; margin:0 auto; padding:24px}
+.header{
+  background:linear-gradient(135deg, rgba(96,165,250,.15), rgba(34,211,238,.08));
+  border:1px solid var(--border); border-radius:16px; padding:24px; margin-bottom:18px;
+}
+h1{margin:0 0 8px; font-size:2rem}
+.subtitle{margin:0; color:var(--muted)}
+.badge-row{display:flex; gap:8px; flex-wrap:wrap; margin-top:14px}
+.badge{padding:6px 10px; border-radius:999px; font-size:.78rem; border:1px solid var(--border); background:rgba(15,23,42,.5)}
+.tabs{
+  background:rgba(2,6,23,.6); border:1px solid var(--border); border-radius:12px; padding:8px; overflow-x:auto; white-space:nowrap;
+  position:sticky; top:10px; z-index:40; backdrop-filter:blur(8px);
+}
+.tab-btn{
+  border:none; background:transparent; color:var(--muted); cursor:pointer;
+  padding:11px 14px; border-radius:10px; margin-right:6px; font-weight:600;
+}
+.tab-btn:hover{color:var(--text); background:rgba(148,163,184,.08)}
+.tab-btn.active{color:var(--cyan); background:rgba(34,211,238,.12)}
+.panel{display:none; margin-top:18px}
+.panel.active{display:block}
+.section{
+  background:rgba(15,23,42,.45); border:1px solid var(--border); border-radius:14px; padding:18px; margin-bottom:14px;
+}
+.section h2{margin:0 0 8px; font-size:1.35rem}
+.desc{color:var(--muted); margin:0 0 14px}
+.grid{display:grid; grid-template-columns:repeat(3,1fr); gap:12px}
+.grid-2{display:grid; grid-template-columns:repeat(2,1fr); gap:12px}
+.card{
+  background:var(--card); border:1px solid var(--border); border-radius:12px; padding:14px;
+}
+.card h3{margin:0 0 8px; font-size:1rem}
+.card p{margin:0; color:var(--muted); line-height:1.45}
+ul{margin:10px 0 0 18px}
+li{margin:4px 0; color:#dbe4f0}
+table{width:100%; border-collapse:collapse; overflow:hidden; border-radius:10px; border:1px solid var(--border); background:var(--card)}
+th,td{padding:10px; border-bottom:1px solid var(--border); text-align:left; font-size:.92rem}
+th{background:rgba(96,165,250,.14); color:#d9ecff}
+.timeline{display:flex; gap:10px; flex-wrap:wrap}
+.step{
+  border:1px dashed var(--border); background:rgba(15,23,42,.45); border-radius:10px; padding:10px 12px;
+  min-width:150px; text-align:center; font-weight:600;
+}
+.kpi{
+  display:flex; gap:10px; flex-wrap:wrap;
+}
+.pill{
+  border:1px solid var(--border); border-radius:999px; padding:6px 10px; font-size:.8rem; color:#dbeafe;
+  background:rgba(96,165,250,.12);
+}
+.quiz-q{background:var(--card); border:1px solid var(--border); border-radius:10px; padding:12px; margin-bottom:10px}
+.quiz-q p{margin:0 0 8px}
+.quiz-q label{display:block; margin:6px 0; color:#dbe4f0}
+.btn{
+  border:none; cursor:pointer; border-radius:10px; padding:10px 14px; font-weight:700;
+  background:linear-gradient(90deg,var(--blue),var(--cyan)); color:#07111f;
+}
+.result{margin-top:10px; padding:10px; border-radius:8px; display:none}
+.ok{display:block; background:rgba(52,211,153,.15); border:1px solid rgba(52,211,153,.5)}
+.bad{display:block; background:rgba(248,113,113,.15); border:1px solid rgba(248,113,113,.45)}
+.footer{margin:26px 0 8px; color:var(--muted); font-size:.82rem; text-align:center}
+code{background:rgba(148,163,184,.14); border:1px solid var(--border); padding:2px 6px; border-radius:6px}
+@media (max-width:960px){.grid,.grid-2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <header class="header">
+    <h1>Ingeniería de Software — De Inicio a Fin</h1>
+    <p class="subtitle">Ruta completa: problema de negocio → requisitos → diseño → construcción → pruebas → despliegue → operación y mejora continua.</p>
+    <div class="badge-row">
+      <span class="badge">📌 Fundamentos</span>
+      <span class="badge">📋 Requisitos</span>
+      <span class="badge">🏗️ Diseño</span>
+      <span class="badge">💻 Desarrollo</span>
+      <span class="badge">🧪 QA</span>
+      <span class="badge">🚀 DevOps</span>
+      <span class="badge">📈 Métricas</span>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab-btn active" data-tab="inicio">🧭 Inicio</button>
+    <button class="tab-btn" data-tab="ciclo">🔄 Ciclo de Vida</button>
+    <button class="tab-btn" data-tab="requisitos">📋 Requisitos</button>
+    <button class="tab-btn" data-tab="diseno">🏗️ Diseño y Arquitectura</button>
+    <button class="tab-btn" data-tab="desarrollo">💻 Desarrollo</button>
+    <button class="tab-btn" data-tab="pruebas">🧪 Pruebas y Calidad</button>
+    <button class="tab-btn" data-tab="devops">🚀 Entrega y DevOps</button>
+    <button class="tab-btn" data-tab="gestion">📊 Gestión y Métricas</button>
+    <button class="tab-btn" data-tab="quiz">📝 Evaluación</button>
+  </nav>
+
+  <section id="panel-inicio" class="panel active">
+    <div class="section">
+      <h2>¿Qué es Ingeniería de Software?</h2>
+      <p class="desc">Disciplina para construir software útil, mantenible y seguro con procesos, técnicas y herramientas. No es solo programar: incluye análisis, diseño, validación, despliegue y operación.</p>
+      <div class="grid">
+        <div class="card">
+          <h3>🎯 Objetivo de negocio</h3>
+          <p>Entregar valor medible (ingresos, eficiencia, cumplimiento, experiencia de usuario).</p>
+        </div>
+        <div class="card">
+          <h3>⚖️ Restricciones</h3>
+          <p>Tiempo, costo, alcance, riesgos, seguridad, regulación y capacidades del equipo.</p>
+        </div>
+        <div class="card">
+          <h3>🧱 Calidad integral</h3>
+          <p>Funcionalidad, confiabilidad, rendimiento, mantenibilidad, usabilidad y portabilidad.</p>
+        </div>
+      </div>
+    </div>
+    <div class="section">
+      <h2>Las 5 preguntas iniciales</h2>
+      <div class="grid-2">
+        <div class="card"><h3>1) ¿Qué problema resolvemos?</h3><p>Define dolor, impacto y prioridad de negocio.</p></div>
+        <div class="card"><h3>2) ¿Para quién?</h3><p>Segmentos de usuario, roles, necesidades y contexto operativo.</p></div>
+        <div class="card"><h3>3) ¿Cómo medimos éxito?</h3><p>KPIs: adopción, tiempo de proceso, errores, satisfacción, NPS.</p></div>
+        <div class="card"><h3>4) ¿Qué riesgos hay?</h3><p>Dependencias, deuda técnica, seguridad, incertidumbre de alcance.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="panel-ciclo" class="panel">
+    <div class="section">
+      <h2>Ciclo de Vida del Software (SDLC)</h2>
+      <p class="desc">No siempre es lineal; suele iterar en sprints o releases cortos.</p>
+      <div class="timeline">
+        <div class="step">1. Descubrimiento</div>
+        <div class="step">2. Requisitos</div>
+        <div class="step">3. Diseño</div>
+        <div class="step">4. Desarrollo</div>
+        <div class="step">5. Pruebas</div>
+        <div class="step">6. Despliegue</div>
+        <div class="step">7. Operación</div>
+        <div class="step">8. Mejora continua</div>
+      </div>
+    </div>
+    <div class="section">
+      <h2>Modelos de proceso</h2>
+      <table>
+        <thead>
+          <tr><th>Modelo</th><th>Cuándo usar</th><th>Riesgo típico</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Cascada</td><td>Requisitos estables y regulación alta</td><td>Poca adaptación al cambio</td></tr>
+          <tr><td>Iterativo/Incremental</td><td>Producto evolutivo por versiones</td><td>Arquitectura débil si no se gobierna</td></tr>
+          <tr><td>Ágil (Scrum/Kanban)</td><td>Entornos dinámicos y feedback frecuente</td><td>Falta de visión global si no hay roadmap</td></tr>
+          <tr><td>DevOps continuo</td><td>Entrega frecuente y automatizada</td><td>Complejidad operacional inicial</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="panel-requisitos" class="panel">
+    <div class="section">
+      <h2>Ingeniería de Requisitos</h2>
+      <p class="desc">Requisito claro = menos retrabajo. Se capturan, analizan, validan y gestionan cambios.</p>
+      <div class="grid">
+        <div class="card">
+          <h3>Funcionales</h3>
+          <p>Qué hace el sistema: casos de uso, reglas y flujos.</p>
+          <ul><li>Historias de usuario</li><li>Casos de uso</li><li>Criterios de aceptación</li></ul>
+        </div>
+        <div class="card">
+          <h3>No funcionales</h3>
+          <p>Cómo debe comportarse: calidad, rendimiento, seguridad, disponibilidad.</p>
+          <ul><li>Latencia objetivo</li><li>RPO/RTO</li><li>Conformidad legal</li></ul>
+        </div>
+        <div class="card">
+          <h3>Trazabilidad</h3>
+          <p>Conectar requisito ↔ diseño ↔ código ↔ prueba ↔ despliegue.</p>
+          <ul><li>Matriz RTM</li><li>Versionado</li><li>Control de cambios</li></ul>
+        </div>
+      </div>
+    </div>
+    <div class="section">
+      <h2>Formato práctico de historia de usuario</h2>
+      <div class="card">
+        <p><code>Como</code> analista de compras, <code>quiero</code> aprobar solicitudes desde móvil, <code>para</code> reducir tiempos de ciclo.</p>
+        <ul>
+          <li><strong>Criterio 1:</strong> Si monto &gt; 5.000, solicitar doble aprobación.</li>
+          <li><strong>Criterio 2:</strong> Registrar auditoría de usuario, fecha y motivo.</li>
+          <li><strong>Criterio 3:</strong> Respuesta en menos de 2 segundos para 95% de casos.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="panel-diseno" class="panel">
+    <div class="section">
+      <h2>Diseño y Arquitectura</h2>
+      <p class="desc">Se transforman requisitos en una solución robusta y extensible.</p>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Principios clave</h3>
+          <ul>
+            <li>Separación de responsabilidades</li>
+            <li>Bajo acoplamiento, alta cohesión</li>
+            <li>Diseño orientado al dominio</li>
+            <li>Seguridad por diseño</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Artefactos recomendados</h3>
+          <ul>
+            <li>Diagrama de contexto y contenedores (C4)</li>
+            <li>Modelo de datos</li>
+            <li>Contratos API (OpenAPI)</li>
+            <li>ADR (Architecture Decision Record)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="section">
+      <h2>Diagramas esenciales en Ingeniería de Software</h2>
+      <table>
+        <thead>
+          <tr><th>Diagrama</th><th>Para qué sirve</th><th>Etapa de uso</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Caso de uso (UML)</td><td>Identificar actores y funcionalidades del sistema</td><td>Requisitos</td></tr>
+          <tr><td>Clases (UML)</td><td>Modelar entidades, atributos, métodos y relaciones</td><td>Diseño</td></tr>
+          <tr><td>Secuencia (UML)</td><td>Visualizar interacción temporal entre componentes</td><td>Diseño técnico</td></tr>
+          <tr><td>Actividad / BPMN</td><td>Mapear flujos de negocio y decisiones</td><td>Análisis de procesos</td></tr>
+          <tr><td>ER (Entidad-Relación)</td><td>Diseñar estructura de datos y cardinalidades</td><td>Diseño de base de datos</td></tr>
+          <tr><td>C4 (Contexto/Contenedor)</td><td>Comunicar arquitectura a nivel macro y micro</td><td>Arquitectura</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="section">
+      <h2>Estilos arquitectónicos</h2>
+      <table>
+        <thead>
+          <tr><th>Estilo</th><th>Ventaja</th><th>Cuándo aplica</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Monolito modular</td><td>Simplicidad operativa</td><td>Equipos pequeños/medianos</td></tr>
+          <tr><td>Microservicios</td><td>Escalado independiente</td><td>Dominios complejos y equipos múltiples</td></tr>
+          <tr><td>Event-driven</td><td>Desacoplamiento temporal</td><td>Integraciones y procesos asíncronos</td></tr>
+          <tr><td>Hexagonal/Clean</td><td>Testabilidad y mantenibilidad</td><td>Sistemas de negocio con larga vida</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="section">
+      <h2>Patrones de diseño (GoF) más usados</h2>
+      <div class="grid">
+        <div class="card">
+          <h3>Creacionales</h3>
+          <p>Controlan cómo se crean objetos y reducen acoplamiento en construcción.</p>
+          <ul><li>Singleton</li><li>Factory Method</li><li>Abstract Factory</li><li>Builder</li></ul>
+        </div>
+        <div class="card">
+          <h3>Estructurales</h3>
+          <p>Organizan clases/objetos para formar estructuras flexibles.</p>
+          <ul><li>Adapter</li><li>Facade</li><li>Decorator</li><li>Composite</li></ul>
+        </div>
+        <div class="card">
+          <h3>Comportamiento</h3>
+          <p>Definen cómo colaboran objetos y cómo se reparte responsabilidad.</p>
+          <ul><li>Strategy</li><li>Observer</li><li>Command</li><li>State</li></ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="panel-desarrollo" class="panel">
+    <div class="section">
+      <h2>Construcción de software</h2>
+      <p class="desc">El código debe ser legible, probado y fácil de evolucionar.</p>
+      <div class="grid">
+        <div class="card">
+          <h3>Buenas prácticas</h3>
+          <ul><li>Convenciones de código</li><li>Revisiones de PR</li><li>Pequeños commits atómicos</li></ul>
+        </div>
+        <div class="card">
+          <h3>Gestión de ramas</h3>
+          <ul><li>Trunk-based o GitFlow ligero</li><li>Feature branches cortas</li><li>Protección de rama principal</li></ul>
+        </div>
+        <div class="card">
+          <h3>Seguridad en desarrollo</h3>
+          <ul><li>No secretos en repositorio</li><li>Dependencias actualizadas</li><li>Análisis SAST/SCA</li></ul>
+        </div>
+      </div>
+    </div>
+    <div class="section">
+      <h2>Tipos de lenguajes: compilado, interpretado e intermedio</h2>
+      <table>
+        <thead>
+          <tr><th>Tipo</th><th>Cómo ejecuta</th><th>Ventaja principal</th><th>Ejemplos</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Compilado</td><td>Se traduce previamente a código máquina/binario</td><td>Alto rendimiento en ejecución</td><td>C, C++, Rust, Go</td></tr>
+          <tr><td>Interpretado</td><td>Un intérprete ejecuta instrucción por instrucción</td><td>Mayor rapidez para probar cambios</td><td>Python, JavaScript, Ruby, PHP</td></tr>
+          <tr><td>Intermedio (bytecode/VM)</td><td>Compila a código intermedio y luego ejecuta VM/JIT</td><td>Balance entre portabilidad y rendimiento</td><td>Java (JVM), C# (.NET CLR), Kotlin</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="section">
+      <h2>Definición de Hecho (DoD) sugerida</h2>
+      <div class="kpi">
+        <span class="pill">✅ Criterios de aceptación cumplidos</span>
+        <span class="pill">✅ Pruebas unitarias y de integración</span>
+        <span class="pill">✅ Code review aprobado</span>
+        <span class="pill">✅ Sin vulnerabilidades críticas</span>
+        <span class="pill">✅ Documentación actualizada</span>
+      </div>
+    </div>
+    <div class="section">
+      <h2>Preguntas aplicadas (Java / Spring MVC)</h2>
+      <p class="desc">Banco de preguntas integrado desde tu carpeta de estudio, con respuesta y explicación corta para repaso.</p>
+      <div class="grid-2">
+        <div class="card">
+          <h3>@Controller + retorno de String en Spring MVC</h3>
+          <p><strong>Pregunta:</strong> ¿Qué rol cumple devolver rutas como <code>"categoria/formulario_categoria"</code> o <code>"redirect:/categorias/listar"</code>?</p>
+          <p><strong>Respuesta:</strong> La clase gestiona peticiones web y retorna vistas (o redirecciones) renderizadas por un motor como Thymeleaf, interactuando con el modelo.</p>
+        </div>
+        <div class="card">
+          <h3>Thymeleaf con <code>method="post"</code></h3>
+          <p><strong>Pregunta:</strong> Si el formulario usa <code>th:action="@{/procesar}" method="post"</code>, ¿qué método debe manejarlo?</p>
+          <p><strong>Respuesta:</strong> <code>@PostMapping("/procesar")</code> (o <code>@RequestMapping(method = POST)</code> equivalente).</p>
+        </div>
+        <div class="card">
+          <h3>Uso de Optional en repositorios</h3>
+          <p><strong>Pregunta:</strong> ¿Por qué usar <code>Optional&lt;Estudiante&gt;</code> antes de eliminar?</p>
+          <p><strong>Respuesta:</strong> Para manejar de forma segura el caso donde no existe el registro y evitar errores por nulos.</p>
+        </div>
+        <div class="card">
+          <h3>Polimorfismo en Java</h3>
+          <p><strong>Pregunta:</strong> Si <code>Padre obj = new Hijo(); obj.mostrar();</code>, ¿qué imprime?</p>
+          <p><strong>Respuesta:</strong> <code>"Mostrar en Hijo"</code>, por despacho dinámico (método sobrescrito en tiempo de ejecución).</p>
+        </div>
+      </div>
+    </div>
+    <div class="section" id="quiz-java-spring">
+      <h2>Quiz rápido: Java y Spring MVC</h2>
+      <div class="quiz-q" data-correct="b">
+        <p>1. En Spring MVC, <code>@Controller</code> con retorno de <code>String</code> se usa para:</p>
+        <label><input type="radio" name="js1" value="a"> Exponer solo APIs JSON</label>
+        <label><input type="radio" name="js1" value="b"> Resolver vistas y manejar interacción web con el modelo</label>
+        <label><input type="radio" name="js1" value="c"> Registrar entidades JPA automáticamente</label>
+        <label><input type="radio" name="js1" value="d"> Configurar seguridad del servidor</label>
+      </div>
+      <div class="quiz-q" data-correct="a">
+        <p>2. Si un formulario Thymeleaf envía por <code>POST</code> a <code>/procesar</code>, ¿qué anotación corresponde?</p>
+        <label><input type="radio" name="js2" value="a"> <code>@PostMapping("/procesar")</code></label>
+        <label><input type="radio" name="js2" value="b"> <code>@GetMapping("/procesar")</code></label>
+        <label><input type="radio" name="js2" value="c"> <code>@DeleteMapping("/procesar")</code></label>
+        <label><input type="radio" name="js2" value="d"> <code>@PutMapping("/procesar")</code></label>
+      </div>
+      <div class="quiz-q" data-correct="c">
+        <p>3. ¿Por qué usar <code>Optional&lt;T&gt;</code> al buscar por ID antes de eliminar?</p>
+        <label><input type="radio" name="js3" value="a"> Para hacer la consulta más rápida siempre</label>
+        <label><input type="radio" name="js3" value="b"> Para forzar eliminación automática sin validar</label>
+        <label><input type="radio" name="js3" value="c"> Para manejar ausencia de registro sin nulos peligrosos</label>
+        <label><input type="radio" name="js3" value="d"> Para convertir cualquier error en éxito</label>
+      </div>
+      <div class="quiz-q" data-correct="d">
+        <p>4. En Java, con <code>Padre obj = new Hijo(); obj.mostrar();</code> (sobrescrito), se ejecuta:</p>
+        <label><input type="radio" name="js4" value="a"> El método de Padre por tipo de referencia</label>
+        <label><input type="radio" name="js4" value="b"> Ningún método, lanza error</label>
+        <label><input type="radio" name="js4" value="c"> Ambos métodos</label>
+        <label><input type="radio" name="js4" value="d"> El método de Hijo por polimorfismo dinámico</label>
+      </div>
+      <button class="btn" onclick="checkSectionQuiz('quiz-java-spring','quiz-result-java')">Verificar quiz Java/Spring</button>
+      <div id="quiz-result-java" class="result"></div>
+    </div>
+  </section>
+
+  <section id="panel-pruebas" class="panel">
+    <div class="section">
+      <h2>Estrategia de pruebas</h2>
+      <p class="desc">La calidad se construye desde el diseño, no se agrega al final.</p>
+      <table>
+        <thead>
+          <tr><th>Nivel</th><th>Objetivo</th><th>Herramientas típicas</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Unitarias</td><td>Validar lógica aislada</td><td>xUnit, Jest, PyTest</td></tr>
+          <tr><td>Integración</td><td>Validar interacción entre módulos</td><td>TestContainers, Postman/Newman</td></tr>
+          <tr><td>E2E</td><td>Validar flujo de negocio completo</td><td>Cypress, Playwright, Selenium</td></tr>
+          <tr><td>No funcionales</td><td>Carga, seguridad, resiliencia</td><td>k6, JMeter, OWASP ZAP</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="section">
+      <h2>Pirámide de pruebas (recomendación)</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Base amplia: Unitarias</h3>
+          <p>Rápidas, baratas, muchas. Detectan errores temprano.</p>
+        </div>
+        <div class="card">
+          <h3>Capa media: Integración</h3>
+          <p>Validan contratos entre componentes y servicios externos.</p>
+        </div>
+        <div class="card">
+          <h3>Cima: E2E</h3>
+          <p>Pocas, críticas y estables. Cubren los flujos de mayor valor.</p>
+        </div>
+        <div class="card">
+          <h3>Regla práctica</h3>
+          <p>Más pruebas automáticas en lógica de negocio; menos en UI frágil.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="panel-devops" class="panel">
+    <div class="section">
+      <h2>Entrega continua y operación</h2>
+      <p class="desc">Objetivo: desplegar con frecuencia y bajo riesgo.</p>
+      <div class="timeline">
+        <div class="step">Commit</div>
+        <div class="step">Build</div>
+        <div class="step">Lint/SAST</div>
+        <div class="step">Tests</div>
+        <div class="step">Artifact</div>
+        <div class="step">Deploy Staging</div>
+        <div class="step">Aprobación</div>
+        <div class="step">Deploy Prod</div>
+      </div>
+    </div>
+    <div class="section">
+      <h2>Checklist de release segura</h2>
+      <div class="grid">
+        <div class="card"><h3>🔐 Seguridad</h3><ul><li>Escaneo de imagen/dependencias</li><li>Secretos en vault</li><li>Hardening base</li></ul></div>
+        <div class="card"><h3>📡 Observabilidad</h3><ul><li>Logs estructurados</li><li>Métricas y alertas</li><li>Trazas distribuidas</li></ul></div>
+        <div class="card"><h3>🧯 Recuperación</h3><ul><li>Rollback probado</li><li>Feature flags</li><li>Runbooks incidentes</li></ul></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="panel-gestion" class="panel">
+    <div class="section">
+      <h2>Gestión ágil y gobierno técnico</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Rituales útiles</h3>
+          <ul>
+            <li>Planning con objetivos claros</li>
+            <li>Daily de bloqueos reales</li>
+            <li>Review con feedback de usuario</li>
+            <li>Retro con acciones concretas</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Artefactos de control</h3>
+          <ul>
+            <li>Backlog priorizado por valor/riesgo</li>
+            <li>Roadmap trimestral</li>
+            <li>Tablero de flujo (Kanban)</li>
+            <li>Registro de deuda técnica</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="section">
+      <h2>Gestión de proyectos: PMI, PMP y PMBOK</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>PMI</h3>
+          <p>Project Management Institute: organismo que define estándares globales de dirección de proyectos.</p>
+        </div>
+        <div class="card">
+          <h3>PMP</h3>
+          <p>Project Management Professional: certificación de gestión de proyectos basada en buenas prácticas del PMI.</p>
+        </div>
+        <div class="card">
+          <h3>PMBOK</h3>
+          <p>Guía de fundamentos de dirección de proyectos. Estructura procesos, dominios, principios y áreas de conocimiento.</p>
+        </div>
+        <div class="card">
+          <h3>Aplicación en software</h3>
+          <p>Se usa para plan de alcance, cronograma, costo, riesgo, calidad, interesados y comunicaciones.</p>
+        </div>
+      </div>
+      <table style="margin-top:12px">
+        <thead>
+          <tr><th>Área PMBOK</th><th>Ejemplo en proyecto de software</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Alcance</td><td>Definir backlog base, entregables y criterios de aceptación</td></tr>
+          <tr><td>Cronograma</td><td>Plan de releases/sprints y ruta crítica</td></tr>
+          <tr><td>Riesgos</td><td>Dependencias externas, deuda técnica, rotación de equipo</td></tr>
+          <tr><td>Calidad</td><td>Estándares de codificación, cobertura de pruebas, gates CI/CD</td></tr>
+          <tr><td>Stakeholders</td><td>Mapa de interesados y plan de comunicación por rol</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="section">
+      <h2>Madurez de procesos: CMM y CMMI</h2>
+      <table>
+        <thead>
+          <tr><th>Nivel</th><th>Estado del proceso</th><th>Qué caracteriza al equipo</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1 - Inicial</td><td>Ad-hoc / reactivo</td><td>Éxitos dependen de personas, no del proceso</td></tr>
+          <tr><td>2 - Gestionado</td><td>Proyectos planificados</td><td>Hay seguimiento de costo, tiempo y alcance</td></tr>
+          <tr><td>3 - Definido</td><td>Proceso organizacional estándar</td><td>Buenas prácticas documentadas y reutilizables</td></tr>
+          <tr><td>4 - Cuantitativamente gestionado</td><td>Métricas y control estadístico</td><td>Decisiones por datos y variabilidad controlada</td></tr>
+          <tr><td>5 - Optimizado</td><td>Mejora continua e innovación</td><td>Prevención de defectos y aprendizaje sistemático</td></tr>
+        </tbody>
+      </table>
+      <p class="desc" style="margin-top:12px">CMM fue el modelo inicial; CMMI evoluciona ese enfoque integrando múltiples disciplinas y una visión moderna de capacidad/madurez organizacional.</p>
+    </div>
+    <div class="section">
+      <h2>Métricas recomendadas (DORA + producto)</h2>
+      <table>
+        <thead>
+          <tr><th>Métrica</th><th>Para qué sirve</th><th>Objetivo sugerido</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Lead Time</td><td>Velocidad desde commit hasta producción</td><td>Disminuir gradualmente</td></tr>
+          <tr><td>Deployment Frequency</td><td>Capacidad de entregar valor</td><td>Aumentar con estabilidad</td></tr>
+          <tr><td>Change Failure Rate</td><td>Calidad de cambios desplegados</td><td>&lt; 15%</td></tr>
+          <tr><td>MTTR</td><td>Tiempo de recuperación ante fallos</td><td>Minimizar</td></tr>
+          <tr><td>Adopción de feature</td><td>Valor real para usuario</td><td>Basado en hipótesis</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="panel-quiz" class="panel">
+    <div class="section">
+      <h2>Evaluación final</h2>
+      <p class="desc">Responde 5 preguntas para validar el recorrido completo.</p>
+
+      <div class="quiz-q" data-correct="b">
+        <p>1. ¿Cuál es el principal objetivo de la ingeniería de software?</p>
+        <label><input type="radio" name="q1" value="a"> Escribir la mayor cantidad de código posible</label>
+        <label><input type="radio" name="q1" value="b"> Entregar valor de negocio con calidad sostenible</label>
+        <label><input type="radio" name="q1" value="c"> Evitar documentación siempre</label>
+        <label><input type="radio" name="q1" value="d"> Reemplazar al usuario final</label>
+      </div>
+
+      <div class="quiz-q" data-correct="d">
+        <p>2. ¿Qué artefacto conecta requisito con pruebas y código?</p>
+        <label><input type="radio" name="q2" value="a"> Diagrama ER</label>
+        <label><input type="radio" name="q2" value="b"> Burndown chart</label>
+        <label><input type="radio" name="q2" value="c"> Dockerfile</label>
+        <label><input type="radio" name="q2" value="d"> Matriz de trazabilidad (RTM)</label>
+      </div>
+
+      <div class="quiz-q" data-correct="a">
+        <p>3. ¿Qué nivel de pruebas debe ser más numeroso según la pirámide?</p>
+        <label><input type="radio" name="q3" value="a"> Unitarias</label>
+        <label><input type="radio" name="q3" value="b"> E2E</label>
+        <label><input type="radio" name="q3" value="c"> Manuales exploratorias</label>
+        <label><input type="radio" name="q3" value="d"> UAT solamente</label>
+      </div>
+
+      <div class="quiz-q" data-correct="c">
+        <p>4. ¿Qué métrica DORA refleja estabilidad de cambios?</p>
+        <label><input type="radio" name="q4" value="a"> Deployment Frequency</label>
+        <label><input type="radio" name="q4" value="b"> Lead Time</label>
+        <label><input type="radio" name="q4" value="c"> Change Failure Rate</label>
+        <label><input type="radio" name="q4" value="d"> Throughput del backlog</label>
+      </div>
+
+      <div class="quiz-q" data-correct="b">
+        <p>5. ¿Cuál práctica reduce riesgo en producción?</p>
+        <label><input type="radio" name="q5" value="a"> Desplegar sin monitoreo</label>
+        <label><input type="radio" name="q5" value="b"> Pipeline CI/CD con pruebas y rollback</label>
+        <label><input type="radio" name="q5" value="c"> Omitir revisión de código</label>
+        <label><input type="radio" name="q5" value="d"> Versionar secretos en Git</label>
+      </div>
+
+      <button class="btn" onclick="checkQuiz()">Verificar evaluación</button>
+      <div id="quiz-result" class="result"></div>
+    </div>
+  </section>
+
+  <p class="footer">Material interactivo de Ingeniería de Software — versión educativa en una sola página.</p>
+</div>
+
+<script>
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    const panel = document.getElementById('panel-' + btn.dataset.tab);
+    if (panel) panel.classList.add('active');
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  });
+});
+
+function checkQuiz() {
+  const qs = document.querySelectorAll('#panel-quiz .quiz-q');
+  let ok = 0;
+  qs.forEach(q => {
+    const selected = q.querySelector('input:checked');
+    const correct = q.dataset.correct;
+    q.style.borderColor = 'var(--border)';
+    q.style.background = 'var(--card)';
+    if (selected && selected.value === correct) {
+      ok++;
+      q.style.borderColor = 'rgba(52,211,153,.7)';
+      q.style.background = 'rgba(52,211,153,.10)';
+    } else {
+      q.style.borderColor = 'rgba(248,113,113,.65)';
+      q.style.background = 'rgba(248,113,113,.08)';
+    }
+  });
+
+  const total = qs.length;
+  const pct = Math.round((ok / total) * 100);
+  const result = document.getElementById('quiz-result');
+  result.className = 'result ' + (pct >= 60 ? 'ok' : 'bad');
+  result.textContent = `Resultado: ${ok}/${total} (${pct}%). ` +
+    (pct === 100 ? 'Excelente dominio del tema.' :
+    pct >= 60 ? 'Buen avance, sigue reforzando arquitectura y calidad.' :
+    'Revisa las pestañas y vuelve a intentarlo.');
+}
+
+function checkSectionQuiz(sectionId, resultId) {
+  const section = document.getElementById(sectionId);
+  const qs = section.querySelectorAll('.quiz-q');
+  let ok = 0;
+  qs.forEach(q => {
+    const selected = q.querySelector('input:checked');
+    const correct = q.dataset.correct;
+    q.style.borderColor = 'var(--border)';
+    q.style.background = 'var(--card)';
+    if (selected && selected.value === correct) {
+      ok++;
+      q.style.borderColor = 'rgba(52,211,153,.7)';
+      q.style.background = 'rgba(52,211,153,.10)';
+    } else {
+      q.style.borderColor = 'rgba(248,113,113,.65)';
+      q.style.background = 'rgba(248,113,113,.08)';
+    }
+  });
+  const total = qs.length;
+  const pct = Math.round((ok / total) * 100);
+  const result = document.getElementById(resultId);
+  result.className = 'result ' + (pct >= 60 ? 'ok' : 'bad');
+  result.textContent = `Resultado: ${ok}/${total} (${pct}%). ` +
+    (pct === 100 ? 'Excelente, dominio sólido de Java/Spring MVC.' :
+    pct >= 60 ? 'Buen avance. Refuerza anotaciones y flujo MVC.' :
+    'Te recomiendo repasar el bloque y volver a intentar.');
+}
+</script>
+</body>
+</html>

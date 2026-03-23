@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Base de Datos — Fundamentos desde Cero</title>
+<style>
+:root{
+  --bg:#0b1020; --bg2:#0f1830; --card:#121c33; --line:rgba(148,163,184,.24);
+  --text:#e5e7eb; --muted:#97a8c2;
+  --blue:#60a5fa; --cyan:#22d3ee; --green:#34d399; --orange:#fb923c; --purple:#a78bfa; --red:#f87171;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; font-family:Inter,Segoe UI,Arial,sans-serif; color:var(--text);
+  background:radial-gradient(circle at 20% 0%, #1a2d59 0%, var(--bg) 45%, #050914 100%);
+}
+.wrap{max-width:1180px; margin:0 auto; padding:24px}
+.hero{
+  border:1px solid var(--line); border-radius:16px; padding:24px;
+  background:linear-gradient(130deg, rgba(96,165,250,.18), rgba(34,211,238,.08));
+}
+h1{margin:0 0 8px; font-size:2rem}
+.sub{margin:0; color:var(--muted)}
+.chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px}
+.chip{padding:6px 10px; border:1px solid var(--line); border-radius:999px; font-size:.8rem; background:rgba(2,6,23,.4)}
+.tabs{
+  margin-top:16px; border:1px solid var(--line); border-radius:12px; padding:8px;
+  overflow-x:auto; white-space:nowrap; position:sticky; top:10px; z-index:30;
+  background:rgba(2,6,23,.58); backdrop-filter:blur(8px);
+}
+.tab{
+  border:none; background:transparent; color:var(--muted); cursor:pointer;
+  padding:10px 13px; border-radius:9px; margin-right:6px; font-weight:700;
+}
+.tab:hover{background:rgba(148,163,184,.08); color:var(--text)}
+.tab.active{background:rgba(34,211,238,.13); color:var(--cyan)}
+.panel{display:none; margin-top:16px}
+.panel.active{display:block}
+.section{
+  border:1px solid var(--line); border-radius:14px; padding:18px; margin-bottom:14px; background:rgba(15,23,42,.5);
+}
+.section h2{margin:0 0 8px; font-size:1.3rem}
+.desc{margin:0 0 12px; color:var(--muted)}
+.grid{display:grid; grid-template-columns:repeat(3,1fr); gap:12px}
+.grid-2{display:grid; grid-template-columns:repeat(2,1fr); gap:12px}
+.card{border:1px solid var(--line); border-radius:12px; padding:14px; background:var(--card)}
+.card h3{margin:0 0 8px; font-size:1rem}
+.card p{margin:0; color:var(--muted); line-height:1.45}
+ul{margin:10px 0 0 18px}
+li{margin:4px 0}
+table{width:100%; border-collapse:collapse; border:1px solid var(--line); border-radius:10px; overflow:hidden; background:var(--card)}
+th,td{padding:10px; border-bottom:1px solid var(--line); text-align:left; font-size:.92rem}
+th{background:rgba(96,165,250,.15)}
+.code{
+  border:1px solid var(--line); border-radius:10px; background:#0b1327; padding:12px; overflow:auto;
+  font-family:Consolas,Monaco,monospace; font-size:.88rem; line-height:1.5;
+}
+.flow{display:flex; flex-wrap:wrap; gap:10px}
+.step{border:1px dashed var(--line); border-radius:10px; padding:10px 12px; font-weight:600; background:rgba(2,6,23,.35)}
+.quiz-q{border:1px solid var(--line); border-radius:10px; padding:12px; margin-bottom:10px; background:var(--card)}
+.quiz-q p{margin:0 0 8px}
+.quiz-q label{display:block; margin:6px 0}
+.btn{
+  border:none; border-radius:10px; padding:10px 14px; font-weight:700; cursor:pointer;
+  background:linear-gradient(90deg,var(--blue),var(--cyan)); color:#071321;
+}
+.result{display:none; margin-top:10px; padding:10px; border-radius:8px}
+.ok{display:block; border:1px solid rgba(52,211,153,.45); background:rgba(52,211,153,.15)}
+.bad{display:block; border:1px solid rgba(248,113,113,.45); background:rgba(248,113,113,.15)}
+code{background:rgba(148,163,184,.14); border:1px solid var(--line); padding:2px 6px; border-radius:6px}
+.foot{text-align:center; color:var(--muted); font-size:.82rem; margin-top:22px}
+@media (max-width:960px){.grid,.grid-2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <h1>Base de Datos — Fundamentos desde lo más básico</h1>
+    <p class="sub">Aprende de forma secuencial: conceptos, modelo relacional, SQL, normalización, transacciones, índices y administración básica.</p>
+    <div class="chips">
+      <span class="chip">🧠 Conceptos</span>
+      <span class="chip">🗃️ Relacional</span>
+      <span class="chip">🧾 SQL</span>
+      <span class="chip">📐 Normalización</span>
+      <span class="chip">🔒 ACID</span>
+      <span class="chip">⚡ Índices</span>
+      <span class="chip">📝 Quiz</span>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="inicio">🚦 Inicio</button>
+    <button class="tab" data-tab="fundamentos">🧠 Fundamentos</button>
+    <button class="tab" data-tab="relacional">🗃️ Modelo Relacional</button>
+    <button class="tab" data-tab="sql">🧾 SQL Básico</button>
+    <button class="tab" data-tab="normalizacion">📐 Normalización</button>
+    <button class="tab" data-tab="transacciones">🔒 Transacciones y ACID</button>
+    <button class="tab" data-tab="indices">⚡ Índices y rendimiento</button>
+    <button class="tab" data-tab="admin">🛠️ Administración básica</button>
+    <button class="tab" data-tab="quiz">📝 Evaluación</button>
+  </nav>
+
+  <section id="panel-inicio" class="panel active">
+    <div class="section">
+      <h2>¿Qué es una base de datos?</h2>
+      <p class="desc">Es un sistema para guardar información de forma estructurada, con reglas que evitan errores y permiten consultar rápido. En la práctica, una base de datos bien diseñada reduce retrabajo, mejora reportes y evita inconsistencias como clientes duplicados o saldos incorrectos.</p>
+      <div class="grid">
+        <div class="card">
+          <h3>¿Para qué sirve?</h3>
+          <ul><li>Centralizar datos en una sola fuente de verdad</li><li>Evitar duplicidad e inconsistencias</li><li>Soportar operación diaria y decisiones</li><li>Mantener historial y trazabilidad</li></ul>
+        </div>
+        <div class="card">
+          <h3>DB vs DBMS</h3>
+          <p><strong>DB</strong>: los datos (tablas, registros, relaciones). <strong>DBMS</strong>: el motor que permite crear, consultar, asegurar y respaldar esos datos (MySQL, PostgreSQL, SQL Server, Oracle).</p>
+        </div>
+        <div class="card">
+          <h3>Tipos principales</h3>
+          <ul><li><strong>Relacional (SQL):</strong> ideal para procesos transaccionales y reglas estrictas</li><li><strong>NoSQL:</strong> útil cuando cambian mucho los esquemas o se requiere alta escalabilidad horizontal</li><li><strong>Data warehouse:</strong> orientado a análisis histórico y BI</li></ul>
+        </div>
+      </div>
+    </div>
+    <div class="section">
+      <h2>Ejemplo real: por qué importa modelar bien</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Sin diseño</h3>
+          <p>Una sola tabla con ventas, cliente, vendedor y producto repetidos en cada fila. Resultado: errores frecuentes al actualizar y reportes lentos.</p>
+        </div>
+        <div class="card">
+          <h3>Con diseño relacional</h3>
+          <p>Tablas separadas para <code>clientes</code>, <code>productos</code>, <code>ventas</code> y <code>detalle_venta</code>. Menos duplicación, mejor control y consultas más claras.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="panel-fundamentos" class="panel">
+    <div class="section">
+      <h2>Conceptos básicos que debes dominar</h2>
+      <div class="grid-2">
+        <div class="card"><h3>Tabla</h3><p>Representa una entidad del negocio. Ejemplo: la tabla <code>clientes</code> almacena solo datos de clientes, no de productos ni pagos.</p></div>
+        <div class="card"><h3>Fila (registro)</h3><p>Es un elemento específico. Si la tabla es <code>clientes</code>, cada fila es un cliente distinto.</p></div>
+        <div class="card"><h3>Columna (atributo)</h3><p>Define qué dato guardar y con qué tipo: <code>nombre VARCHAR(100)</code>, <code>fecha_registro DATE</code>, <code>saldo DECIMAL(10,2)</code>.</p></div>
+        <div class="card"><h3>Tipo de dato</h3><p>Controla calidad de datos y rendimiento. Elegir bien tipos evita errores y desperdicio de almacenamiento.</p></div>
+        <div class="card"><h3>Clave primaria (PK)</h3><p>Identificador único por fila. Debe ser estable y no cambiar con frecuencia.</p></div>
+        <div class="card"><h3>Clave foránea (FK)</h3><p>Conecta tablas. Una venta referencia al cliente que la realizó.</p></div>
+      </div>
+    </div>
+    <div class="section">
+      <h2>Flujo de trabajo de datos</h2>
+      <div class="flow">
+        <div class="step">1) Levantar reglas del negocio</div>
+        <div class="step">2) Diseñar entidades y relaciones</div>
+        <div class="step">3) Crear tablas y restricciones</div>
+        <div class="step">4) Cargar y validar datos</div>
+        <div class="step">5) Consultar y medir rendimiento</div>
+        <div class="step">6) Respaldar y monitorear</div>
+      </div>
+    </div>
+    <div class="section">
+      <h2>Errores típicos de principiante</h2>
+      <div class="grid">
+        <div class="card"><h3>Guardar todo como texto</h3><p>Complica filtros, sumas y validaciones. Usa tipos correctos.</p></div>
+        <div class="card"><h3>No definir PK/FK</h3><p>Se pierde integridad y aparecen datos huérfanos.</p></div>
+        <div class="card"><h3>No validar nulos</h3><p>Campos críticos vacíos rompen lógica de negocio y reportes.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="panel-relacional" class="panel">
+    <div class="section">
+      <h2>Modelo relacional</h2>
+      <p class="desc">Organiza datos en tablas con relaciones explícitas. La idea central es simple: cada dato se guarda una sola vez donde corresponde, y se conecta con llaves para consultar todo junto sin duplicar.</p>
+      <table>
+        <thead><tr><th>Relación</th><th>Descripción</th><th>Ejemplo</th></tr></thead>
+        <tbody>
+          <tr><td>1 a 1</td><td>Un registro se relaciona con uno del otro lado</td><td>Usuario ↔ Perfil</td></tr>
+          <tr><td>1 a N</td><td>Un registro se relaciona con muchos</td><td>Cliente ↔ Pedidos</td></tr>
+          <tr><td>N a N</td><td>Muchos a muchos mediante tabla intermedia</td><td>Estudiante ↔ Curso</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="section">
+      <h2>Claves y restricciones</h2>
+      <div class="grid">
+        <div class="card"><h3>PK</h3><p>Clave principal única. Ejemplo recomendado: <code>id_cliente</code> entero autoincremental o UUID.</p></div>
+        <div class="card"><h3>FK</h3><p>Clave foránea para relacionar tablas y evitar registros huérfanos. Ejemplo: venta sin cliente no debería existir.</p></div>
+        <div class="card"><h3>UNIQUE</h3><p>Evita duplicados en valores que deben ser únicos: correo, cédula, código.</p></div>
+        <div class="card"><h3>NOT NULL</h3><p>Obliga a ingresar datos críticos. Ejemplo: una orden sin fecha no debería guardarse.</p></div>
+        <div class="card"><h3>CHECK</h3><p>Valida reglas: <code>precio &gt; 0</code>, <code>estado IN ('A','I')</code>.</p></div>
+        <div class="card"><h3>DEFAULT</h3><p>Asigna valores por defecto para reducir errores manuales.</p></div>
+      </div>
+    </div>
+    <div class="section">
+      <h2>Mini modelo de ejemplo (ventas)</h2>
+      <div class="code">
+clientes(id_cliente PK, nombre, correo UNIQUE)
+productos(id_producto PK, nombre, precio CHECK (precio > 0))
+ventas(id_venta PK, id_cliente FK, fecha)
+detalle_venta(id_detalle PK, id_venta FK, id_producto FK, cantidad CHECK (cantidad > 0), precio_unitario)
+      </div>
+    </div>
+  </section>
+
+  <section id="panel-sql" class="panel">
+    <div class="section">
+      <h2>SQL básico (CRUD)</h2>
+      <p class="desc">SQL se divide en familias: DDL (estructura), DML (datos), DCL (permisos) y TCL (transacciones). Primero domina DDL + DML.</p>
+      <div class="code">
+CREATE TABLE clientes (
+  id INT PRIMARY KEY,
+  nombre VARCHAR(100) NOT NULL,
+  correo VARCHAR(150) UNIQUE
+);
+
+INSERT INTO clientes (id, nombre, correo)
+VALUES (1, 'Ana Pérez', 'ana@correo.com');
+
+SELECT id, nombre, correo
+FROM clientes
+WHERE nombre LIKE 'Ana%';
+
+UPDATE clientes
+SET correo = 'ana.perez@correo.com'
+WHERE id = 1;
+
+DELETE FROM clientes
+WHERE id = 1;
+      </div>
+    </div>
+    <div class="section">
+      <h2>¿Qué es DDL, DML y DCL?</h2>
+      <table>
+        <thead><tr><th>Tipo</th><th>Para qué sirve</th><th>Comandos típicos</th></tr></thead>
+        <tbody>
+          <tr><td>DDL (Data Definition Language)</td><td>Define o cambia la estructura de la base de datos</td><td>CREATE, ALTER, DROP, TRUNCATE</td></tr>
+          <tr><td>DML (Data Manipulation Language)</td><td>Inserta, consulta, modifica o elimina datos</td><td>INSERT, SELECT, UPDATE, DELETE</td></tr>
+          <tr><td>DCL (Data Control Language)</td><td>Controla permisos y seguridad de acceso</td><td>GRANT, REVOKE</td></tr>
+        </tbody>
+      </table>
+      <div class="code">
+-- DDL: crear estructura
+CREATE TABLE productos (
+  id INT PRIMARY KEY,
+  nombre VARCHAR(120) NOT NULL,
+  precio DECIMAL(10,2) CHECK (precio > 0)
+);
+
+-- DML: manipular datos
+INSERT INTO productos (id, nombre, precio) VALUES (1, 'Resina PE', 25.50);
+UPDATE productos SET precio = 26.00 WHERE id = 1;
+SELECT id, nombre, precio FROM productos;
+
+-- DCL: controlar acceso
+GRANT SELECT, INSERT ON productos TO usuario_ventas;
+REVOKE INSERT ON productos FROM usuario_ventas;
+      </div>
+    </div>
+    <div class="section">
+      <h2>JOIN explicado con lógica de negocio</h2>
+      <div class="code">
+SELECT v.id_venta, c.nombre, v.fecha
+FROM ventas v
+INNER JOIN clientes c ON c.id_cliente = v.id_cliente;
+
+-- INNER JOIN: solo ventas con cliente válido.
+-- LEFT JOIN: trae todos los clientes, tengan o no ventas.
+      </div>
+    </div>
+    <div class="section">
+      <h2>Consultas útiles</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>JOIN</h3>
+          <p>Une tablas para responder preguntas reales: “¿qué cliente compró qué producto?”.</p>
+        </div>
+        <div class="card">
+          <h3>GROUP BY</h3>
+          <p>Agrupa datos para análisis: ventas por mes, por vendedor o por categoría.</p>
+        </div>
+        <div class="card">
+          <h3>ORDER BY</h3>
+          <p>Ordena resultados ascendente o descendente.</p>
+        </div>
+        <div class="card">
+          <h3>LIMIT/TOP</h3>
+          <p>Restringe cantidad de filas devueltas.</p>
+        </div>
+      </div>
+    </div>
+    <div class="section">
+      <h2>Buenas prácticas de consulta</h2>
+      <div class="grid">
+        <div class="card"><h3>Evita <code>SELECT *</code></h3><p>Pide solo columnas necesarias para reducir tráfico y costo de ejecución.</p></div>
+        <div class="card"><h3>Filtra temprano</h3><p>Usa <code>WHERE</code> para reducir filas antes de agrupar/ordenar.</p></div>
+        <div class="card"><h3>Cuida funciones en filtros</h3><p>Funciones sobre columnas indexadas pueden impedir uso de índice.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="panel-normalizacion" class="panel">
+    <div class="section">
+      <h2>Normalización (en términos simples)</h2>
+      <p class="desc">Normalizar es organizar datos para minimizar redundancia y anomalías al insertar, actualizar o eliminar.</p>
+      <table>
+        <thead><tr><th>Forma Normal</th><th>Qué evita</th><th>Idea principal</th></tr></thead>
+        <tbody>
+          <tr><td>1FN</td><td>Campos multivalor</td><td>Datos atómicos, una cosa por celda</td></tr>
+          <tr><td>2FN</td><td>Dependencias parciales</td><td>Todo atributo depende de la PK completa</td></tr>
+          <tr><td>3FN</td><td>Dependencias transitivas</td><td>Atributos no clave dependen solo de la PK</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="section">
+      <h2>Anomalías que evita la normalización</h2>
+      <div class="grid-2">
+        <div class="card"><h3>Inserción</h3><p>No deberías crear una venta para poder registrar por primera vez un producto.</p></div>
+        <div class="card"><h3>Actualización</h3><p>Cambiar el correo de un cliente en 20 filas distintas genera riesgo de inconsistencias.</p></div>
+        <div class="card"><h3>Eliminación</h3><p>Borrar una venta no debe eliminar accidentalmente la información maestra del cliente.</p></div>
+        <div class="card"><h3>Duplicación</h3><p>Menos repetición de datos reduce errores y espacio usado.</p></div>
+      </div>
+    </div>
+    <div class="section">
+      <h2>¿Siempre normalizar al máximo?</h2>
+      <div class="card">
+        <p>No necesariamente. En analítica o reportes se usa <strong>desnormalización controlada</strong> para acelerar lecturas, siempre evaluando costo de mantenimiento y consistencia.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="panel-transacciones" class="panel">
+    <div class="section">
+      <h2>Transacciones y propiedades ACID</h2>
+      <p class="desc">Una transacción agrupa operaciones relacionadas para que el sistema no quede “a medias”. Es crítica en banca, inventario, pagos y cualquier proceso sensible.</p>
+      <div class="grid">
+        <div class="card"><h3>A — Atomicidad</h3><p>Todo o nada. Si falla una parte, se revierte todo.</p></div>
+        <div class="card"><h3>C — Consistencia</h3><p>Los datos pasan de un estado válido a otro válido.</p></div>
+        <div class="card"><h3>I — Aislamiento</h3><p>Transacciones concurrentes no se “pisan” entre sí.</p></div>
+        <div class="card"><h3>D — Durabilidad</h3><p>Confirmado el commit, el dato persiste ante fallos.</p></div>
+      </div>
+    </div>
+    <div class="section">
+      <h2>Ejemplo básico de transacción</h2>
+      <div class="code">
+BEGIN TRANSACTION;
+
+UPDATE cuentas
+SET saldo = saldo - 100
+WHERE id = 1;
+
+UPDATE cuentas
+SET saldo = saldo + 100
+WHERE id = 2;
+
+COMMIT; -- o ROLLBACK si ocurre error
+      </div>
+    </div>
+    <div class="section">
+      <h2>Niveles de aislamiento (idea práctica)</h2>
+      <table>
+        <thead><tr><th>Nivel</th><th>Qué permite</th><th>Riesgo</th></tr></thead>
+        <tbody>
+          <tr><td>Read Uncommitted</td><td>Máximo rendimiento</td><td>Lecturas sucias</td></tr>
+          <tr><td>Read Committed</td><td>Equilibrio común en OLTP</td><td>Lecturas no repetibles</td></tr>
+          <tr><td>Repeatable Read</td><td>Lecturas estables por transacción</td><td>Phantoms según motor</td></tr>
+          <tr><td>Serializable</td><td>Mayor consistencia</td><td>Menor concurrencia</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="panel-indices" class="panel">
+    <div class="section">
+      <h2>Índices y rendimiento</h2>
+      <p class="desc">Un índice funciona como el índice de un libro: evita leer todo. Ayuda en búsquedas y joins, pero cada escritura debe actualizarlo, por eso hay que diseñarlo con criterio.</p>
+      <table>
+        <thead><tr><th>Buena práctica</th><th>Razón</th></tr></thead>
+        <tbody>
+          <tr><td>Indexar PK y FK</td><td>Mejora joins y filtros comunes</td></tr>
+          <tr><td>Indexar columnas de búsqueda frecuente</td><td>Reduce full scans</td></tr>
+          <tr><td>Evitar exceso de índices</td><td>Más costo de escritura y mantenimiento</td></tr>
+          <tr><td>Revisar planes de ejecución</td><td>Diagnóstico real de cuellos de botella</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="section">
+      <h2>Cuándo un índice sí/no ayuda</h2>
+      <div class="grid-2">
+        <div class="card"><h3>Sí ayuda</h3><p>Filtros por columnas selectivas, joins por FK y ordenamientos frecuentes.</p></div>
+        <div class="card"><h3>No tanto</h3><p>Columnas con pocos valores distintos (ej. estado A/I) o tablas muy pequeñas.</p></div>
+        <div class="card"><h3>Compuesto</h3><p>El orden de columnas importa: diseña según filtros más usados.</p></div>
+        <div class="card"><h3>Métrica clave</h3><p>Valida con plan de ejecución y tiempo real, no por intuición.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="panel-admin" class="panel">
+    <div class="section">
+      <h2>Administración básica de BD</h2>
+      <p class="desc">Administrar una BD es garantizar disponibilidad, seguridad, rendimiento y recuperación ante fallos.</p>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Seguridad</h3>
+          <ul><li>Principio de mínimo privilegio</li><li>Roles y permisos por función</li><li>Auditoría de accesos</li></ul>
+        </div>
+        <div class="card">
+          <h3>Respaldos</h3>
+          <ul><li>Backups completos + incrementales</li><li>Pruebas periódicas de restauración</li><li>RPO/RTO definidos</li></ul>
+        </div>
+        <div class="card">
+          <h3>Mantenimiento</h3>
+          <ul><li>Actualización de estadísticas</li><li>Reorganización/reconstrucción de índices</li><li>Limpieza de datos obsoletos</li></ul>
+        </div>
+        <div class="card">
+          <h3>Monitoreo</h3>
+          <ul><li>CPU, memoria, IOPS</li><li>Queries lentas</li><li>Bloqueos y deadlocks</li></ul>
+        </div>
+      </div>
+    </div>
+    <div class="section">
+      <h2>Plan mínimo operativo recomendado</h2>
+      <div class="flow">
+        <div class="step">Backups diarios + prueba mensual de restore</div>
+        <div class="step">Monitoreo de queries lentas</div>
+        <div class="step">Revisión semanal de bloqueos/deadlocks</div>
+        <div class="step">Parcheo y actualización controlada</div>
+        <div class="step">Documentar RPO y RTO del negocio</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="panel-quiz" class="panel">
+    <div class="section">
+      <h2>Mini evaluación de fundamentos</h2>
+      <p class="desc">Responde 5 preguntas rápidas para validar comprensión.</p>
+
+      <div class="quiz-q" data-correct="b">
+        <p>1. ¿Qué garantiza la clave primaria (PK)?</p>
+        <label><input type="radio" name="q1" value="a"> Cifrado de datos</label>
+        <label><input type="radio" name="q1" value="b"> Identificación única de cada fila</label>
+        <label><input type="radio" name="q1" value="c"> Compresión de la tabla</label>
+        <label><input type="radio" name="q1" value="d"> Réplica automática</label>
+      </div>
+
+      <div class="quiz-q" data-correct="c">
+        <p>2. ¿Cuál sentencia SQL recupera datos?</p>
+        <label><input type="radio" name="q2" value="a"> INSERT</label>
+        <label><input type="radio" name="q2" value="b"> UPDATE</label>
+        <label><input type="radio" name="q2" value="c"> SELECT</label>
+        <label><input type="radio" name="q2" value="d"> DELETE</label>
+      </div>
+
+      <div class="quiz-q" data-correct="a">
+        <p>3. ¿Qué propiedad ACID implica “todo o nada”?</p>
+        <label><input type="radio" name="q3" value="a"> Atomicidad</label>
+        <label><input type="radio" name="q3" value="b"> Durabilidad</label>
+        <label><input type="radio" name="q3" value="c"> Consistencia</label>
+        <label><input type="radio" name="q3" value="d"> Aislamiento</label>
+      </div>
+
+      <div class="quiz-q" data-correct="d">
+        <p>4. ¿Para qué sirve una clave foránea (FK)?</p>
+        <label><input type="radio" name="q4" value="a"> Acelerar backups</label>
+        <label><input type="radio" name="q4" value="b"> Cifrar contraseñas</label>
+        <label><input type="radio" name="q4" value="c"> Ordenar columnas</label>
+        <label><input type="radio" name="q4" value="d"> Relacionar tablas y mantener integridad</label>
+      </div>
+
+      <div class="quiz-q" data-correct="b">
+        <p>5. ¿Qué efecto tiene agregar demasiados índices?</p>
+        <label><input type="radio" name="q5" value="a"> Siempre mejora todo</label>
+        <label><input type="radio" name="q5" value="b"> Puede ralentizar inserciones y updates</label>
+        <label><input type="radio" name="q5" value="c"> Elimina necesidad de backups</label>
+        <label><input type="radio" name="q5" value="d"> Rompe las transacciones ACID</label>
+      </div>
+
+      <button class="btn" onclick="checkQuiz()">Verificar respuestas</button>
+      <div id="quizResult" class="result"></div>
+    </div>
+  </section>
+
+  <p class="foot">Material interactivo de Base de Datos — nivel fundamentos.</p>
+</div>
+
+<script>
+document.querySelectorAll('.tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    const panel = document.getElementById('panel-' + btn.dataset.tab);
+    if (panel) panel.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+});
+
+function checkQuiz() {
+  const questions = document.querySelectorAll('#panel-quiz .quiz-q');
+  let score = 0;
+
+  questions.forEach(q => {
+    const selected = q.querySelector('input:checked');
+    const correct = q.dataset.correct;
+    q.style.borderColor = 'var(--line)';
+    q.style.background = 'var(--card)';
+
+    if (selected && selected.value === correct) {
+      score++;
+      q.style.borderColor = 'rgba(52,211,153,.7)';
+      q.style.background = 'rgba(52,211,153,.10)';
+    } else {
+      q.style.borderColor = 'rgba(248,113,113,.65)';
+      q.style.background = 'rgba(248,113,113,.09)';
+    }
+  });
+
+  const total = questions.length;
+  const pct = Math.round((score / total) * 100);
+  const result = document.getElementById('quizResult');
+  result.className = 'result ' + (pct >= 60 ? 'ok' : 'bad');
+  result.textContent = `Resultado: ${score}/${total} (${pct}%). ` +
+    (pct === 100 ? 'Excelente dominio de fundamentos de bases de datos.' :
+    pct >= 60 ? 'Buen avance. Refuerza SQL y normalización.' :
+    'Revisa las pestañas y vuelve a intentarlo.');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Electrónica Básica e IoT — Fundamentos</title>
+<style>
+:root{
+  --bg:#0b1020; --card:#121b32; --line:rgba(148,163,184,.24);
+  --text:#e5e7eb; --muted:#96a8c3; --blue:#60a5fa; --cyan:#22d3ee; --green:#34d399; --orange:#fb923c;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;color:var(--text);background:radial-gradient(circle at 20% 0%, #17305f 0%, #0b1020 45%, #060914 100%)}
+.wrap{max-width:1180px;margin:0 auto;padding:24px}
+.hero{border:1px solid var(--line);border-radius:16px;padding:22px;background:linear-gradient(130deg, rgba(96,165,250,.18), rgba(34,211,238,.08))}
+h1{margin:0 0 8px;font-size:2rem}.sub{margin:0;color:var(--muted)}
+.tabs{margin-top:16px;border:1px solid var(--line);border-radius:12px;padding:8px;overflow-x:auto;white-space:nowrap;background:rgba(2,6,23,.55)}
+.tab{border:none;background:transparent;color:var(--muted);padding:10px 12px;border-radius:9px;margin-right:6px;cursor:pointer;font-weight:700}
+.tab.active{background:rgba(34,211,238,.14);color:var(--cyan)}
+.panel{display:none;margin-top:14px}.panel.active{display:block}
+.section{border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:12px;background:rgba(15,23,42,.5)}
+.section h2{margin:0 0 8px;font-size:1.25rem}.desc{margin:0 0 12px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.card{border:1px solid var(--line);border-radius:10px;padding:12px;background:var(--card)}
+.card h3{margin:0 0 8px;font-size:1rem}.card p{margin:0;color:var(--muted);line-height:1.45}
+ul{margin:8px 0 0 18px}li{margin:4px 0}
+table{width:100%;border-collapse:collapse;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--card)}
+th,td{padding:10px;border-bottom:1px solid var(--line);text-align:left;font-size:.92rem}th{background:rgba(96,165,250,.14)}
+.quiz-q{border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px;background:var(--card)}
+.quiz-q label{display:block;margin:6px 0}
+.btn{border:none;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer;background:linear-gradient(90deg,var(--blue),var(--cyan));color:#071321}
+.result{display:none;margin-top:10px;padding:10px;border-radius:8px}.ok{display:block;background:rgba(52,211,153,.15);border:1px solid rgba(52,211,153,.5)}.bad{display:block;background:rgba(248,113,113,.15);border:1px solid rgba(248,113,113,.45)}
+code{background:rgba(148,163,184,.14);border:1px solid var(--line);padding:2px 6px;border-radius:6px}
+@media (max-width:960px){.grid,.grid-2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <h1>Electrónica Básica e IoT</h1>
+    <p class="sub">Desde corriente, voltaje y componentes hasta sensores, microcontroladores y arquitectura de Internet de las Cosas.</p>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="inicio">🚦 Inicio</button>
+    <button class="tab" data-tab="electrica">⚡ Fundamentos Eléctricos</button>
+    <button class="tab" data-tab="componentes">🔧 Componentes</button>
+    <button class="tab" data-tab="circuitos">🧪 Circuitos y Ley de Ohm</button>
+    <button class="tab" data-tab="digital">💻 Electrónica Digital</button>
+    <button class="tab" data-tab="iot">📡 IoT</button>
+    <button class="tab" data-tab="quiz">📝 Quiz</button>
+  </nav>
+
+  <section id="panel-inicio" class="panel active">
+    <div class="section">
+      <h2>¿Qué aprenderás?</h2>
+      <div class="grid">
+        <div class="card"><h3>Base eléctrica</h3><p>Diferencia entre voltaje, corriente, resistencia y potencia.</p></div>
+        <div class="card"><h3>Diseño básico</h3><p>Cómo armar y analizar circuitos simples de manera segura.</p></div>
+        <div class="card"><h3>IoT aplicado</h3><p>Cómo conectar sensores y enviar datos a la nube.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="panel-electrica" class="panel">
+    <div class="section">
+      <h2>Fundamentos eléctricos</h2>
+      <table>
+        <thead><tr><th>Concepto</th><th>Símbolo</th><th>Unidad</th><th>Idea clave</th></tr></thead>
+        <tbody>
+          <tr><td>Voltaje</td><td>V</td><td>Voltio</td><td>Diferencia de potencial que impulsa electrones</td></tr>
+          <tr><td>Corriente</td><td>I</td><td>Amperio</td><td>Flujo de carga eléctrica por un conductor</td></tr>
+          <tr><td>Resistencia</td><td>R</td><td>Ohmio</td><td>Oposición al paso de corriente</td></tr>
+          <tr><td>Potencia</td><td>P</td><td>Watt</td><td>Consumo/entrega de energía por unidad de tiempo</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="panel-componentes" class="panel">
+    <div class="section">
+      <h2>Componentes esenciales</h2>
+      <div class="grid-2">
+        <div class="card"><h3>Resistencia</h3><p>Limita corriente. Se mide por bandas de colores o valor en ohmios.</p></div>
+        <div class="card"><h3>Capacitor</h3><p>Almacena energía temporalmente. Útil en filtros y estabilización.</p></div>
+        <div class="card"><h3>Diodo / LED</h3><p>Conduce en un solo sentido. LED emite luz.</p></div>
+        <div class="card"><h3>Transistor</h3><p>Actúa como interruptor o amplificador.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="panel-circuitos" class="panel">
+    <div class="section">
+      <h2>Ley de Ohm y potencia</h2>
+      <div class="grid">
+        <div class="card"><h3>Ley de Ohm</h3><p><code>V = I * R</code></p></div>
+        <div class="card"><h3>Potencia</h3><p><code>P = V * I</code></p></div>
+        <div class="card"><h3>Despejes útiles</h3><p><code>I = V/R</code>, <code>R = V/I</code>, <code>P = I²R</code>.</p></div>
+      </div>
+    </div>
+    <div class="section">
+      <h2>Serie vs paralelo</h2>
+      <table>
+        <thead><tr><th>Tipo</th><th>Corriente</th><th>Voltaje</th><th>Resistencia equivalente</th></tr></thead>
+        <tbody>
+          <tr><td>Serie</td><td>Igual en todos</td><td>Se divide</td><td><code>R_eq = R1 + R2 + ...</code></td></tr>
+          <tr><td>Paralelo</td><td>Se divide</td><td>Igual en ramas</td><td><code>1/R_eq = 1/R1 + 1/R2 + ...</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="panel-digital" class="panel">
+    <div class="section">
+      <h2>Electrónica digital</h2>
+      <p class="desc">Base de la computación y microcontroladores.</p>
+      <div class="grid">
+        <div class="card"><h3>Bit y byte</h3><p>0/1 como unidad mínima; 8 bits = 1 byte.</p></div>
+        <div class="card"><h3>Compuertas lógicas</h3><p>AND, OR, NOT, NAND, NOR, XOR.</p></div>
+        <div class="card"><h3>PWM</h3><p>Modulación por ancho de pulso para controlar potencia promedio.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="panel-iot" class="panel">
+    <div class="section">
+      <h2>Internet de las Cosas (IoT)</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Arquitectura típica</h3>
+          <ul>
+            <li>Sensor/actuador</li>
+            <li>Microcontrolador (ESP32, Arduino, STM32)</li>
+            <li>Conectividad (Wi-Fi, BLE, LoRa, NB-IoT)</li>
+            <li>Backend/API/MQTT broker</li>
+            <li>Dashboard y alertas</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Protocolos frecuentes</h3>
+          <ul>
+            <li><strong>MQTT:</strong> ligero y eficiente para telemetría</li>
+            <li><strong>HTTP/REST:</strong> integración sencilla con APIs</li>
+            <li><strong>CoAP:</strong> útil en dispositivos muy limitados</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="section">
+      <h2>Caso práctico simple</h2>
+      <div class="card">
+        <p>Monitor de temperatura en planta: un ESP32 lee sensor DHT22, publica por MQTT cada 30s y un dashboard en la nube muestra tendencia y genera alerta si T > 45°C.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="panel-quiz" class="panel">
+    <div class="section">
+      <h2>Quiz de repaso</h2>
+      <div class="quiz-q" data-correct="a">
+        <p>1. ¿Qué expresa la Ley de Ohm?</p>
+        <label><input type="radio" name="q1" value="a"> V = I * R</label>
+        <label><input type="radio" name="q1" value="b"> P = V * R</label>
+        <label><input type="radio" name="q1" value="c"> I = V + R</label>
+        <label><input type="radio" name="q1" value="d"> R = I / V</label>
+      </div>
+      <div class="quiz-q" data-correct="c">
+        <p>2. ¿Cuál protocolo es muy usado en IoT por su bajo overhead?</p>
+        <label><input type="radio" name="q2" value="a"> FTP</label>
+        <label><input type="radio" name="q2" value="b"> SMTP</label>
+        <label><input type="radio" name="q2" value="c"> MQTT</label>
+        <label><input type="radio" name="q2" value="d"> Telnet</label>
+      </div>
+      <div class="quiz-q" data-correct="b">
+        <p>3. En paralelo, ¿qué magnitud es igual en todas las ramas?</p>
+        <label><input type="radio" name="q3" value="a"> Corriente</label>
+        <label><input type="radio" name="q3" value="b"> Voltaje</label>
+        <label><input type="radio" name="q3" value="c"> Potencia</label>
+        <label><input type="radio" name="q3" value="d"> Resistencia</label>
+      </div>
+      <button class="btn" onclick="checkQuiz()">Verificar respuestas</button>
+      <div id="quizResult" class="result"></div>
+    </div>
+  </section>
+</div>
+
+<script>
+document.querySelectorAll('.tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    const panel = document.getElementById('panel-' + btn.dataset.tab);
+    if (panel) panel.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+});
+
+function checkQuiz() {
+  const questions = document.querySelectorAll('#panel-quiz .quiz-q');
+  let score = 0;
+  questions.forEach(q => {
+    const selected = q.querySelector('input:checked');
+    const correct = q.dataset.correct;
+    q.style.borderColor = 'var(--line)';
+    q.style.background = 'var(--card)';
+    if (selected && selected.value === correct) {
+      score++;
+      q.style.borderColor = 'rgba(52,211,153,.7)';
+      q.style.background = 'rgba(52,211,153,.10)';
+    } else {
+      q.style.borderColor = 'rgba(248,113,113,.65)';
+      q.style.background = 'rgba(248,113,113,.09)';
+    }
+  });
+  const total = questions.length;
+  const pct = Math.round((score / total) * 100);
+  const result = document.getElementById('quizResult');
+  result.className = 'result ' + (pct >= 60 ? 'ok' : 'bad');
+  result.textContent = `Resultado: ${score}/${total} (${pct}%). ` +
+    (pct === 100 ? 'Excelente base en electrónica e IoT.' :
+    pct >= 60 ? 'Buen avance. Refuerza circuitos y protocolos IoT.' :
+    'Revisa las pestañas y vuelve a intentar.');
+}
+</script>
+</body>
+</html>

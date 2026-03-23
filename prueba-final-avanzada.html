@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prueba Final Avanzada (60) — Ingeniería Informática</title>
+<style>
+:root{
+  --bg:#0b1020; --card:#121c33; --line:rgba(148,163,184,.24);
+  --text:#e5e7eb; --muted:#96a8c3; --blue:#60a5fa; --cyan:#22d3ee; --green:#34d399; --red:#f87171; --orange:#fb923c;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;color:var(--text);background:radial-gradient(circle at 20% 0%, #1a2f5f 0%, #0b1020 45%, #060914 100%)}
+.wrap{max-width:1200px;margin:0 auto;padding:24px}
+.hero{border:1px solid var(--line);border-radius:14px;padding:18px;background:linear-gradient(130deg, rgba(96,165,250,.16), rgba(34,211,238,.08));margin-bottom:14px}
+h1{margin:0 0 8px;font-size:1.9rem}.sub{margin:0;color:var(--muted)}
+.meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.pill{border:1px solid var(--line);border-radius:999px;padding:5px 9px;font-size:.78rem;background:rgba(2,6,23,.4)}
+.section{border:1px solid var(--line);border-radius:12px;padding:16px;background:rgba(15,23,42,.5)}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.toolbar .progress{flex:1;min-width:220px;height:10px;background:rgba(148,163,184,.18);border-radius:999px;overflow:hidden;border:1px solid var(--line)}
+.toolbar .progress>div{height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--cyan))}
+.section-filters{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}
+.sf-btn{border:1px solid var(--line);border-radius:999px;padding:6px 10px;background:rgba(2,6,23,.35);color:var(--text);cursor:pointer;font-size:.8rem}
+.sf-btn.active{border-color:var(--cyan);background:rgba(34,211,238,.12);color:#cfefff}
+.quiz-q{border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px;background:var(--card)}
+.quiz-q p{margin:0 0 8px}
+.area{font-size:.78rem;color:#cde2ff;margin-bottom:6px}
+.quiz-q label{display:block;margin:6px 0}
+.code{font-family:Consolas,Monaco,monospace;background:rgba(2,6,23,.35);border:1px solid var(--line);padding:8px;border-radius:8px;display:block;white-space:pre-wrap}
+.hint-toggle{margin-top:8px;font-size:.8rem;color:#bfe7ff;background:rgba(34,211,238,.08);border:1px dashed rgba(34,211,238,.4);padding:4px 8px;border-radius:8px;cursor:pointer}
+.hint-box{display:none;margin-top:8px;padding:8px;border-radius:8px;border:1px solid rgba(245,158,11,.35);background:rgba(245,158,11,.08);font-size:.86rem;color:#ffe7bf}
+.hint-box.show{display:block}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+.btn{border:none;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer;background:linear-gradient(90deg,var(--blue),var(--cyan));color:#071321}
+.btn.secondary{background:rgba(148,163,184,.18);color:var(--text);border:1px solid var(--line)}
+.result{display:none;margin-top:12px;padding:12px;border-radius:10px}
+.ok{display:block;background:rgba(52,211,153,.15);border:1px solid rgba(52,211,153,.5)}
+.bad{display:block;background:rgba(248,113,113,.15);border:1px solid rgba(248,113,113,.45)}
+.area-report{display:none;margin-top:12px;padding:12px;border-radius:10px;border:1px solid var(--line);background:rgba(18,28,51,.75)}
+.area-report.show{display:block}
+.area-report table{width:100%;border-collapse:collapse}
+.area-report th,.area-report td{padding:8px;border-bottom:1px solid var(--line);font-size:.9rem;text-align:left}
+.area-report th{color:#cfe4ff}
+.study-map{margin-top:12px;padding:12px;border-radius:10px;border:1px solid var(--line);background:rgba(18,28,51,.75)}
+.study-map table{width:100%;border-collapse:collapse}
+.study-map th,.study-map td{padding:8px;border-bottom:1px solid var(--line);font-size:.86rem;text-align:left}
+.study-map th{color:#cfe4ff}
+.foot{margin-top:14px;color:var(--muted);font-size:.82rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <h1>Prueba Final Avanzada (60 preguntas)</h1>
+    <p class="sub">Evaluación difícil e integrada: SO, Redes, Base de Datos, Ingeniería de Software, Arquitectura, Auditoría, BI, ML, DL, IA e IoT.</p>
+    <div class="meta">
+      <span class="pill">60 preguntas</span>
+      <span class="pill">Nivel: Intermedio/Avanzado</span>
+      <span class="pill">Incluye código y casos prácticos</span>
+      <span class="pill">Aprobación sugerida: 70%</span>
+    </div>
+  </header>
+
+  <section class="section" id="quiz-final">
+    <div class="toolbar">
+      <strong id="counter">0/60 contestadas</strong>
+      <div class="progress"><div id="bar"></div></div>
+    </div>
+    <div class="section-filters" id="sectionFilters"></div>
+    <div id="questions"></div>
+    <div class="actions">
+      <button class="btn" onclick="checkFinalQuiz()">Calificar prueba avanzada</button>
+      <button class="btn secondary" onclick="resetFinalQuiz()">Reiniciar</button>
+    </div>
+    <div id="quizResult" class="result"></div>
+    <div id="areaReport" class="area-report"></div>
+    <div id="studyMap" class="study-map"></div>
+    <p class="foot">Esta prueba es adicional y no reemplaza los quizzes individuales de cada módulo.</p>
+  </section>
+</div>
+
+<script>
+const questions = [
+  // SO / Linux (1-10)
+  {area:"SO/Linux", q:"¿Cuál transición NO es válida directamente en el ciclo clásico de estados de proceso?", opts:["Running -> Ready","Ready -> Running","Blocked -> Ready","Blocked -> Running"], correct:3},
+  {area:"SO/Linux", q:"Si un archivo tiene permisos <code>-rw-r-----</code>, su valor octal es:", opts:["640","750","644","600"], correct:0},
+  {area:"SO/Linux", q:"En Linux, ¿qué comando muestra puertos en escucha con PID, recomendado sobre netstat?", opts:["ip addr","ss -tulpn","route -n","iftop"], correct:1},
+  {area:"SO/Linux", q:"La principal diferencia entre microkernel y monolítico es:", opts:["Microkernel ejecuta más servicios en user-space","Monolítico no usa drivers","Microkernel no soporta multitarea","Monolítico siempre es más seguro"], correct:0},
+  {area:"SO/Linux", q:"Si ejecutas <code>kill -15 PID</code>, la señal enviada es:", opts:["SIGKILL","SIGTERM","SIGHUP","SIGSTOP"], correct:1},
+  {area:"SO/Linux", q:"En paginación, un page fault ocurre cuando:", opts:["El proceso termina","No existe tabla de páginas","La página solicitada no está en RAM","Se llena la CPU"], correct:2},
+  {area:"SO/Linux", q:"Comando más apropiado para seguir logs en vivo de nginx con systemd:", opts:["journalctl -u nginx -f","systemctl show nginx","dmesg -w nginx","tail /etc/nginx"], correct:0},
+  {area:"SO/Linux", q:"Si el scheduler usa quantum corto, típicamente mejora:", opts:["Tiempo de respuesta interactivo","Throughput de batch siempre","Uso de disco","Memoria virtual"], correct:0},
+  {area:"SO/Linux", q:"¿Qué imprime?\n<span class='code'>echo $((2**3 + 4))</span>", opts:["8","10","12","16"], correct:2},
+  {area:"SO/Linux", q:"Para buscar texto recursivo con número de línea y respetar binarios, se usa mejor:", opts:["find","ps","grep -rn","chmod"], correct:2},
+
+  // Redes (11-20)
+  {area:"Redes", q:"Una subred /26 ofrece hosts utilizables:", opts:["30","62","126","254"], correct:1},
+  {area:"Redes", q:"Dada la red <code>10.10.50.0/24</code>. Considere el requerimiento de dos subredes de 62 hosts utilizables cada una, y otra subred de 14 hosts; optimizando el desperdicio de direcciones IPv4, indique cuál sería el primer host de la tercera subred:", opts:["10.10.192.1/24","10.10.64.1/26","10.10.50.1/26","10.10.128.1/24"], correct:1},
+  {area:"Redes", q:"En redundancia de gateway virtual, protocolo estándar (no propietario Cisco):", opts:["HSRP","VRRP","GLBP","EIGRP"], correct:1},
+  {area:"Redes", q:"¿Qué capa OSI enruta paquetes por IP?", opts:["2","3","4","7"], correct:1},
+  {area:"Redes", q:"Si la red es 192.168.1.64/26, el broadcast es:", opts:["192.168.1.127","192.168.1.126","192.168.1.191","192.168.1.65"], correct:0},
+  {area:"Redes", q:"¿Qué protocolo asigna IP dinámicamente?", opts:["DNS","DHCP","ARP","ICMP"], correct:1},
+  {area:"Redes", q:"Comando para trazar salto a salto en Windows:", opts:["traceip","tracert","pathing","route print"], correct:1},
+  {area:"Redes", q:"¿Cuántos hosts utilizables tiene una subred /27?", opts:["14","30","62","126"], correct:1},
+  {area:"Redes", q:"Dirección privada RFC1918 válida:", opts:["8.8.8.8","172.20.5.10","200.10.1.1","100.64.1.1"], correct:1},
+  {area:"Redes", q:"En CIDR, /30 se usa comúnmente para:", opts:["Red LAN masiva","Enlace punto a punto","Multicast","DNS anycast"], correct:1},
+
+  // Base de Datos (21-30)
+  {area:"Base de Datos", q:"¿Cuál sentencia es DCL?", opts:["ALTER TABLE","UPDATE","GRANT","DELETE"], correct:2},
+  {area:"Base de Datos", q:"En 3FN se busca eliminar:", opts:["Campos atómicos","Dependencias transitivas","Dependencias funcionales","Claves primarias"], correct:1},
+  {area:"Base de Datos", q:"ACID: propiedad que asegura persistencia post-commit:", opts:["Atomicidad","Aislamiento","Durabilidad","Consistencia"], correct:2},
+  {area:"Base de Datos", q:"¿Qué hace esta consulta?\n<span class='code'>SELECT cliente_id, COUNT(*) FROM ventas GROUP BY cliente_id;</span>", opts:["Actualiza ventas por cliente","Cuenta ventas por cliente","Ordena clientes","Elimina duplicados"], correct:1},
+  {area:"Base de Datos", q:"Índice compuesto (A,B) ayuda mejor en:", opts:["WHERE B=...","WHERE A=...","WHERE C=...","Solo ORDER BY C"], correct:1},
+  {area:"Base de Datos", q:"`LEFT JOIN` entre clientes y ventas retorna:", opts:["Solo clientes con ventas","Todos los clientes, tengan o no ventas","Solo ventas sin cliente","Igual que INNER siempre"], correct:1},
+  {area:"Base de Datos", q:"En SQL, `ROLLBACK` se usa para:", opts:["Guardar definitivo","Revertir transacción","Dar permisos","Crear índice"], correct:1},
+  {area:"Base de Datos", q:"Una FK sirve para:", opts:["Mejorar UI","Relacionar tablas e integridad referencial","Particionar tablas","Comprimir datos"], correct:1},
+  {area:"Base de Datos", q:"Tipo recomendado para montos monetarios:", opts:["FLOAT","VARCHAR","DECIMAL(10,2)","BOOLEAN"], correct:2},
+  {area:"Base de Datos", q:"Read Committed evita:", opts:["Lecturas sucias","Lecturas no repetibles","Phantoms","Deadlocks"], correct:0},
+
+  // Ingeniería de Software / Java / Spring / Arquitectura (31-45)
+  {area:"Ing. Software", q:"En el siguiente controlador Spring MVC:\n<span class='code'>public class CategoriaController {\n  @GetMapping(\"/nuevo\")\n  public String mostrarFormularioNuevaCategoria(Model model){\n    model.addAttribute(\"categoria\", new Categoria());\n    return \"categoria/formulario_categoria\";\n  }\n\n  @PostMapping(\"/guardar\")\n  public String guardarCategoria(@ModelAttribute Categoria categoria){\n    return \"redirect:/categorias/listar\";\n  }\n}</span>\n¿Qué rol cumple este patrón con <code>@Controller</code> y retornos tipo vista/redirección?", opts:["Hace que la clase sea un componente genérico sin relación con capa web","Permite gestionar peticiones web, devolver vistas (Thymeleaf) y manejar interacción con el modelo","Indica que maneja solo REST y devuelve JSON mediante Thymeleaf","Convierte automáticamente la clase en repositorio JPA"], correct:1},
+  {area:"Ing. Software", q:"Patrón SOLID que dice “abierto a extensión, cerrado a modificación”:", opts:["SRP","OCP","LSP","ISP"], correct:1},
+  {area:"Ing. Software", q:"Código Java:\n<span class='code'>class A{void m(){System.out.print(\"A\");}} class B extends A{void m(){System.out.print(\"B\");}} A x=new B(); x.m();</span> ¿Salida?", opts:["A","B","AB","Error"], correct:1},
+  {area:"Ing. Software", q:"Uso principal de `Optional<T>`:", opts:["Acelerar consultas","Evitar nulos y modelar ausencia","Reemplazar listas","Sinónimo de try/catch"], correct:1},
+  {area:"Arquitectura", q:"En DIP, módulo de alto nivel debe depender de:", opts:["Detalles concretos","Abstracciones","Base de datos","Framework"], correct:1},
+  {area:"Arquitectura", q:"DDD: lugar donde viven entidades y reglas de negocio centrales:", opts:["Infraestructura","Aplicación","Dominio","Presentación"], correct:2},
+  {area:"Gestión PMI/PMBOK", q:"PMI corresponde a:", opts:["Lenguaje de programación","Instituto de gestión de proyectos","Framework de testing","Norma de redes"], correct:1},
+  {area:"Madurez CMMI", q:"Nivel donde procesos son cuantitativamente gestionados:", opts:["2","3","4","5"], correct:2},
+  {area:"Ing. Software", q:"DORA: métrica que refleja estabilidad de cambios:", opts:["Lead Time","Deployment Frequency","Change Failure Rate","MTTR"], correct:2},
+  {area:"Ing. Software", q:"En CI/CD, secuencia más razonable:", opts:["Deploy->Test->Build","Build->Test->Deploy","Test->Deploy->Commit","Commit->Deploy->Build"], correct:1},
+  {area:"Patrones", q:"Patrón para notificar varios suscriptores ante cambios:", opts:["Factory","Observer","Singleton","Builder"], correct:1},
+  {area:"Patrones", q:"Patrón para encapsular creación compleja paso a paso:", opts:["Decorator","Facade","Builder","Command"], correct:2},
+  {area:"Ing. Software", q:"¿Qué hace?\n<span class='code'>git add . && git commit -m \"feat\" && git push</span>", opts:["Solo compila","Agrega, confirma y envía cambios","Borra rama","Reinicia repo"], correct:1},
+  {area:"Arquitectura", q:"Microservicios vs monolito: ventaja típica de microservicios:", opts:["Menor complejidad siempre","Escalado independiente por servicio","Sin DevOps","Sin observabilidad"], correct:1},
+  {area:"Ing. Software", q:"En pruebas, la base de la pirámide debe ser:", opts:["E2E","Manual","Unitarias","UAT"], correct:2},
+
+  // BI / ML / DL / IA (46-55)
+  {area:"BI", q:"Secuencia típica BI corporativa:", opts:["Dashboard->ETL->DW","Fuentes->Staging->ETL/ELT->ODS->DW","DW->Fuentes","OLAP->Fuentes"], correct:1},
+  {area:"BI", q:"Operación OLAP que rota ejes de análisis:", opts:["Slice","Dice","Pivot","Roll-up"], correct:2},
+  {area:"BI", q:"Kimball se asocia más con enfoque:", opts:["Top-down corporativo normalizado","Bottom-up dimensional con data marts","NoSQL first","Solo streaming"], correct:1},
+  {area:"ML", q:"Problema con etiquetas sí/no normalmente se modela como:", opts:["Clustering","Clasificación supervisada","Regresión no lineal siempre","RL"], correct:1},
+  {area:"ML", q:"Métrica robusta con clases desbalanceadas:", opts:["Accuracy sola","F1-score","MSE","R2"], correct:1},
+  {area:"ML", q:"Overfitting suele mitigarse con:", opts:["Más complejidad sin límites","Regularización/validación cruzada","Quitar validación","Reducir datos"], correct:1},
+  {area:"DL", q:"Arquitectura destacada en imágenes:", opts:["RNN","CNN","Naive Bayes","KNN"], correct:1},
+  {area:"DL", q:"Transformers destacan por mecanismo de:", opts:["Convolución","Atención","Reglas if-then","Árboles"], correct:1},
+  {area:"IA", q:"ANI significa:", opts:["IA general","IA estrecha para tareas específicas","Superinteligencia","IA cuántica"], correct:1},
+  {area:"IA", q:"¿En qué año se presentó la arquitectura Transformer ('Attention Is All You Need')?", opts:["2012","2016","2017","2020"], correct:2},
+
+  // IoT / Electrónica / Auditoría (56-60)
+  {area:"Electrónica", q:"Ley de Ohm correcta:", opts:["P=VI","V=IR","I=V+R","R=I/V"], correct:1},
+  {area:"IoT", q:"Protocolo ligero pub/sub en IoT:", opts:["HTTP","MQTT","FTP","SMTP"], correct:1},
+  {area:"Auditoría", q:"Triada principal de seguridad:", opts:["CIA","RPO/RTO/MTTR","DNS/DHCP/NAT","CPU/RAM/SSD"], correct:0},
+  {area:"Auditoría", q:"RTO representa:", opts:["Pérdida máxima de datos","Tiempo máximo de recuperación","Frecuencia de backup","Riesgo total operacional"], correct:1},
+  {area:"IoT", q:"En arquitectura IoT, componente que toma lectura física:", opts:["Broker","Sensor","Dashboard","Firewall"], correct:1}
+];
+
+const hintsByArea = {
+  "SO/Linux":"Recuerda estados de proceso, señales y comandos base de administración.",
+  "Redes":"Calcula bits de host con (32 - prefijo). Para hosts: 2^h - 2.",
+  "Base de Datos":"Piensa en integridad, ACID, normalización y tipo de sentencia SQL.",
+  "Ing. Software":"Ubica el principio/patrón en el problema planteado.",
+  "Arquitectura":"DIP/DDD priorizan abstracciones y dominio sobre detalles.",
+  "Gestión PMI/PMBOK":"Relaciona término con marco de gestión de proyectos.",
+  "Madurez CMMI":"Memoriza progresión 1→5: inicial, gestionado, definido, cuantitativo, optimizado.",
+  "Patrones":"Identifica intención del patrón antes del nombre.",
+  "BI":"Diferencia capas: Staging/ODS/DW/Data Mart y operaciones OLAP.",
+  "ML":"Evalúa tipo de problema: clasificación, regresión, clustering.",
+  "DL":"Asocia arquitectura al tipo de dato (imagen, texto, secuencia).",
+  "IA":"Distingue ANI/AGI/ASI y uso de prompts.",
+  "IA Generativa":"Un buen prompt define contexto, tarea y formato.",
+  "Electrónica":"Ley de Ohm: V=I*R y despejes.",
+  "IoT":"MQTT es ligero y pub/sub para telemetría.",
+  "Auditoría":"CIA y continuidad: RTO tiempo, RPO pérdida."
+};
+
+const moduleByArea = {
+  "SO/Linux":"infraestructura-so.html",
+  "Redes":"redes-fundamentos.html / redes.html",
+  "Base de Datos":"base-datos-fundamentos.html",
+  "Ing. Software":"ingenieria-software.html",
+  "Arquitectura":"arquitectura-ddd-dip.html",
+  "Gestión PMI/PMBOK":"ingenieria-software.html",
+  "Madurez CMMI":"ingenieria-software.html",
+  "Patrones":"ingenieria-software.html / arquitectura-ddd-dip.html",
+  "BI":"innovacion.html",
+  "ML":"innovacion.html",
+  "DL":"innovacion.html",
+  "IA":"innovacion.html",
+  "Electrónica":"electronica-basica-iot.html",
+  "IoT":"electronica-basica-iot.html",
+  "Auditoría":"auditoria.html"
+};
+
+function buildStudyMap() {
+  const el = document.getElementById("studyMap");
+  const rows = questions.map((q, i) => {
+    const mod = moduleByArea[q.area] || "index.html";
+    return `<tr><td>${i + 1}</td><td>${q.area}</td><td>${mod}</td><td>${q.q.replace(/<[^>]*>/g,'').slice(0, 95)}...</td></tr>`;
+  }).join("");
+  el.innerHTML = `
+    <h3 style="margin:0 0 8px;font-size:1rem">Matriz de trazabilidad para estudio (pregunta → módulo)</h3>
+    <table>
+      <thead><tr><th>#</th><th>Área</th><th>Módulo sugerido</th><th>Enfoque de repaso</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <p style="margin:8px 0 0;color:var(--muted);font-size:.82rem">Método recomendado: responde, revisa reporte por área y vuelve a estudiar solo los módulos con más fallos.</p>
+  `;
+}
+
+const answers = {};
+let selectedSection = "Todas";
+
+function buildSectionFilters() {
+  const el = document.getElementById("sectionFilters");
+  const areas = ["Todas", ...new Set(questions.map(q => q.area))];
+  el.innerHTML = areas.map(a => `<button class="sf-btn ${a===selectedSection?'active':''}" data-area="${a}">${a}</button>`).join("");
+}
+
+function getHint(item, idx) {
+  const q = item.q.toLowerCase();
+
+  // SO/Linux
+  if (q.includes("estados de proceso") || q.includes("blocked -> running")) return "Enfoque: ciclo de vida de procesos. Repasa en `infraestructura-so.html` la secuencia Created/Ready/Running/Waiting/Terminated.";
+  if (q.includes("permisos") || q.includes("-rw-r-----")) return "Enfoque: permisos Unix en octal. Convierte cada triada r/w/x a 4/2/1 y suma por bloque.";
+  if (q.includes("puertos en escucha") || q.includes("ss -tulpn") || q.includes("netstat")) return "Enfoque: diagnóstico de red en Linux. Revisa comandos por categoría en `infraestructura-so.html`.";
+  if (q.includes("microkernel") || q.includes("monolítico")) return "Enfoque: tipos de kernel. Revisa la clasificación de SO por diseño de kernel en `infraestructura-so.html`.";
+  if (q.includes("kill -15")) return "Enfoque: señales de procesos. Recuerda diferencia entre SIGTERM (gracioso) y SIGKILL (forzado).";
+  if (q.includes("page fault") || q.includes("paginación")) return "Enfoque: gestión de memoria. Repasa paginación, memoria virtual y swap en `infraestructura-so.html`.";
+  if (q.includes("journalctl")) return "Enfoque: observabilidad de servicios systemd. Revisa bloque de servicios/logs en Linux.";
+  if (q.includes("quantum")) return "Enfoque: planificación CPU. Quantum corto suele mejorar respuesta interactiva.";
+  if (q.includes("echo $((2**3 + 4))")) return "Enfoque: aritmética en shell. Evalúa primero potencia y luego suma.";
+  if (q.includes("grep -rn")) return "Enfoque: búsqueda recursiva en Linux. grep con -r y -n para texto + línea.";
+
+  // Redes
+  if (q.includes("/26") && q.includes("hosts")) return "Enfoque: subneteo CIDR. Hosts útiles = 2^(32-prefijo) - 2.";
+  if (q.includes("10.10.50.0/24")) return "Enfoque: VLSM. Asigna primero subredes grandes (62 hosts) y luego la de 14 hosts.";
+  if (q.includes("gateway virtual") || q.includes("vrrp") || q.includes("hsrp")) return "Enfoque: redundancia de primer salto (FHRP). Repasa HSRP/VRRP en `redes-fundamentos.html`.";
+  if (q.includes("capa osi") && q.includes("ip")) return "Enfoque: modelo OSI. El ruteo IP pertenece a capa de red.";
+  if (q.includes("broadcast")) return "Enfoque: rango de subred. Identifica bloque /26 y toma la última IP del bloque.";
+  if (q.includes("asigna ip dinámicamente") || q.includes("dhcp")) return "Enfoque: funciones de protocolos base de red.";
+  if (q.includes("tracert")) return "Enfoque: comandos de diagnóstico en Windows vs Linux (tracert/traceroute).";
+  if (q.includes("rfc1918")) return "Enfoque: rangos privados RFC1918: 10/8, 172.16/12, 192.168/16.";
+  if (q.includes("/30")) return "Enfoque: enlaces punto a punto y tamaño de subred mínima utilizable.";
+  if (q.includes("/27")) return "Enfoque: cálculo rápido: /27 => 5 bits host => 30 hosts utilizables.";
+
+  // Base de datos
+  if (q.includes("dcl")) return "Enfoque: clasificación SQL. DCL controla permisos (GRANT/REVOKE).";
+  if (q.includes("3fn")) return "Enfoque: normalización. 3FN elimina dependencias transitivas.";
+  if (q.includes("acid") || q.includes("post-commit")) return "Enfoque: ACID. Durabilidad = persistencia tras commit.";
+  if (q.includes("group by")) return "Enfoque: agregación SQL. GROUP BY + COUNT resume por clave.";
+  if (q.includes("índice compuesto")) return "Enfoque: orden del índice. (A,B) prioriza filtros que empiezan por A.";
+  if (q.includes("left join")) return "Enfoque: joins. LEFT trae todo del lado izquierdo, coincida o no.";
+  if (q.includes("rollback")) return "Enfoque: TCL/transacciones. ROLLBACK revierte cambios no confirmados.";
+  if (q.includes("fk")) return "Enfoque: integridad referencial entre tablas.";
+  if (q.includes("monetarios") || q.includes("decimal")) return "Enfoque: tipos de dato. Evita FLOAT para dinero.";
+  if (q.includes("read committed")) return "Enfoque: niveles de aislamiento. Read Committed evita dirty reads.";
+
+  // Ingeniería / Arquitectura / Gestión
+  if (q.includes("categoriacontroller")) return "Enfoque: Spring MVC clásico: @Controller + vista + model + redirect.";
+  if (q.includes("solid") || q.includes("abierto a extensión")) return "Enfoque: OCP. Extender comportamiento sin modificar clase existente.";
+  if (q.includes("class a") && q.includes("class b")) return "Enfoque: polimorfismo en Java (despacho dinámico).";
+  if (q.includes("optional")) return "Enfoque: ausencia de valor segura, evita NullPointer.";
+  if (q.includes("dip")) return "Enfoque: dependencia hacia abstracciones, no implementaciones concretas.";
+  if (q.includes("ddd")) return "Enfoque: reglas núcleo en capa de dominio.";
+  if (q.includes("pmi")) return "Enfoque: PMI/PMBOK en gestión de proyectos.";
+  if (q.includes("cmmi")) return "Enfoque: nivel 4 = cuantitativamente gestionado.";
+  if (q.includes("dora")) return "Enfoque: Change Failure Rate mide estabilidad de cambios.";
+  if (q.includes("ci/cd")) return "Enfoque: pipeline básico Build -> Test -> Deploy.";
+  if (q.includes("suscriptores")) return "Enfoque: patrón Observer notifica múltiples listeners.";
+  if (q.includes("creación compleja")) return "Enfoque: patrón Builder.";
+  if (q.includes("git add") && q.includes("git commit")) return "Enfoque: flujo Git de preparar/confirmar/publicar.";
+  if (q.includes("microservicios vs monolito")) return "Enfoque: ventaja real de microservicios = escalado independiente.";
+  if (q.includes("pirámide")) return "Enfoque: base de pirámide de testing = pruebas unitarias.";
+
+  // BI / ML / DL / IA
+  if (q.includes("secuencia típica bi")) return "Enfoque: arquitectura BI por capas. Revisa `innovacion.html` (Staging, ODS, DW, OLAP).";
+  if (q.includes("olap") && q.includes("rota")) return "Enfoque: operación OLAP Pivot.";
+  if (q.includes("kimball")) return "Enfoque: Kimball = bottom-up dimensional con data marts.";
+  if (q.includes("etiquetas sí/no")) return "Enfoque: problema de clasificación supervisada.";
+  if (q.includes("desbalanceadas")) return "Enfoque: F1-score equilibra precision y recall.";
+  if (q.includes("overfitting")) return "Enfoque: regularización y validación cruzada para generalizar.";
+  if (q.includes("imágenes")) return "Enfoque: CNN en visión por computadora.";
+  if (q.includes("transformers")) return "Enfoque: mecanismo de atención.";
+  if (q.includes("ani")) return "Enfoque: ANI = IA estrecha (la actual).";
+  if (q.includes("attention is all you need") || q.includes("2017")) return "Enfoque: hito histórico de Transformers en 2017.";
+
+  // IoT / Electrónica / Auditoría
+  if (q.includes("ley de ohm")) return "Enfoque: fórmula base V = I * R.";
+  if (q.includes("mqtt") || q.includes("pub/sub")) return "Enfoque: IoT ligero, protocolo de telemetría MQTT.";
+  if (q.includes("triada")) return "Enfoque: CIA = Confidencialidad, Integridad, Disponibilidad.";
+  if (q.includes("rto")) return "Enfoque: continuidad. RTO es tiempo máximo de recuperación.";
+  if (q.includes("lectura física")) return "Enfoque: en arquitectura IoT quien mide el mundo físico es el sensor.";
+
+  return `Enfoque: ${item.area}. Revisa este tema en ${moduleByArea[item.area] || "el módulo correspondiente"} y descarta primero opciones incompatibles con la definición central.`;
+}
+
+function renderQuestions() {
+  const container = document.getElementById("questions");
+  const source = questions.map((q, i) => ({...q, idx:i}))
+    .filter(item => selectedSection === "Todas" || item.area === selectedSection);
+  container.innerHTML = source.map((item) => {
+    const idx = item.idx;
+    const qn = idx + 1;
+    const opts = item.opts.map((op, i) => {
+      const checked = answers[qn] === i ? "checked" : "";
+      return `<label><input type="radio" name="q${qn}" value="${i}" ${checked}> ${op}</label>`;
+    }).join("");
+    const hint = getHint(item, idx);
+    return `
+      <div class="quiz-q" data-correct="${item.correct}" data-area="${item.area}">
+        <div class="area">Área: ${item.area}</div>
+        <p><strong>${qn}.</strong> ${item.q}</p>
+        ${opts}
+        <button class="hint-toggle" type="button" onclick="toggleHint(this)">💡 Ver pista</button>
+        <div class="hint-box">${hint}</div>
+      </div>
+    `;
+  }).join("");
+  updateProgress();
+}
+
+function updateProgress() {
+  const answered = Object.keys(answers).length;
+  document.getElementById('counter').textContent = `${answered}/${questions.length} contestadas`;
+  document.getElementById('bar').style.width = `${(answered / questions.length) * 100}%`;
+}
+
+document.addEventListener('change', (e) => {
+  if (e.target.matches('#questions input[type="radio"]')) {
+    const qn = Number(e.target.name.replace("q",""));
+    answers[qn] = Number(e.target.value);
+    updateProgress();
+  }
+});
+
+document.addEventListener('click', (e) => {
+  if (e.target.matches('.sf-btn')) {
+    selectedSection = e.target.dataset.area;
+    buildSectionFilters();
+    renderQuestions();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+});
+
+function toggleHint(btn) {
+  const box = btn.nextElementSibling;
+  const isOpen = box.classList.contains('show');
+  box.classList.toggle('show');
+  btn.textContent = isOpen ? "💡 Ver pista" : "🙈 Ocultar pista";
+}
+
+function checkFinalQuiz() {
+  const qs = document.querySelectorAll('#questions .quiz-q');
+  let ok = 0;
+  const areaStats = {};
+
+  qs.forEach((q) => {
+    const selected = q.querySelector('input:checked');
+    const correct = Number(q.dataset.correct);
+    const area = q.dataset.area || "General";
+    if (!areaStats[area]) areaStats[area] = { correct: 0, total: 0 };
+    areaStats[area].total++;
+
+    q.style.borderColor = 'var(--line)';
+    q.style.background = 'var(--card)';
+
+    if (selected && Number(selected.value) === correct) {
+      ok++;
+      areaStats[area].correct++;
+      q.style.borderColor = 'rgba(52,211,153,.75)';
+      q.style.background = 'rgba(52,211,153,.10)';
+    } else {
+      q.style.borderColor = 'rgba(248,113,113,.65)';
+      q.style.background = 'rgba(248,113,113,.08)';
+    }
+  });
+
+  const total = qs.length;
+  const pct = Math.round((ok / total) * 100);
+  const result = document.getElementById('quizResult');
+  result.className = 'result ' + (pct >= 70 ? 'ok' : 'bad');
+  result.textContent = `Resultado final: ${ok}/${total} (${pct}%). ` +
+    (pct >= 90 ? 'Nivel sobresaliente.' :
+     pct >= 70 ? 'Aprobado con buen dominio.' :
+     'Debes reforzar áreas clave y repetir la prueba.');
+
+  const rows = Object.entries(areaStats).map(([area, stat]) => {
+    const ap = Math.round((stat.correct / stat.total) * 100);
+    const estado = ap >= 70 ? "OK" : "Reforzar";
+    return `<tr><td>${area}</td><td>${stat.correct}/${stat.total}</td><td>${ap}%</td><td>${estado}</td></tr>`;
+  }).join("");
+
+  const reportEl = document.getElementById('areaReport');
+  reportEl.className = 'area-report show';
+  reportEl.innerHTML = `
+    <h3 style="margin:0 0 8px;font-size:1rem">Reporte por área</h3>
+    <table>
+      <thead><tr><th>Área</th><th>Aciertos</th><th>Porcentaje</th><th>Estado</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <p style="margin:8px 0 0;color:var(--muted);font-size:.82rem">Prioriza primero las áreas en estado "Reforzar".</p>
+  `;
+}
+
+function resetFinalQuiz() {
+  Object.keys(answers).forEach(k => delete answers[k]);
+  document.querySelectorAll('#questions .quiz-q').forEach(q => {
+    q.style.borderColor = 'var(--line)';
+    q.style.background = 'var(--card)';
+  });
+  const result = document.getElementById('quizResult');
+  result.className = 'result';
+  result.textContent = '';
+  const reportEl = document.getElementById('areaReport');
+  reportEl.className = 'area-report';
+  reportEl.innerHTML = '';
+  selectedSection = "Todas";
+  buildSectionFilters();
+  renderQuestions();
+  updateProgress();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+buildSectionFilters();
+renderQuestions();
+buildStudyMap();
+</script>
+</body>
+</html>

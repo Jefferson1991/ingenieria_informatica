@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Redes — Fundamentos desde Cero</title>
+<style>
+:root{
+  --bg:#07101f; --bg2:#0d1a31; --card:#0f1b33; --line:rgba(148,163,184,.24);
+  --text:#e5e7eb; --muted:#93a4bf;
+  --blue:#60a5fa; --cyan:#22d3ee; --green:#34d399; --orange:#fb923c; --purple:#a78bfa; --red:#f87171;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; font-family:Inter,Segoe UI,Arial,sans-serif; color:var(--text);
+  background:radial-gradient(circle at 20% 0%, #15315f 0%, var(--bg) 40%, #040914 100%);
+}
+.wrap{max-width:1180px; margin:0 auto; padding:24px}
+.hero{
+  border:1px solid var(--line); border-radius:16px; padding:24px;
+  background:linear-gradient(120deg, rgba(96,165,250,.16), rgba(34,211,238,.08));
+}
+h1{margin:0 0 8px; font-size:2rem}
+.sub{margin:0; color:var(--muted)}
+.chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px}
+.chip{border:1px solid var(--line); border-radius:999px; padding:6px 10px; font-size:.8rem; background:rgba(2,6,23,.4)}
+.tabs{
+  margin-top:16px; border:1px solid var(--line); border-radius:12px; padding:8px; overflow-x:auto; white-space:nowrap;
+  position:sticky; top:10px; z-index:30; background:rgba(2,6,23,.55); backdrop-filter:blur(8px);
+}
+.tab{
+  border:none; background:transparent; color:var(--muted); cursor:pointer;
+  padding:10px 13px; border-radius:9px; font-weight:700; margin-right:6px;
+}
+.tab:hover{background:rgba(148,163,184,.08); color:var(--text)}
+.tab.active{background:rgba(34,211,238,.12); color:var(--cyan)}
+.panel{display:none; margin-top:16px}
+.panel.active{display:block}
+.section{
+  border:1px solid var(--line); border-radius:14px; padding:18px; margin-bottom:14px; background:rgba(15,23,42,.5);
+}
+.section h2{margin:0 0 8px; font-size:1.3rem}
+.desc{margin:0 0 12px; color:var(--muted)}
+.grid{display:grid; grid-template-columns:repeat(3,1fr); gap:12px}
+.grid-2{display:grid; grid-template-columns:repeat(2,1fr); gap:12px}
+.card{border:1px solid var(--line); background:var(--card); border-radius:12px; padding:14px}
+.card h3{margin:0 0 8px; font-size:1rem}
+.card p{margin:0; color:var(--muted); line-height:1.45}
+ul{margin:10px 0 0 18px}
+li{margin:4px 0}
+table{width:100%; border-collapse:collapse; border:1px solid var(--line); border-radius:10px; overflow:hidden; background:var(--card)}
+th,td{padding:10px; border-bottom:1px solid var(--line); text-align:left; font-size:.92rem}
+th{background:rgba(96,165,250,.15)}
+.flow{display:flex; flex-wrap:wrap; gap:10px}
+.step{padding:10px 12px; border:1px dashed var(--line); border-radius:10px; background:rgba(2,6,23,.35); font-weight:600}
+.quiz-q{border:1px solid var(--line); border-radius:10px; padding:12px; margin-bottom:10px; background:var(--card)}
+.quiz-q p{margin:0 0 8px}
+.quiz-q label{display:block; margin:6px 0}
+.btn{
+  border:none; border-radius:10px; padding:10px 14px; font-weight:700; cursor:pointer;
+  background:linear-gradient(90deg,var(--blue),var(--cyan)); color:#071321;
+}
+.result{display:none; margin-top:10px; border-radius:8px; padding:10px}
+.ok{display:block; border:1px solid rgba(52,211,153,.45); background:rgba(52,211,153,.15)}
+.bad{display:block; border:1px solid rgba(248,113,113,.45); background:rgba(248,113,113,.15)}
+.foot{margin-top:20px; text-align:center; color:var(--muted); font-size:.82rem}
+code{background:rgba(148,163,184,.15); border:1px solid var(--line); border-radius:6px; padding:2px 6px}
+@media (max-width:960px){.grid,.grid-2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <h1>Redes — Fundamentos desde lo más básico</h1>
+    <p class="sub">Ruta práctica para entender cómo se conectan dispositivos, cómo viajan los datos y qué protocolos hacen posible Internet y redes empresariales.</p>
+    <div class="chips">
+      <span class="chip">🧠 Conceptos base</span>
+      <span class="chip">🧱 OSI/TCP-IP</span>
+      <span class="chip">🔢 IP y subredes</span>
+      <span class="chip">🔌 Dispositivos</span>
+      <span class="chip">📡 Protocolos</span>
+      <span class="chip">📝 Mini quiz</span>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="inicio">🚦 Inicio</button>
+    <button class="tab" data-tab="conceptos">🧠 Conceptos Básicos</button>
+    <button class="tab" data-tab="modelos">🧱 Modelos OSI y TCP/IP</button>
+    <button class="tab" data-tab="ip">🔢 Direccionamiento IP</button>
+    <button class="tab" data-tab="subredes">📐 Subredes básicas</button>
+    <button class="tab" data-tab="equipos">🔌 Equipos de Red</button>
+    <button class="tab" data-tab="protocolos">📡 Protocolos esenciales</button>
+    <button class="tab" data-tab="quiz">📝 Evaluación</button>
+  </nav>
+
+  <section id="panel-inicio" class="panel active">
+    <div class="section">
+      <h2>¿Qué es una red?</h2>
+      <p class="desc">Una red es un conjunto de dispositivos conectados para intercambiar información y compartir recursos.</p>
+      <div class="grid">
+        <div class="card">
+          <h3>Componentes</h3>
+          <ul><li>Hosts (PC, laptop, móvil, servidor)</li><li>Medios (cable, fibra, Wi-Fi)</li><li>Equipos intermedios (switch, router)</li></ul>
+        </div>
+        <div class="card">
+          <h3>Objetivos</h3>
+          <ul><li>Comunicación</li><li>Compartir recursos</li><li>Acceso a servicios</li></ul>
+        </div>
+        <div class="card">
+          <h3>Escala</h3>
+          <ul><li>LAN: red local</li><li>MAN: metropolitana</li><li>WAN: larga distancia / Internet</li></ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="panel-conceptos" class="panel">
+    <div class="section">
+      <h2>Fundamentos clave</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Ancho de banda vs latencia</h3>
+          <p><strong>Ancho de banda</strong>: cantidad de datos por segundo (Mbps/Gbps). <strong>Latencia</strong>: tiempo que tarda un paquete en ir y volver (ms).</p>
+        </div>
+        <div class="card">
+          <h3>Paquete y trama</h3>
+          <p>Los datos se dividen en unidades. En capa de red se habla de <em>paquetes</em>; en capa de enlace, de <em>tramas</em>.</p>
+        </div>
+        <div class="card">
+          <h3>Unicast, Broadcast y Multicast</h3>
+          <p>Uno a uno, uno a todos, uno a muchos (grupo).</p>
+        </div>
+        <div class="card">
+          <h3>Cliente-servidor</h3>
+          <p>Cliente solicita, servidor responde. Ejemplo: navegador ↔ servidor web.</p>
+        </div>
+      </div>
+    </div>
+    <div class="section">
+      <h2>Cómo viaja un mensaje (resumen)</h2>
+      <div class="flow">
+        <div class="step">Aplicación crea datos</div>
+        <div class="step">Se encapsulan en capas</div>
+        <div class="step">Se envían por medio físico</div>
+        <div class="step">Destino desencapsula</div>
+        <div class="step">Aplicación recibe</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="panel-modelos" class="panel">
+    <div class="section">
+      <h2>Modelo OSI (7 capas)</h2>
+      <table>
+        <thead><tr><th>Capa</th><th>Función principal</th><th>Ejemplos</th></tr></thead>
+        <tbody>
+          <tr><td>7. Aplicación</td><td>Servicios al usuario</td><td>HTTP, DNS, SMTP</td></tr>
+          <tr><td>6. Presentación</td><td>Formato/cifrado/compresión</td><td>TLS, UTF-8, JPEG</td></tr>
+          <tr><td>5. Sesión</td><td>Control de diálogo</td><td>RPC, NetBIOS</td></tr>
+          <tr><td>4. Transporte</td><td>Entrega extremo a extremo</td><td>TCP, UDP</td></tr>
+          <tr><td>3. Red</td><td>Direcciones lógicas y ruteo</td><td>IP, ICMP</td></tr>
+          <tr><td>2. Enlace</td><td>Dirección MAC y tramas</td><td>Ethernet, Wi-Fi</td></tr>
+          <tr><td>1. Física</td><td>Bits por el medio</td><td>Cables, fibra, radio</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="section">
+      <h2>Modelo TCP/IP (4 capas)</h2>
+      <div class="grid">
+        <div class="card"><h3>Aplicación</h3><p>HTTP, HTTPS, DNS, DHCP, SMTP, FTP.</p></div>
+        <div class="card"><h3>Transporte</h3><p>TCP (confiable), UDP (rápido, sin confirmación).</p></div>
+        <div class="card"><h3>Internet</h3><p>IP, ICMP, ARP para direccionamiento y ruteo.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="panel-ip" class="panel">
+    <div class="section">
+      <h2>Direccionamiento IP básico</h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3>IPv4</h3>
+          <p>32 bits, formato decimal con puntos: <code>192.168.10.25</code>.</p>
+          <ul>
+            <li>Clase privada A: <code>10.0.0.0/8</code></li>
+            <li>Clase privada B: <code>172.16.0.0/12</code></li>
+            <li>Clase privada C: <code>192.168.0.0/16</code></li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>IPv6</h3>
+          <p>128 bits, mayor espacio de direcciones: <code>2001:db8::1</code>.</p>
+          <ul>
+            <li>Sin NAT obligatorio</li>
+            <li>Autoconfiguración más robusta</li>
+            <li>Diseñado para crecimiento de Internet</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="section">
+      <h2>Conceptos indispensables</h2>
+      <div class="grid">
+        <div class="card"><h3>Máscara</h3><p>Define qué parte es red y qué parte es host. Ejemplo: <code>/24</code> = 255.255.255.0.</p></div>
+        <div class="card"><h3>Gateway</h3><p>Puerta de salida a otras redes, normalmente la interfaz del router.</p></div>
+        <div class="card"><h3>DNS</h3><p>Traduce nombres de dominio a direcciones IP.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="panel-subredes" class="panel">
+    <div class="section">
+      <h2>Subredes (nivel inicial)</h2>
+      <p class="desc">Subredar es dividir una red grande en redes más pequeñas para ordenar, mejorar seguridad y optimizar tráfico.</p>
+      <table>
+        <thead><tr><th>Prefijo</th><th>Máscara</th><th>Hosts útiles</th><th>Uso común</th></tr></thead>
+        <tbody>
+          <tr><td>/24</td><td>255.255.255.0</td><td>254</td><td>LAN pequeña/mediana</td></tr>
+          <tr><td>/25</td><td>255.255.255.128</td><td>126</td><td>Segmentar dos áreas</td></tr>
+          <tr><td>/26</td><td>255.255.255.192</td><td>62</td><td>Oficinas pequeñas</td></tr>
+          <tr><td>/27</td><td>255.255.255.224</td><td>30</td><td>VLAN departamental</td></tr>
+          <tr><td>/30</td><td>255.255.255.252</td><td>2</td><td>Enlace punto a punto</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="section">
+      <h2>Ejemplo rápido</h2>
+      <div class="card">
+        <p>Red base: <code>192.168.1.0/24</code>. Si la divides en /26 obtienes 4 subredes:</p>
+        <ul>
+          <li><code>192.168.1.0/26</code> (hosts .1 a .62, broadcast .63)</li>
+          <li><code>192.168.1.64/26</code> (hosts .65 a .126, broadcast .127)</li>
+          <li><code>192.168.1.128/26</code> (hosts .129 a .190, broadcast .191)</li>
+          <li><code>192.168.1.192/26</code> (hosts .193 a .254, broadcast .255)</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="panel-equipos" class="panel">
+    <div class="section">
+      <h2>Equipos de red esenciales</h2>
+      <div class="grid">
+        <div class="card">
+          <h3>Switch (Capa 2)</h3>
+          <p>Conecta equipos dentro de la LAN y reenvía tramas por dirección MAC.</p>
+        </div>
+        <div class="card">
+          <h3>Router (Capa 3)</h3>
+          <p>Conecta redes distintas y decide la mejor ruta para paquetes IP.</p>
+        </div>
+        <div class="card">
+          <h3>Access Point</h3>
+          <p>Conecta dispositivos inalámbricos (Wi-Fi) a la red cableada.</p>
+        </div>
+      </div>
+    </div>
+    <div class="section">
+      <h2>Otros componentes</h2>
+      <div class="grid-2">
+        <div class="card"><h3>Firewall</h3><p>Filtra tráfico según reglas de seguridad.</p></div>
+        <div class="card"><h3>Modem/ONT</h3><p>Interfaz entre red local y proveedor de Internet.</p></div>
+        <div class="card"><h3>Servidor DHCP</h3><p>Asigna IP automáticamente a clientes.</p></div>
+        <div class="card"><h3>Servidor DNS</h3><p>Resuelve nombres de dominio a direcciones IP.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="panel-protocolos" class="panel">
+    <div class="section">
+      <h2>Protocolos que debes dominar primero</h2>
+      <table>
+        <thead><tr><th>Protocolo</th><th>Función</th><th>Puerto típico</th></tr></thead>
+        <tbody>
+          <tr><td>HTTP / HTTPS</td><td>Web</td><td>80 / 443</td></tr>
+          <tr><td>DNS</td><td>Resolución de nombres</td><td>53</td></tr>
+          <tr><td>DHCP</td><td>Asignación automática de IP</td><td>67/68</td></tr>
+          <tr><td>SSH</td><td>Administración remota segura</td><td>22</td></tr>
+          <tr><td>SMTP / IMAP</td><td>Correo electrónico</td><td>25 / 143</td></tr>
+          <tr><td>ICMP</td><td>Diagnóstico (ping)</td><td>No usa puerto</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="section">
+      <h2>Comandos base de diagnóstico</h2>
+      <div class="grid">
+        <div class="card"><h3><code>ipconfig</code> / <code>ip a</code></h3><p>Ver configuración IP local.</p></div>
+        <div class="card"><h3><code>ping 8.8.8.8</code></h3><p>Probar conectividad y latencia.</p></div>
+        <div class="card"><h3><code>tracert</code> / <code>traceroute</code></h3><p>Ver salto a salto hasta destino.</p></div>
+      </div>
+    </div>
+    <div class="section">
+      <h2>Redundancia de gateway virtual (FHRP)</h2>
+      <p class="desc">Cuando hay dos o más routers para salida, se usan protocolos de redundancia de primer salto para mantener una puerta de enlace virtual activa aun si un router falla.</p>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Protocolos comunes</h3>
+          <ul>
+            <li><strong>HSRP</strong> (Cisco): un router activo y uno standby.</li>
+            <li><strong>VRRP</strong> (estándar): router master y backup.</li>
+            <li><strong>GLBP</strong> (Cisco): además balancea carga entre routers.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Pregunta tipo examen</h3>
+          <p><strong>En un escenario de redundancia de routers, ¿qué permite usar una IP de gateway virtual?</strong></p>
+          <p>Respuesta esperada: <strong>un protocolo FHRP</strong> (por ejemplo HSRP o VRRP).</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="panel-quiz" class="panel">
+    <div class="section">
+      <h2>Mini evaluación de fundamentos</h2>
+      <p class="desc">Responde y valida tu comprensión básica de redes.</p>
+
+      <div class="quiz-q" data-correct="a">
+        <p>1. ¿Qué equipo conecta redes diferentes?</p>
+        <label><input type="radio" name="q1" value="a"> Router</label>
+        <label><input type="radio" name="q1" value="b"> Switch</label>
+        <label><input type="radio" name="q1" value="c"> Hub</label>
+        <label><input type="radio" name="q1" value="d"> Access Point</label>
+      </div>
+
+      <div class="quiz-q" data-correct="c">
+        <p>2. ¿Cuál es la función de DNS?</p>
+        <label><input type="radio" name="q2" value="a"> Cifrar paquetes</label>
+        <label><input type="radio" name="q2" value="b"> Asignar IP dinámicas</label>
+        <label><input type="radio" name="q2" value="c"> Resolver nombres a direcciones IP</label>
+        <label><input type="radio" name="q2" value="d"> Bloquear puertos</label>
+      </div>
+
+      <div class="quiz-q" data-correct="b">
+        <p>3. ¿Qué prefijo ofrece 254 hosts útiles?</p>
+        <label><input type="radio" name="q3" value="a"> /30</label>
+        <label><input type="radio" name="q3" value="b"> /24</label>
+        <label><input type="radio" name="q3" value="c"> /27</label>
+        <label><input type="radio" name="q3" value="d"> /26</label>
+      </div>
+
+      <div class="quiz-q" data-correct="d">
+        <p>4. ¿Qué capa OSI se encarga del direccionamiento lógico y ruteo?</p>
+        <label><input type="radio" name="q4" value="a"> Capa Física</label>
+        <label><input type="radio" name="q4" value="b"> Capa de Enlace</label>
+        <label><input type="radio" name="q4" value="c"> Capa de Transporte</label>
+        <label><input type="radio" name="q4" value="d"> Capa de Red</label>
+      </div>
+
+      <div class="quiz-q" data-correct="a">
+        <p>5. ¿Cuál protocolo se usa típicamente para administración remota segura?</p>
+        <label><input type="radio" name="q5" value="a"> SSH</label>
+        <label><input type="radio" name="q5" value="b"> FTP</label>
+        <label><input type="radio" name="q5" value="c"> Telnet</label>
+        <label><input type="radio" name="q5" value="d"> SNMP</label>
+      </div>
+
+      <div class="quiz-q" data-correct="c">
+        <p>6. En redundancia de gateway, ¿qué opción pertenece a protocolos FHRP?</p>
+        <label><input type="radio" name="q6" value="a"> STP y OSPF</label>
+        <label><input type="radio" name="q6" value="b"> BGP y RIP</label>
+        <label><input type="radio" name="q6" value="c"> HSRP y VRRP</label>
+        <label><input type="radio" name="q6" value="d"> DHCP y DNS</label>
+      </div>
+
+      <div class="quiz-q" data-correct="b">
+        <p>7. Red <code>10.10.50.0/24</code>, necesitas subredes para 62, 62 y 14 hosts (VLSM). ¿Cuál es el primer host de la tercera subred?</p>
+        <label><input type="radio" name="q7" value="a"> 10.10.50.65</label>
+        <label><input type="radio" name="q7" value="b"> 10.10.50.129</label>
+        <label><input type="radio" name="q7" value="c"> 10.10.50.1</label>
+        <label><input type="radio" name="q7" value="d"> 10.10.50.193</label>
+      </div>
+
+      <button class="btn" onclick="checkQuiz()">Verificar respuestas</button>
+      <div id="quizResult" class="result"></div>
+    </div>
+  </section>
+
+  <p class="foot">Material interactivo de Redes — nivel fundamentos.</p>
+</div>
+
+<script>
+document.querySelectorAll('.tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    const panel = document.getElementById('panel-' + btn.dataset.tab);
+    if (panel) panel.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+});
+
+function checkQuiz() {
+  const questions = document.querySelectorAll('#panel-quiz .quiz-q');
+  let score = 0;
+
+  questions.forEach(q => {
+    const selected = q.querySelector('input:checked');
+    const correct = q.dataset.correct;
+    q.style.borderColor = 'var(--line)';
+    q.style.background = 'var(--card)';
+
+    if (selected && selected.value === correct) {
+      score++;
+      q.style.borderColor = 'rgba(52,211,153,.7)';
+      q.style.background = 'rgba(52,211,153,.10)';
+    } else {
+      q.style.borderColor = 'rgba(248,113,113,.65)';
+      q.style.background = 'rgba(248,113,113,.09)';
+    }
+  });
+
+  const total = questions.length;
+  const pct = Math.round((score / total) * 100);
+  const result = document.getElementById('quizResult');
+  result.className = 'result ' + (pct >= 60 ? 'ok' : 'bad');
+  result.textContent = `Resultado: ${score}/${total} (${pct}%). ` +
+    (pct === 100 ? 'Excelente base en redes.' :
+    pct >= 60 ? 'Buen progreso. Refuerza subredes y protocolos.' :
+    'Revisa las pestañas y vuelve a intentar.');
+}
+</script>
+</body>
+</html>
