@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Prueba Final Avanzada (60) — Ingeniería Informática</title>
+<title>Prueba Final Avanzada — Ingeniería Informática</title>
 <style>
 :root{
   --bg:#0b1020; --card:#121c33; --line:rgba(148,163,184,.24);
@@ -17,6 +17,11 @@ h1{margin:0 0 8px;font-size:1.9rem}.sub{margin:0;color:var(--muted)}
 .meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .pill{border:1px solid var(--line);border-radius:999px;padding:5px 9px;font-size:.78rem;background:rgba(2,6,23,.4)}
 .section{border:1px solid var(--line);border-radius:12px;padding:16px;background:rgba(15,23,42,.5)}
+.exam-config{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-bottom:12px}
+.cfg-card{border:1px solid var(--line);border-radius:10px;padding:10px;background:rgba(2,6,23,.35)}
+.cfg-card label{display:block;font-size:.82rem;color:var(--muted);margin-bottom:6px}
+.cfg-card select{width:100%;padding:8px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--text)}
+.timer-badge{display:inline-block;padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:rgba(245,158,11,.18);color:#ffe2b2;font-weight:700}
 .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
 .toolbar .progress{flex:1;min-width:220px;height:10px;background:rgba(148,163,184,.18);border-radius:999px;overflow:hidden;border:1px solid var(--line)}
 .toolbar .progress>div{height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--cyan))}
@@ -52,10 +57,10 @@ h1{margin:0 0 8px;font-size:1.9rem}.sub{margin:0;color:var(--muted)}
 <body>
 <div class="wrap">
   <header class="hero">
-    <h1>Prueba Final Avanzada (60 preguntas)</h1>
-    <p class="sub">Evaluación difícil e integrada: SO, Redes, Base de Datos, Ingeniería de Software, Arquitectura, Auditoría, BI, ML, DL, IA e IoT.</p>
+    <h1>Prueba Final Avanzada — Banco Integral</h1>
+    <p class="sub">Evaluación integral alineada a todo el contenido de tus módulos: SO, Cloud, Docker, DevOps, Redes, BD, IS, Arquitectura, Auditoría, BI, Minería, ML, DL, IA e IoT.</p>
     <div class="meta">
-      <span class="pill">60 preguntas</span>
+      <span class="pill">Cobertura por módulos</span>
       <span class="pill">Nivel: Intermedio/Avanzado</span>
       <span class="pill">Incluye código y casos prácticos</span>
       <span class="pill">Aprobación sugerida: 70%</span>
@@ -63,8 +68,32 @@ h1{margin:0 0 8px;font-size:1.9rem}.sub{margin:0;color:var(--muted)}
   </header>
 
   <section class="section" id="quiz-final">
+    <div class="exam-config">
+      <div class="cfg-card">
+        <label for="examVersion">Versión del examen</label>
+        <select id="examVersion">
+          <option value="A">Versión A</option>
+          <option value="B">Versión B</option>
+        </select>
+      </div>
+      <div class="cfg-card">
+        <label for="examTime">Tiempo</label>
+        <select id="examTime">
+          <option value="60">60 minutos</option>
+          <option value="90" selected>90 minutos</option>
+          <option value="120">120 minutos</option>
+        </select>
+      </div>
+      <div class="cfg-card">
+        <label>Control</label>
+        <div class="actions" style="margin-top:0">
+          <button class="btn" id="startExamBtn" onclick="startExam()">Iniciar simulador</button>
+          <span class="timer-badge" id="timerBadge">⏱️ 90:00</span>
+        </div>
+      </div>
+    </div>
     <div class="toolbar">
-      <strong id="counter">0/60 contestadas</strong>
+      <strong id="counter">0/0 contestadas</strong>
       <div class="progress"><div id="bar"></div></div>
     </div>
     <div class="section-filters" id="sectionFilters"></div>
@@ -152,7 +181,53 @@ const questions = [
   {area:"IoT", q:"Protocolo ligero pub/sub en IoT:", opts:["HTTP","MQTT","FTP","SMTP"], correct:1},
   {area:"Auditoría", q:"Triada principal de seguridad:", opts:["CIA","RPO/RTO/MTTR","DNS/DHCP/NAT","CPU/RAM/SSD"], correct:0},
   {area:"Auditoría", q:"RTO representa:", opts:["Pérdida máxima de datos","Tiempo máximo de recuperación","Frecuencia de backup","Riesgo total operacional"], correct:1},
-  {area:"IoT", q:"En arquitectura IoT, componente que toma lectura física:", opts:["Broker","Sensor","Dashboard","Firewall"], correct:1}
+  {area:"IoT", q:"En arquitectura IoT, componente que toma lectura física:", opts:["Broker","Sensor","Dashboard","Firewall"], correct:1},
+
+  // Cloud / Docker / DevOps (61-75)
+  {area:"Cloud", q:"En IaaS, ¿quién gestiona el sistema operativo?", opts:["El proveedor","El cliente","Ambos por igual","Ninguno"], correct:1},
+  {area:"Cloud", q:"¿Qué modelo cloud te entrega aplicación lista para usar por navegador?", opts:["IaaS","PaaS","SaaS","On-Prem"], correct:2},
+  {area:"Cloud", q:"¿Cuál es una ventaja típica de cloud híbrida?", opts:["Elimina internet","Combina control privado y escalabilidad pública","No requiere seguridad","Solo sirve para backups"], correct:1},
+  {area:"Docker", q:"Diferencia principal imagen vs contenedor:", opts:["Imagen ejecuta procesos; contenedor no","Imagen es plantilla inmutable, contenedor instancia en ejecución","Son exactamente lo mismo","Contenedor siempre pesa más"], correct:1},
+  {area:"Docker", q:"Comando para ver logs en tiempo real de un contenedor:", opts:["docker inspect","docker logs -f","docker top","docker ps -f"], correct:1},
+  {area:"Docker", q:"Tecnologías del kernel clave para aislamiento en contenedores:", opts:["SELinux y SSH","Namespaces y Cgroups","NAT y DNS","TLS y JWT"], correct:1},
+  {area:"Docker", q:"En Dockerfile, para aprovechar caché de dependencias Node, primero conviene:", opts:["COPY . .","RUN npm start","COPY package*.json y luego npm install","EXPOSE 3000"], correct:2},
+  {area:"Docker", q:"Unidad mínima de despliegue en Kubernetes:", opts:["Nodo","Servicio","Pod","Cluster"], correct:2},
+  {area:"DevOps", q:"En pipeline CI/CD, gate de calidad se aplica típicamente en:", opts:["Build/Lint/Test","Solo deploy prod","Solo commit local","Después de rollback"], correct:0},
+  {area:"DevOps", q:"Estrategia de despliegue con rollback inmediato por switch de tráfico:", opts:["Canary","Blue-Green","Rolling update","Recreate"], correct:1},
+  {area:"DevOps", q:"Terraform usa enfoque:", opts:["IaC declarativa","Programación orientada a eventos","Solo scripts bash","Monitoreo de logs"], correct:0},
+  {area:"DevOps", q:"¿Qué comando muestra vista previa antes de aplicar infraestructura con Terraform?", opts:["terraform apply","terraform init","terraform plan","terraform state rm"], correct:2},
+  {area:"DevOps", q:"GitOps se asocia más con herramientas como:", opts:["ArgoCD/Flux","WinSCP","Excel","Jupyter"], correct:0},
+  {area:"DevOps", q:"Métrica DORA MTTR mide:", opts:["Frecuencia de despliegue","Tiempo para recuperar servicio","Fallo por cambio","Tiempo de coding"], correct:1},
+  {area:"DevOps", q:"Objetivo principal de observabilidad en producción:", opts:["Solo almacenar logs","Detectar y explicar fallos rápidamente","Eliminar pruebas","Evitar métricas"], correct:1},
+
+  // Redes avanzadas / VLAN / IPv6 / ACL (76-90)
+  {area:"Redes Avanzadas", q:"Una VLAN se usa para:", opts:["Aumentar voltaje en cable","Segmentar lógicamente la red en dominios de broadcast","Reemplazar router","Cifrar Wi-Fi"], correct:1},
+  {area:"Redes Avanzadas", q:"Para comunicar VLANs entre sí se requiere:", opts:["Solo switch capa 2","Enrutamiento inter-VLAN (router o switch L3)","DHCP relay únicamente","Cambiar DNS"], correct:1},
+  {area:"Redes Avanzadas", q:"En trunk 802.1Q, se transporta:", opts:["Una sola VLAN nativa","Múltiples VLAN etiquetadas","Solo tráfico IPv6","Solo multicast"], correct:1},
+  {area:"Redes Avanzadas", q:"ACL extendida permite filtrar por:", opts:["Solo IP origen","IP origen/destino, protocolo y puertos","Solo MAC","Solo VLAN ID"], correct:1},
+  {area:"Redes Avanzadas", q:"Regla práctica de ACL en Cisco: al final existe un:", opts:["permit any","deny any implícito","redirect gateway","allow local"], correct:1},
+  {area:"Redes Avanzadas", q:"Dirección loopback IPv6 es:", opts:["::","::1","fe80::1","2001:db8::1"], correct:1},
+  {area:"Redes Avanzadas", q:"Prefijo IPv6 típicamente asignado a LAN:", opts:["/24","/30","/64","/128"], correct:2},
+  {area:"Redes Avanzadas", q:"NAT en IPv4 se usa principalmente para:", opts:["Mejorar latencia","Conservar direcciones públicas","Cifrar tráfico","Asignar VLAN"], correct:1},
+  {area:"Redes Avanzadas", q:"Protocolo que evita bucles en switches capa 2:", opts:["OSPF","STP","BGP","ICMP"], correct:1},
+  {area:"Redes Avanzadas", q:"Comando Linux para ver interfaces e IP:", opts:["ip addr","show ip route","arp -a only","route add"], correct:0},
+  {area:"Redes Avanzadas", q:"En IPv4 privada, rango correcto clase C:", opts:["192.168.0.0/16","169.254.0.0/16","224.0.0.0/4","127.0.0.0/8"], correct:0},
+  {area:"Redes Avanzadas", q:"Si necesitas 14 hosts utilizables, prefijo más ajustado:", opts:["/27","/28","/29","/26"], correct:1},
+  {area:"Redes Avanzadas", q:"¿Qué hace ping?", opts:["Mide throughput HTTP","Verifica conectividad ICMP y latencia aproximada","Configura rutas","Asigna DHCP"], correct:1},
+  {area:"Redes Avanzadas", q:"Si un enlace cae y hay HSRP/VRRP, el efecto esperado es:", opts:["Sin gateway","Conmutación al router de respaldo","Se borra la VLAN","Se apaga DHCP"], correct:1},
+  {area:"Redes Avanzadas", q:"Un /24 tiene máscara:", opts:["255.255.0.0","255.255.255.0","255.255.255.192","255.255.255.252"], correct:1},
+
+  // BI, Minería, Auditoría avanzada (91-100)
+  {area:"BI", q:"¿Qué capa almacena datos históricos corporativos para análisis transversal?", opts:["ODS","Data Warehouse","Cache DNS","Data Lake local temporal"], correct:1},
+  {area:"BI", q:"En OLAP, Roll-up significa:", opts:["Bajar detalle","Subir nivel de agregación","Rotar ejes","Filtrar una dimensión fija"], correct:1},
+  {area:"Minería", q:"En CRISP-DM, la primera fase es:", opts:["Preparación de datos","Modelado","Comprensión del negocio","Despliegue"], correct:2},
+  {area:"Minería", q:"KDD incluye entre sus fases:", opts:["Solo visualización","Selección, preprocesamiento, transformación, minería, evaluación","Solo deploy","Solo entrenamiento"], correct:1},
+  {area:"ML", q:"En matriz de confusión, Precision se calcula como:", opts:["TP/(TP+FN)","TP/(TP+FP)","(TP+TN)/Total","2PR/(P+R)"], correct:1},
+  {area:"DL", q:"Backpropagation se usa para:", opts:["Crear datos sintéticos","Actualizar pesos usando gradientes","Asignar IP","Renderizar dashboards"], correct:1},
+  {area:"IA", q:"ANI, AGI, ASI representan:", opts:["Tipos de redes","Niveles/categorías de capacidad de IA","Protocolos IoT","Formatos de dataset"], correct:1},
+  {area:"Auditoría", q:"Marco orientado a gobierno y gestión TI empresarial:", opts:["COBIT","Docker","PyTorch","Terraform"], correct:0},
+  {area:"Auditoría", q:"Ciclo de mejora continua común en gestión/auditoría:", opts:["PDCA","FIFO","LIFO","CRUD"], correct:0},
+  {area:"Auditoría", q:"RPO en continuidad del negocio se refiere a:", opts:["Tiempo para restaurar","Pérdida máxima de datos aceptable","Costo del incidente","Cantidad de backups"], correct:1}
 ];
 
 const hintsByArea = {
@@ -171,7 +246,12 @@ const hintsByArea = {
   "IA Generativa":"Un buen prompt define contexto, tarea y formato.",
   "Electrónica":"Ley de Ohm: V=I*R y despejes.",
   "IoT":"MQTT es ligero y pub/sub para telemetría.",
-  "Auditoría":"CIA y continuidad: RTO tiempo, RPO pérdida."
+  "Auditoría":"CIA, continuidad (RPO/RTO) y marcos como COBIT/NIST.",
+  "Cloud":"Modelos IaaS/PaaS/SaaS y responsabilidad compartida.",
+  "Docker":"Imagen vs contenedor, comandos y conceptos de aislamiento.",
+  "DevOps":"Pipeline CI/CD, estrategias de despliegue e IaC.",
+  "Redes Avanzadas":"VLAN, trunk, ACL, IPv6, STP, NAT y subneteo.",
+  "Minería":"CRISP-DM y KDD para descubrimiento de patrones."
 };
 
 const moduleByArea = {
@@ -189,12 +269,59 @@ const moduleByArea = {
   "IA":"innovacion.html",
   "Electrónica":"electronica-basica-iot.html",
   "IoT":"electronica-basica-iot.html",
-  "Auditoría":"auditoria.html"
+  "Auditoría":"auditoria.html",
+  "Cloud":"infraestructura-so.html",
+  "Docker":"infraestructura-so.html",
+  "DevOps":"infraestructura-so.html",
+  "Redes Avanzadas":"redes.html",
+  "Minería":"innovacion.html"
 };
+
+let runtimeQuestions = [];
+const answers = {};
+let selectedSection = "Todas";
+let examStarted = false;
+let timerInterval = null;
+let timeLeftSec = 90 * 60;
+
+function seededRandom(seed) {
+  let s = seed % 2147483647;
+  if (s <= 0) s += 2147483646;
+  return function() {
+    s = (s * 16807) % 2147483647;
+    return (s - 1) / 2147483646;
+  };
+}
+
+function shuffleWithRng(arr, rng) {
+  const copy = [...arr];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+function buildRuntimeQuestions(version) {
+  const seed = version === "A" ? 20260323 : 20260324;
+  const rng = seededRandom(seed);
+  const transformed = questions.map((q, idx) => {
+    const optsWithIdx = q.opts.map((opt, i) => ({ opt, originalIdx: i }));
+    const shuffledOpts = shuffleWithRng(optsWithIdx, rng);
+    const newCorrect = shuffledOpts.findIndex(o => o.originalIdx === q.correct);
+    return {
+      ...q,
+      id: idx + 1,
+      opts: shuffledOpts.map(o => o.opt),
+      correct: newCorrect
+    };
+  });
+  return shuffleWithRng(transformed, rng);
+}
 
 function buildStudyMap() {
   const el = document.getElementById("studyMap");
-  const rows = questions.map((q, i) => {
+  const rows = runtimeQuestions.map((q, i) => {
     const mod = moduleByArea[q.area] || "index.html";
     return `<tr><td>${i + 1}</td><td>${q.area}</td><td>${mod}</td><td>${q.q.replace(/<[^>]*>/g,'').slice(0, 95)}...</td></tr>`;
   }).join("");
@@ -208,12 +335,9 @@ function buildStudyMap() {
   `;
 }
 
-const answers = {};
-let selectedSection = "Todas";
-
 function buildSectionFilters() {
   const el = document.getElementById("sectionFilters");
-  const areas = ["Todas", ...new Set(questions.map(q => q.area))];
+  const areas = ["Todas", ...new Set(runtimeQuestions.map(q => q.area))];
   el.innerHTML = areas.map(a => `<button class="sf-btn ${a===selectedSection?'active':''}" data-area="${a}">${a}</button>`).join("");
 }
 
@@ -297,22 +421,22 @@ function getHint(item, idx) {
 
 function renderQuestions() {
   const container = document.getElementById("questions");
-  const source = questions.map((q, i) => ({...q, idx:i}))
-    .filter(item => selectedSection === "Todas" || item.area === selectedSection);
-  container.innerHTML = source.map((item) => {
-    const idx = item.idx;
-    const qn = idx + 1;
+  const source = runtimeQuestions.filter(item => selectedSection === "Todas" || item.area === selectedSection);
+  container.innerHTML = source.map((item, localIdx) => {
+    const qn = localIdx + 1;
     const opts = item.opts.map((op, i) => {
-      const checked = answers[qn] === i ? "checked" : "";
-      return `<label><input type="radio" name="q${qn}" value="${i}" ${checked}> ${op}</label>`;
+      const checked = answers[item.id] === i ? "checked" : "";
+      const disabled = examStarted ? "" : "disabled";
+      return `<label><input type="radio" name="q_${item.id}" value="${i}" ${checked} ${disabled}> ${op}</label>`;
     }).join("");
-    const hint = getHint(item, idx);
+    const hint = getHint(item, item.id - 1);
+    const disabledHint = examStarted ? "" : "disabled";
     return `
       <div class="quiz-q" data-correct="${item.correct}" data-area="${item.area}">
         <div class="area">Área: ${item.area}</div>
         <p><strong>${qn}.</strong> ${item.q}</p>
         ${opts}
-        <button class="hint-toggle" type="button" onclick="toggleHint(this)">💡 Ver pista</button>
+        <button class="hint-toggle" type="button" onclick="toggleHint(this)" ${disabledHint}>💡 Ver pista</button>
         <div class="hint-box">${hint}</div>
       </div>
     `;
@@ -322,14 +446,15 @@ function renderQuestions() {
 
 function updateProgress() {
   const answered = Object.keys(answers).length;
-  document.getElementById('counter').textContent = `${answered}/${questions.length} contestadas`;
-  document.getElementById('bar').style.width = `${(answered / questions.length) * 100}%`;
+  const total = runtimeQuestions.length || 1;
+  document.getElementById('counter').textContent = `${answered}/${runtimeQuestions.length} contestadas`;
+  document.getElementById('bar').style.width = `${(answered / total) * 100}%`;
 }
 
 document.addEventListener('change', (e) => {
   if (e.target.matches('#questions input[type="radio"]')) {
-    const qn = Number(e.target.name.replace("q",""));
-    answers[qn] = Number(e.target.value);
+    const qid = Number(e.target.name.replace("q_",""));
+    answers[qid] = Number(e.target.value);
     updateProgress();
   }
 });
@@ -344,39 +469,96 @@ document.addEventListener('click', (e) => {
 });
 
 function toggleHint(btn) {
+  if (!examStarted) return;
   const box = btn.nextElementSibling;
   const isOpen = box.classList.contains('show');
   box.classList.toggle('show');
   btn.textContent = isOpen ? "💡 Ver pista" : "🙈 Ocultar pista";
 }
 
+function formatTime(sec) {
+  const m = Math.floor(sec / 60).toString().padStart(2, '0');
+  const s = Math.floor(sec % 60).toString().padStart(2, '0');
+  return `${m}:${s}`;
+}
+
+function updateTimerBadge() {
+  document.getElementById('timerBadge').textContent = `⏱️ ${formatTime(timeLeftSec)}`;
+}
+
+function startTimer() {
+  clearInterval(timerInterval);
+  updateTimerBadge();
+  timerInterval = setInterval(() => {
+    timeLeftSec--;
+    updateTimerBadge();
+    if (timeLeftSec <= 0) {
+      clearInterval(timerInterval);
+      lockExam();
+      checkFinalQuiz();
+      const result = document.getElementById('quizResult');
+      result.className = 'result bad';
+      result.textContent += " Tiempo agotado.";
+    }
+  }, 1000);
+}
+
+function startExam() {
+  Object.keys(answers).forEach(k => delete answers[k]);
+  selectedSection = "Todas";
+  const version = document.getElementById('examVersion').value;
+  const mins = Number(document.getElementById('examTime').value);
+  timeLeftSec = mins * 60;
+  runtimeQuestions = buildRuntimeQuestions(version);
+  examStarted = true;
+  buildSectionFilters();
+  renderQuestions();
+  buildStudyMap();
+  startTimer();
+  document.getElementById('startExamBtn').textContent = `Reiniciar ${version}`;
+  document.getElementById('examVersion').disabled = true;
+  document.getElementById('examTime').disabled = true;
+}
+
+function lockExam() {
+  examStarted = false;
+  document.querySelectorAll('#questions input[type="radio"]').forEach(el => el.disabled = true);
+  document.querySelectorAll('.hint-toggle').forEach(el => el.disabled = true);
+}
+
 function checkFinalQuiz() {
-  const qs = document.querySelectorAll('#questions .quiz-q');
   let ok = 0;
   const areaStats = {};
-
-  qs.forEach((q) => {
-    const selected = q.querySelector('input:checked');
-    const correct = Number(q.dataset.correct);
-    const area = q.dataset.area || "General";
+  runtimeQuestions.forEach((q) => {
+    const selected = answers[q.id];
+    const correct = Number(q.correct);
+    const area = q.area || "General";
     if (!areaStats[area]) areaStats[area] = { correct: 0, total: 0 };
     areaStats[area].total++;
-
-    q.style.borderColor = 'var(--line)';
-    q.style.background = 'var(--card)';
-
-    if (selected && Number(selected.value) === correct) {
+    if (selected !== undefined && Number(selected) === correct) {
       ok++;
       areaStats[area].correct++;
-      q.style.borderColor = 'rgba(52,211,153,.75)';
-      q.style.background = 'rgba(52,211,153,.10)';
-    } else {
-      q.style.borderColor = 'rgba(248,113,113,.65)';
-      q.style.background = 'rgba(248,113,113,.08)';
     }
   });
 
-  const total = qs.length;
+  document.querySelectorAll('#questions .quiz-q').forEach((qEl) => {
+    const input = qEl.querySelector('input[type="radio"]');
+    if (!input) return;
+    const qid = Number(input.name.replace("q_",""));
+    const current = runtimeQuestions.find(q => q.id === qid);
+    const selected = answers[qid];
+    qEl.style.borderColor = 'var(--line)';
+    qEl.style.background = 'var(--card)';
+    if (selected !== undefined && current && Number(selected) === Number(current.correct)) {
+      qEl.style.borderColor = 'rgba(52,211,153,.75)';
+      qEl.style.background = 'rgba(52,211,153,.10)';
+    } else if (selected !== undefined) {
+      qEl.style.borderColor = 'rgba(248,113,113,.65)';
+      qEl.style.background = 'rgba(248,113,113,.08)';
+    }
+  });
+
+  const total = runtimeQuestions.length;
   const pct = Math.round((ok / total) * 100);
   const result = document.getElementById('quizResult');
   result.className = 'result ' + (pct >= 70 ? 'ok' : 'bad');
@@ -401,9 +583,12 @@ function checkFinalQuiz() {
     </table>
     <p style="margin:8px 0 0;color:var(--muted);font-size:.82rem">Prioriza primero las áreas en estado "Reforzar".</p>
   `;
+  lockExam();
+  clearInterval(timerInterval);
 }
 
 function resetFinalQuiz() {
+  clearInterval(timerInterval);
   Object.keys(answers).forEach(k => delete answers[k]);
   document.querySelectorAll('#questions .quiz-q').forEach(q => {
     q.style.borderColor = 'var(--line)';
@@ -415,16 +600,25 @@ function resetFinalQuiz() {
   const reportEl = document.getElementById('areaReport');
   reportEl.className = 'area-report';
   reportEl.innerHTML = '';
+  document.getElementById('examVersion').disabled = false;
+  document.getElementById('examTime').disabled = false;
+  document.getElementById('startExamBtn').textContent = "Iniciar simulador";
+  examStarted = false;
+  runtimeQuestions = buildRuntimeQuestions(document.getElementById('examVersion').value);
   selectedSection = "Todas";
+  updateTimerBadge();
   buildSectionFilters();
   renderQuestions();
+  buildStudyMap();
   updateProgress();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+runtimeQuestions = buildRuntimeQuestions("A");
 buildSectionFilters();
 renderQuestions();
 buildStudyMap();
+updateTimerBadge();
 </script>
 </body>
 </html>
